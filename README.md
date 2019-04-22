@@ -32,9 +32,9 @@ Main reasons behing using this script:
 
 * No need to install anything
   * Bash is installed and configured as a default shell on nearly any Linux distro.
-  * This script does NOT install any software on your system. It's designed to create .conf config files and add some IPTABLE rules.
+  * This script does NOT install any software on your system. It's designed to create .conf config files and add some iptables rules.
 * You are in control
-  * Any system changes are shown to the user and user confirmation is rquired BEFORE any changes are made.
+  * Any system changes are shown to the user and user confirmation is required BEFORE any changes are made.
 * Easily readable
   * It's easy to understand the inner workings of the script because bash is a very popular language.
   * Annotations will be added to obscure parts of the script to clarify the logic behind certain operations.
