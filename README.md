@@ -17,6 +17,7 @@ Table of Contents
       * [Using the script](#using-the-script)
          * [Pre-requisites](#pre-requisites)
          * [Usage](#usage)
+      * [Why would I use this script?](#why-use-wireguard-ligase)
       * [Installing Wireguard](#installing-wireguard)
          * [Arch](#arch)
          * [Ubuntu](#ubuntu)
@@ -24,6 +25,19 @@ Table of Contents
          * [Fedora](#fedora)
          * [Others](#others)
       * [Disclaimer](#disclaimer)
+
+## Why use Wireguard-Ligase?
+
+Main reasons behing using this script:
+
+* No need to install anything
+  * Bash is installed and configured as a default shell on nearly any Linux distro.
+  * This script does NOT install any software on your system. It's designed to create .conf config files and add some IPTABLE rules.
+* You are in control
+  * Any system changes are shown to the user and user confirmation is rquired BEFORE any changes are made.
+* Easily readable
+  * It's easy to understand the inner workings of the script because bash is a very popular language.
+  * Annotations will be added to obscure parts of the script to clarify the logic behind certain operations.
 
 ## Using the script
 
