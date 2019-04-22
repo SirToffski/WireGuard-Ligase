@@ -1,7 +1,7 @@
 # Wireguard Ligase
 
 
-> Wireguard Ligase is a collection of bash scripts desidned to easily deploy Wireguard server and configure mulriple client in one go.
+> Wireguard Ligase is a collection of bash scripts designed to easily deploy Wireguard server and configure multiple clients in one go.
 > ![shell screenshot with logo](/doc/shell-screenshot-with-logo.png)
 
 
@@ -28,7 +28,7 @@ Table of Contents
 
 ## Why use Wireguard-Ligase?
 
-Main reasons behing using this script:
+Main reasons behind using this script:
 
 * No need to install anything
   * Bash is installed and configured as a default shell on nearly any Linux distro.
@@ -45,11 +45,11 @@ Using the script is fairly simple. There are a number of requirements for runnin
 
 ### Pre-requisites
 
-1.  A server with a public IP address (DigitalOcean, LightSail, Vultr, etc) runnning Linux.
+1.  A server with a public IP address (DigitalOcean, LightSail, Vultr, etc) running Linux.
 
 2.  Wireguard MUST be installed on the server before running the script. See installation guides for popular Linux distros.
 
-3.  A user with sudo privilidges for making any system changes.
+3.  A user with sudo privileges for making any system changes.
 
 ### Usage
 
@@ -94,6 +94,6 @@ For other Operating Systems, please check the [**official website**](https://www
 
 ## Disclaimer
 
-The plan is to keep this updated and add features until the project reaches it’s logical conclusion.
+The plan is to keep this updated and add features until the project reaches its logical conclusion.
 
-Everyone is welcome to fork / contribute / use parts of the or the entire project.
+Everyone is welcome to fork / contribute / use parts any or all parts of the project.
