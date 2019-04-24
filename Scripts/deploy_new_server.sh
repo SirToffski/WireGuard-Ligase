@@ -222,7 +222,7 @@ fi
 
 echo "-----------------"
 
-echho "Before ending this script, would you like to setup IPTABLES for the new server?
+echo "Before ending this script, would you like to setup IPTABLES for the new server?
 
 1 = yes, 2 = no
 "
