@@ -228,7 +228,7 @@ echo "Before ending this script, would you like to setup IPTABLES for the new se
 "
 read -r iptables_setup
 if [[ $iptables_setup == 1 ]]; then
- sudo bash setup_iptables.sh
+ sudo bash "$my_working_dir"/Scripts/setup_iptables.sh
 else
   echo "Sounds good. Ending the scritp..."
 fi
