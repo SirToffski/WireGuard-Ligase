@@ -27,11 +27,11 @@ read -r generate_server_key
 
 check_for_keys_directory=$(ls "$my_working_dir" | grep -c --count keys)
 
-if  [[ "$generate_server_key" == 1 ]] && [[$check_for_keys_directory -ge 1]]; then
+if  [[ "$generate_server_key" == 1 ]] && [[ $check_for_keys_directory -ge 1 ]]; then
   wg genkey | tee "$my_working_dir"/keys/ServerPrivatekey | wg pubkey > "$my_working_dir"/keys/ServerPublickey
   chmod 600 "$my_working_dir"/keys/ServerPrivatekey && chmod 600 "$my_working_dir"/keys/ServerPublickey
   
-elif [[ "$generate_server_key" == 1 ]] && [[$check_for_keys_directory == 0]]; then
+elif [[ "$generate_server_key" == 1 ]] && [[ $check_for_keys_directory == 0 ]]; then
   mkdir keys
   wg genkey | tee "$my_working_dir"/keys/ServerPrivatekey | wg pubkey > "$my_working_dir"/keys/ServerPublickey
   chmod 600 "$my_working_dir"/keys/ServerPrivatekey && chmod 600 "$my_working_dir"/keys/ServerPublickey
