@@ -103,6 +103,12 @@ Configure clients?
 
 read -r client_config_answer
 
+check_for_clients_directory=$(ls "$my_working_dir" | grep -c --count client_configs)
+
+if [[ $check_for_clients_directory == 0 ]]; then
+  mkdir client_configs
+fi
+
 if [[ "$client_config_answer" == 1 ]]; then
   echo "
   How many clients would you like to configure?
