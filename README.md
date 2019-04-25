@@ -92,6 +92,11 @@ The script will guide you through the rest of the process.
 
 For other Operating Systems, please check the [**official website**](https://www.wireguard.com/install/).
 
+## Changelog
+
+* April 24th, 2019
+** Script to deploy the server would exit with an error if $pwd/keys/ and $pwd/client_confings/ did not exist during key creation.Logic to pre-check if the directory exists and to create one if needed was added. Script is now fully functional. 
+
 ## Disclaimer
 
 The plan is to keep this updated and add features until the project reaches its logical conclusion.
