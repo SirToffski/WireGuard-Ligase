@@ -24,6 +24,7 @@ Table of Contents
          * [RHEL / CentOS](#rhel--centos)
          * [Fedora](#fedora)
          * [Others](#others)
+      * [Changelog](#changelog)
       * [Disclaimer](#disclaimer)
 
 ## Why use Wireguard-Ligase?
@@ -95,7 +96,7 @@ For other Operating Systems, please check the [**official website**](https://www
 ## Changelog
 
 * April 24th, 2019
-** Script to deploy the server would exit with an error if $pwd/keys/ and $pwd/client_confings/ did not exist during key creation.Logic to pre-check if the directory exists and to create one if needed was added. Script is now fully functional. 
+  * Script to deploy the server would exit with an error if $pwd/keys/ and $pwd/client_confings/ did not exist during key creation.Logic to pre-check if the directory exists and to create one if needed was added. Script is now fully functional. 
 
 ## Disclaimer
 
