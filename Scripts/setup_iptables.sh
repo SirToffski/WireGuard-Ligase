@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 echo "
 We are going to setup some basic iptables so the server can function correctly.
