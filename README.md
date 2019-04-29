@@ -102,6 +102,7 @@ For other Operating Systems, please check the [**official website**](https://www
   * Similar pre-check as the above was added to the scipt to configure clients only.
   * All bash was updated with a new shebang.
   * New image generated with Carbon-cli instead of a screenshot.
+  * Text colours and styling were added to improve readability.
 
 ## Disclaimer
 
