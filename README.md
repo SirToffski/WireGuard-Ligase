@@ -98,6 +98,10 @@ For other Operating Systems, please check the [**official website**](https://www
 
 * April 24th, 2019
   * Script to deploy the server would exit with an error if $pwd/keys/ and $pwd/client_confings/ did not exist during key creation.Logic to pre-check if the directory exists and to create one if needed was added. Script is now fully functional.
+* April 24th, 2019
+  * Similar pre-check as the above was added to the scipt to configure clients only.
+  * All bash was updated with a new shebang.
+  * New image generated with Carbon-cli instead of a screenshot.
 
 ## Disclaimer
 
