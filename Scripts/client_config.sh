@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 
 my_working_dir=$(pwd)
+check_for_keys_directory=$(ls "$my_working_dir" | grep -c --count keys)
+
+if [[ $check_for_keys_directory == 0 ]]; then
+  mkdir keys
+fi
 
 echo " This script will help in easily generating client config for WireGuard."
 
@@ -36,6 +41,8 @@ for (( i = 1; i <= "$number_of_clients"; i++ )); do
   echo "
   Provide the name of the client
   "
+
+
   read -r client_name_[$i]
 
   wg genkey | tee "$my_working_dir"/keys/"${client_name_["$i"]}"Privatekey | wg pubkey > "$my_working_dir"/keys/"${client_name_["$i"]}"Publickey
