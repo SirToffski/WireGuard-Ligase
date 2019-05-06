@@ -88,8 +88,8 @@ if [[ "$save_server_config" == 1 ]]; then
   Example: wg0
   "
   read -r config_file_name
-  check_for_existing_config=$(ls /etc/wireguard/ | grep -c --count "$config_file_name".conf)
-  if [[ $save_server_config == 1 ]] && [[ $save_server_config -ge $check_for_existing_config ]]; then
+  check_for_existing_config=$(ls /etc/wireguard/ | grep -c --count "$config_file_name")
+  if [[ $save_server_config == 1 ]] && [[ $check_for_existing_config -ge $save_server_config ]]; then
     echo "
     Found existing config file with the same name. Backing up to /etc/wireguard/$config_file_name.conf.bak"
 
