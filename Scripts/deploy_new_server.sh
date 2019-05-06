@@ -232,7 +232,7 @@ ${BWhite}1 = yes, 2 = no${Color_Off}
 
 read -r enable_on_boot
 
-if [[ $enable_on_boot == 1 ]] && [[ $check_for_existing_config -ge $save_server_config ]]; then
+if [[ $enable_on_boot == 1 ]] && [[ $check_for_existing_config -ge $enable_on_boot ]]; then
   chown -v root:root /etc/wireguard/"$config_file_name".conf
   chmod -v 600 /etc/wireguard/"$config_file_name".conf
   wg-quick up "$config_file_name"
