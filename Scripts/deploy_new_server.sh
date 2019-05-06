@@ -225,6 +225,36 @@ fi
 
 echo "-----------------"
 
+echo -e "${IWhite}Almost done! Would you like to bring WireGuard interface up and to enable the service on boot?${Color_Off}
+
+${BWhite}1 = yes, 2 = no${Color_Off}
+"
+
+read -r enable_on_boot
+
+if [[ $enable_on_boot == 1 ]] && [[ $check_for_existing_config -ge $save_server_config ]]; then
+  chown -v root:root /etc/wireguard/"$config_file_name".conf
+  chmod -v 600 /etc/wireguard/"$config_file_name".conf
+  wg-quick up "$config_file_name"
+  systemctl enable wg-quick@"$config_file_name".service
+elif [[ $enable_on_boot == 1 ]] && [[ $check_for_existing_config -le "0" ]]; then
+  echo -e "${IWhite} Existing config/interface was not found. Please specify server config filename without .conf part.
+
+  Example: for /etc/wireguard/wg0.conf, type wg0${Color_Off}"
+  read -r existing_server_interface
+  chown -v root:root /etc/wireguard/"$existing_server_interface".conf
+  chmod -v 600 /etc/wireguard/"$existing_server_interface".conf
+  wg-quick up "$existing_server_interface"
+  systemctl enable wg-quick@"$existing_server_interface".service
+elif [[ $enable_on_boot == 2 ]] && [[ $check_for_existing_config -ge $save_server_config ]]; then
+  echo -e "${IWhite} To manually enable the service and bring tunnel interface up, the following commands can be used:${Color_Off}"
+  echo -e "
+  ${IYellow}chown -v root:root /etc/wireguard/$config_file_name.conf
+  chmod -v 600 /etc/wireguard/$config_file_name.conf
+  wg-quick up $config_file_name
+  systemctl enable wg-quick@$config_file_name.service${Color_Off}"
+fi
+
 echo -e "${IWhite}Before ending this script, would you like to setup IPTABLES for the new server?${Color_Off}
 
 ${BWhite}1 = yes, 2 = no${Color_Off}
