@@ -233,6 +233,15 @@ ${BWhite}1 = yes, 2 = no${Color_Off}
 read -r enable_on_boot
 
 if [[ $enable_on_boot == 1 ]] && [[ $check_for_existing_config -ge $enable_on_boot ]]; then
+  echo -e "
+  ${IYellow}chown -v root:root /etc/wireguard/$config_file_name.conf
+  chmod -v 600 /etc/wireguard/$config_file_name.conf
+  wg-quick up $config_file_name
+  systemctl enable wg-quick@$config_file_name.service${Color_Off}"
+  read -n 1 -s -r -p "
+  Review the above commands.
+
+  Press any key to continue or CTRL+C to stop."
   chown -v root:root /etc/wireguard/"$config_file_name".conf
   chmod -v 600 /etc/wireguard/"$config_file_name".conf
   wg-quick up "$config_file_name"
@@ -242,6 +251,15 @@ elif [[ $enable_on_boot == 1 ]] && [[ $check_for_existing_config -le "0" ]]; the
 
   Example: for /etc/wireguard/wg0.conf, type wg0${Color_Off}"
   read -r existing_server_interface
+  echo -e "
+  ${IYellow}chown -v root:root /etc/wireguard/$existing_server_interface.conf
+  chmod -v 600 /etc/wireguard/$existing_server_interface.conf
+  wg-quick up $existing_server_interface
+  systemctl enable wg-quick@$existing_server_interface.service${Color_Off}"
+  read -n 1 -s -r -p "
+  Review the above commands.
+
+  Press any key to continue or CTRL+C to stop."
   chown -v root:root /etc/wireguard/"$existing_server_interface".conf
   chmod -v 600 /etc/wireguard/"$existing_server_interface".conf
   wg-quick up "$existing_server_interface"
