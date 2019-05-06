@@ -103,6 +103,13 @@ For other Operating Systems, please check the [**official website**](https://www
   * All bash was updated with a new shebang.
   * New image generated with Carbon-cli instead of a screenshot.
   * Text colours and styling were added to improve readability.
+* May 6th, 2019
+  * Bugfixes:
+    * Client config portion of the script had a syntax error reading `AllowedIPd` instead of `AllowedIPs`. This has been corrected.
+    * Option to enable IP forwarding would change the value to `net.ipv4.ip_forward=1`, but would not uncomment it. This was fixed.
+  * New features:
+    * An option to install iptables-persistend and to enable systemctl service was added.
+    * An option to enable WireGuard tunnel interface and to enable the interface on boot was added.
 
 ## Disclaimer
 
