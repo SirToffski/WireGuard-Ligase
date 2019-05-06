@@ -179,7 +179,7 @@ if [[ $configure_server_with_clients == 1 ]] && [[ $save_server_config == 1 ]]; 
     echo "
 [Peer]
 PublicKey = ${client_public_key_["$a"]}
-AllowedIPd = ${client_private_address_["$a"]}/32
+AllowedIPs = ${client_private_address_["$a"]}/32
 " >> /etc/wireguard/"$config_file_name".conf
   done
 elif [[ $configure_server_with_clients == 1 ]] && [[ $check_server_config_name == 1 ]]; then
@@ -192,7 +192,7 @@ elif [[ $configure_server_with_clients == 1 ]] && [[ $check_server_config_name =
     echo "
 [Peer]
 PublicKey = ${client_public_key_["$b"]}
-AllowedIPd = ${client_private_address_["$b"]}/32
+AllowedIPs = ${client_private_address_["$b"]}/32
 " >> /etc/wireguard/wg0.conf
   done
 
@@ -205,7 +205,7 @@ elif [[  $configure_server_with_clients == 1 ]] && [[ $check_server_config_name 
     echo "
 [Peer]
 PublicKey = ${client_public_key_["$c"]}
-AllowedIPd = ${client_private_address_["$c"]}/32
+AllowedIPs = ${client_private_address_["$c"]}/32
 " >> /etc/wireguard/"$server_file_for_clients".conf
   done
 else

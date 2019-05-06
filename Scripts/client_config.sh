@@ -89,7 +89,7 @@ if [[ $configure_server_with_clients == 1 ]]; then
     echo "
   [Peer]
   PublicKey = ${client_public_key_["$c"]}
-  AllowedIPd = ${client_private_address_["$c"]}/32
+  AllowedIPs = ${client_private_address_["$c"]}/32
   " >> /etc/wireguard/"$server_file_for_clients".conf
   done
 else
