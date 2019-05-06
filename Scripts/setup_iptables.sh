@@ -57,7 +57,7 @@ Review the above commands.
 
 Press any key to continue or CTRL+C to stop."
 
-sed -i 's/net.ipv4.ip_forward=0/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
+sed -i 's/#net.ipv4.ip_forward=0/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
 sysctl -p
 
 iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
@@ -66,6 +66,29 @@ iptables -A INPUT -p udp -m udp --dport "$listen_port" -m conntrack --ctstate NE
 iptables -A FORWARD -i "$interface_name" -o "$interface_name" -m conntrack --ctstate NEW -j ACCEPT
 iptables -t nat -A POSTROUTING -s "$server_subnet" -o eth0 -j MASQUERADE
 
-echo "Done!
+echo "Done!"
 
+echo "
+In order to make the above iptables rules persistent after system reboot,
+iptables-persistent need to be installed.
+
+Would you like the script to install iptables-persistent and enabled the service?
+
+Following commands would be used:
+
+
+apt-get install iptables-persistent
+systemctl enable netfilter-persistent
+netfilter-persistent save"
+
+read -n 1 -s -r -p "
+Review the above commands.
+
+Press any key to continue or CTRL+C to stop."
+
+apt-get install iptables-persistent
+systemctl enable netfilter-persistent
+netfilter-persistent save
+
+echo "
 Ending the script...."
