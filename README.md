@@ -115,4 +115,4 @@ For other Operating Systems, please check the [**official website**](https://www
 
 The plan is to keep this updated and add features until the project reaches its logical conclusion.
 
-Everyone is welcome to fork / contribute / use parts any or all parts of the project.
+Everyone is welcome to fork / contribute / use any or all parts of the project.
