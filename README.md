@@ -34,7 +34,8 @@ Main reasons behind using this script:
 
 * No need to install anything
   * Bash is installed and configured as a default shell on nearly any Linux distro.
-  * This script does NOT install any software on your system. It's designed to create .conf config files and add some iptables rules.
+  * ~~This script does NOT install any software on your system.~~ It's designed to create .conf config files and add some iptables rules.
+    * The aforementioned point regarding the script not installing any software does not apply since an option to install iptables-persistent on Ubuntu has been added on the 6th of May 2019.
 * You are in control
   * Any system changes are shown to the user and user confirmation is required BEFORE any changes are made.
 * Easily readable
