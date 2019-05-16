@@ -74,7 +74,9 @@ echo "
 In order to make the above iptables rules persistent after system reboot,
 iptables-persistent need to be installed.
 
-Would you like the script to install iptables-persistent and enabled the service?
+Would you like the script to install iptables-persistent and to enable the service?
+
+NOTE: * At this time this applies to Ubuntu only *
 
 Following commands would be used:
 
