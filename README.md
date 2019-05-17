@@ -26,6 +26,7 @@ Table of Contents
          * [Fedora](#fedora)
          * [Others](#others)
       * [Changelog](#changelog)
+      * [TODO](#todo)
       * [Disclaimer](#disclaimer)
 
 ## Why use Wireguard-Ligase?
@@ -111,6 +112,12 @@ For other Operating Systems, please check the [**official website**](https://www
   * New features:
     * An option to install iptables-persistent and to enable systemctl service was added.
     * An option to enable WireGuard tunnel interface and to enable the interface on boot was added.
+    
+## TODO
+
+  * Add an option for a quick hands-free server deployment / host configuration. Especially useful for people who dont want to answer a lot of questions and are not too fussy about naming clients, etc.
+  * Customize server config depending on the distro in use (Arch vs Ubuntu, vs RHEL, etc)
+  * Add option to configure other UNIX OS types (such as OpenBSD)
 
 ## Disclaimer
 
