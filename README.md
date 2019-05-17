@@ -58,39 +58,40 @@ Using the script is fairly simple. There are a number of requirements for runnin
 ### Usage
 
 As mentioned before, using the script is very simple.
+```bash
+$ git clone https://github.com/SirToffski/WireGuard-Ligase.git # (1) Clone the repository.
+$ cd WireGuard-Ligase/ # (2) cd into the repository.
+$ bash configure-wireguard.sh # (3) Run the script.
+```
 
-    $ git clone https://github.com/SirToffski/WireGuard-Ligase.git (1)
-    $ cd WireGuard-Ligase/ (2)
-    $ bash configure-wireguard.sh (3)
-
-1. Clone the repository.
-2. cd into the repository.
-3. Run the script.
 
 The script will guide you through the rest of the process.
 
 ## Installing Wireguard
 
 ### Arch
-
-    $ sudo pacman -S wireguard-tools
-
+```bash
+$ sudo pacman -S wireguard-tools
+```
 ### Ubuntu
-
-    $ sudo add-apt-repository ppa:wireguard/wireguard
-    $ sudo apt-get update
-    $ sudo apt-get install wireguard
+```bash
+$ sudo add-apt-repository ppa:wireguard/wireguard
+$ sudo apt-get update
+$ sudo apt-get install wireguard
+```
 
 ### RHEL / CentOS
-
-    $ sudo curl -Lo /etc/yum.repos.d/wireguard.repo https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo
-    $ sudo yum install epel-release
-    $ sudo yum install wireguard-dkms wireguard-tools
+```bash
+$ sudo curl -Lo /etc/yum.repos.d/wireguard.repo https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo
+$ sudo yum install epel-release
+$ sudo yum install wireguard-dkms wireguard-tools
+```
 
 ### Fedora
-
-    $ sudo dnf copr enable jdoss/wireguard
-    $ sudo dnf install wireguard-dkms wireguard-tools
+```bash
+$ sudo dnf copr enable jdoss/wireguard
+$ sudo dnf install wireguard-dkms wireguard-tools
+```
 
 ### Others
 
