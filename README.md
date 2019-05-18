@@ -1,7 +1,4 @@
 ![shell screenshot with logo](/doc/icon-left-font-monochrome-black.svg)
-
-# Wireguard Ligase
-
 > Wireguard Ligase is a collection of bash scripts designed to easily deploy Wireguard server and configure multiple clients in one go.
 
 The main goals of Wireguard Ligase are:
@@ -12,7 +9,6 @@ The main goals of Wireguard Ligase are:
 Table of Contents
 =================
 
-   * [Wireguard Ligase](#wireguard-ligase)
       * [Using the script](#using-the-script)
          * [Pre-requisites](#pre-requisites)
          * [Usage](#usage)
