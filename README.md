@@ -3,7 +3,7 @@
 
 > Wireguard Ligase is a collection of bash scripts designed to easily deploy Wireguard server and configure multiple clients in one go.
 
-![shell screenshot with logo](/doc/carbon-WG.png)
+![shell screenshot with logo](/doc/WGL.png)
 
 
 The main goals of Wireguard Ligase are:
@@ -113,7 +113,7 @@ For other Operating Systems, please check the [**official website**](https://www
   * New features:
     * An option to install iptables-persistent and to enable systemctl service was added.
     * An option to enable WireGuard tunnel interface and to enable the interface on boot was added.
-    
+
 ## TODO
 
   * Add an option for a quick hands-free server deployment / host configuration. Especially useful for people who dont want to answer a lot of questions and are not too fussy about naming clients, etc.
