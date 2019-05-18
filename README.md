@@ -9,19 +9,19 @@ The main goals of Wireguard Ligase are:
 Table of Contents
 =================
 
-      * [Using the script](#using-the-script)
-         * [Pre-requisites](#pre-requisites)
-         * [Usage](#usage)
-      * [Why would I use this script?](#why-use-wireguard-ligase)
-      * [Installing Wireguard](#installing-wireguard)
-         * [Arch](#arch)
-         * [Ubuntu](#ubuntu)
-         * [RHEL / CentOS](#rhel--centos)
-         * [Fedora](#fedora)
-         * [Others](#others)
-      * [Changelog](#changelog)
-      * [TODO](#todo)
-      * [Disclaimer](#disclaimer)
+  * [Using the script](#using-the-script)
+     * [Pre-requisites](#pre-requisites)
+     * [Usage](#usage)
+  * [Why would I use this script?](#why-use-wireguard-ligase)
+  * [Installing Wireguard](#installing-wireguard)
+     * [Arch](#arch)
+     * [Ubuntu](#ubuntu)
+     * [RHEL / CentOS](#rhel--centos)
+     * [Fedora](#fedora)
+     * [Others](#others)
+  * [Changelog](#changelog)
+  * [TODO](#todo)
+  * [Disclaimer](#disclaimer)
 
 ## Why use Wireguard-Ligase?
 
