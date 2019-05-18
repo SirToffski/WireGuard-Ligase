@@ -1,7 +1,7 @@
 # Wireguard Ligase
 
 
-![shell screenshot with logo](/doc/WGL.png)
+![shell screenshot with logo](/doc/icon-left-font-monochrome-black.svg)
 
 > Wireguard Ligase is a collection of bash scripts designed to easily deploy Wireguard server and configure multiple clients in one go.
 
