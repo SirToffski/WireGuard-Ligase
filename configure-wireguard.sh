@@ -14,7 +14,8 @@
 # Q: Why another WG configuration script?
 # A: Why not?
 # Q: ....Ligase???
-# A: Search on Wikipedia
+# A: In biochemistry, a ligase is an enzyme that can catalyze the joining of two large molecules by forming a new chemical bond -
+# - https://en.wikipedia.org/wiki/Ligase (May 19th, 2019)
 
 
 my_working_dir=$(pwd)
