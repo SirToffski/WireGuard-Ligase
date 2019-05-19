@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 my_working_dir=$(pwd)
-source "$my_working_dir"/doc/colours.sh
+source "$(find ~ | grep WireGuard-Ligase/doc/colours.sh)"
 
 ######################## Pre-checks ##############################
 # Check if a directory /keys/ exists, if not, it will be made

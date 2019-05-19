@@ -20,7 +20,7 @@
 
 my_working_dir=$(pwd)
 
-source "$my_working_dir"/doc/colours.sh
+source "$(find ~ | grep WireGuard-Ligase/doc/colours.sh)"
 
 logo=$(cat "$my_working_dir"/doc/ascii-logo)
 
