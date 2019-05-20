@@ -36,15 +36,19 @@ echo -e "
 Let's begin. Please select from one of the following options:
 -----------------------------------
 
-${BWhite}1 = I would like to configure a new server and clients from scratch.${Color_Off}
+${BWhite}1 = Quick Setup. You will only be asked to specify public server IP.${Color_Off}
 
 -----------------------------------
 
-${BWhite}2 = I just need to generate some client configs and add those to an existing server.${Color_Off}
+${BWhite}2 = Advanced Setup: I would like to configure a new server and clients from scratch.${Color_Off}
 
 -----------------------------------
 
-${BWhite}3 = I just need commands to configure IPTABLEs.${Color_Off}
+${BWhite}3 = Clients only: I just need to generate some client configs and add those to an existing server.${Color_Off}
+
+-----------------------------------
+
+${BWhite}4 = IPTABLES: I just need commands to configure IPTABLEs.${Color_Off}
 
 ----------------------------------"
 
@@ -52,12 +56,15 @@ read -r scope_of_script
 
 case "$scope_of_script" in
   "1")
-  sudo bash "$(find /home | grep WireGuard-Ligase/Scripts/deploy_new_server.sh)"
+  sudo bash "$(find /home | grep WireGuard-Ligase/Scripts/quick_setup.sh)"
     ;;
   "2")
-  sudo bash "$(find /home | grep WireGuard-Ligase/Scripts/client_config.sh)"
+  sudo bash "$(find /home | grep WireGuard-Ligase/Scripts/deploy_new_server.sh)"
     ;;
   "3")
+  sudo bash "$(find /home | grep WireGuard-Ligase/Scripts/client_config.sh)"
+    ;;
+  "4")
   sudo bash "$(find /home | grep WireGuard-Ligase/Scripts/setup_iptables.sh)"
     ;;
   *)
