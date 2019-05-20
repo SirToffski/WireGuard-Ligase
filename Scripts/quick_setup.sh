@@ -11,7 +11,7 @@ client_dns="1.1.1.1"
 number_of_clients="2"
 client_private_address_1="10.253.254.2"
 client_private_address_2="10.253.254.3"
-config_file_name="wg_0"
+config_file_name="wg0"
 server_subnet="10.253.254.0/24"
 ##########################################################################
 
