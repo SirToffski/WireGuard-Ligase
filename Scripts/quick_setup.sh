@@ -5,14 +5,14 @@ find_colours_dir="$(find /home | grep /WireGuard-Ligase/doc/colours.sh)"
 source "$find_colours_dir"
 my_separator="--------------------------------------"
 ############################ DEFINE VARIABLES ############################
-server_private_range="10.253.254.1"
-server_listen_port="9201"
+server_private_range="10.10.100.1"
+server_listen_port="51820"
 client_dns="1.1.1.1"
 number_of_clients="2"
-client_private_address_1="10.253.254.2"
-client_private_address_2="10.253.254.3"
+client_private_address_1="10.10.100.2"
+client_private_address_2="10.10.100.3"
 config_file_name="wg0"
-server_subnet="10.253.254.0/24"
+server_subnet="10.10.100.0/24"
 ##########################################################################
 
 ######################## Pre-checks ######################################################
