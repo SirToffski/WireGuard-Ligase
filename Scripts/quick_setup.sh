@@ -119,7 +119,7 @@ case "$proceed_quick_setup" in
   # Saving server config
   echo -e "
   ${BGreen}Saving server config${Color_Off}"
-  echo "$new_server_config" > server_config.txt && echo "$new_server_config" > /etc/wireguard/wg_0.conf
+  echo "$new_server_config" > "$config_file_name".txt && echo "$new_server_config" > /etc/wireguard/"$config_file_name".conf
   # Generating client keys
   for (( i = 1; i <= "$number_of_clients"; i++ )); do
     wg genkey | tee "$my_working_dir"/keys/client_"$i"_Privatekey | wg pubkey > "$my_working_dir"/keys/client_"$i"_Publickey
