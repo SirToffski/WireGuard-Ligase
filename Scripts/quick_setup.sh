@@ -5,29 +5,29 @@ find_colours_dir="$(find /home | grep /WireGuard-Ligase/doc/colours.sh)"
 source "$find_colours_dir"
 my_separator="--------------------------------------"
 ############################ DEFINE VARIABLES ############################
-server_private_range="10.253.254.1"#######################################
-server_listen_port="9201"#################################################
-client_dns="1.1.1.1"######################################################
-number_of_clients="2"#####################################################
-client_private_address_1="10.253.254.2"###################################
-client_private_address_2="10.253.254.3"###################################
-config_file_name="wg_0"###################################################
-server_subnet="10.253.254.0/24"###########################################
+server_private_range="10.253.254.1"
+server_listen_port="9201"
+client_dns="1.1.1.1"
+number_of_clients="2"
+client_private_address_1="10.253.254.2"
+client_private_address_2="10.253.254.3"
+config_file_name="wg_0"
+server_subnet="10.253.254.0/24"
 ##########################################################################
 
 ######################## Pre-checks ######################################################
-# Check if a directory /keys/ exists, if not, it will be made                            #
-check_for_keys_directory=$(ls "$my_working_dir" | grep -c --count keys)                  #
-if [[ $check_for_keys_directory == 0 ]]; then                                            #
-  mkdir keys                                                                             #
-fi                                                                                       #
+# Check if a directory /keys/ exists, if not, it will be made
+check_for_keys_directory=$(ls "$my_working_dir" | grep -c --count keys)
+if [[ $check_for_keys_directory == 0 ]]; then
+  mkdir keys
+fi
                                                                                          #
-# Check if a directory /client_configs/ exists, if not, it will be made                  #
-check_for_clients_directory=$(ls "$my_working_dir" | grep -c --count client_configs)     #
-                                                                                         #
-if [[ $check_for_clients_directory == 0 ]]; then                                         #
-  mkdir client_configs                                                                   #
-fi                                                                                       #
+# Check if a directory /client_configs/ exists, if not, it will be made
+check_for_clients_directory=$(ls "$my_working_dir" | grep -c --count client_configs)
+
+if [[ $check_for_clients_directory == 0 ]]; then
+  mkdir client_configs
+fi
 ##########################################################################################
 
 echo -e "
@@ -49,7 +49,7 @@ chmod -v 600 ${BRed}/etc/wireguard/$config_file_name.conf${IYellow}
 wg-quick up ${BRed}$config_file_name${IYellow}
 systemctl enable wg-quick@${BRed}${IYellow}$config_file_name.service${Color_Off}
 -----------------------------------------------------------------------
-10) iptables:
+${IWhite}10) iptables:${Color_Off}
 # Track VPN connection
 ${IYellow}iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT${Color_Off}
@@ -87,7 +87,7 @@ echo -e "$my_separator"
 read -r server_public_address
 echo -e "$my_separator"
 
-echo -e"
+echo -e "
 ${BWhite}Review the above. Do you wish to proceed? (y/n)${Color_Off}"
 
 read -r proceed_quick_setup
@@ -197,7 +197,9 @@ TODO:
   "n"|"N")
   echo -e "
   Ending the script...."
+  exit
     ;;
   *)
   echo -e "${BRed}Sorry, wrong choise. Rerun the script and try again${Color_Off}"
+  exit
 esac
