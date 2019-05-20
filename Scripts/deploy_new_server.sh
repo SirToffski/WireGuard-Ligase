@@ -178,11 +178,11 @@ Endpoint = $server_public_address:$server_listen_port
 AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 21" > "$my_working_dir"/client_configs/"${client_name_["$i"]}".conf
   done
-else
   echo -e "
 Awesome!
-Client config files were saved to ${IWhite}$my_working_dir/client_configs/${Color_Off}
-
+Client config files were saved to ${IWhite}$my_working_dir/client_configs/${Color_Off}"
+else
+  echo -e "
 ${IWhite}Before ending this script, would you like to setup IPTABLES for the new server?${Color_Off}
 
 ${BWhite}1 = yes, 2 = no${Color_Off}
@@ -191,6 +191,7 @@ ${BWhite}1 = yes, 2 = no${Color_Off}
   if [[ $iptables_setup == 1 ]]; then
     sudo bash setup_iptables.sh
   fi
+  echo -e "Ending the script...."
   exit
 fi
 
