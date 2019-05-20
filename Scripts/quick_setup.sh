@@ -129,30 +129,56 @@ case "$proceed_quick_setup" in
 
     client_private_key_["$i"]=$(cat "$my_working_dir"/keys/client_"$i"_Privatekey)
     client_public_key_["$i"]=$(cat "$my_working_dir"/keys/client_"$i"_Publickey)
-    # Generating client configs
-    echo -e "
-    ${BGreen}Generating client configs${Color_Off}"
-    echo "
+  done
+  # Generating client 1 config
+  echo -e "
+${BGreen}Generating client 1 config${Color_Off}"
+  echo "
 [Interface]
-Address = ${client_private_address_["$i"]}
-PrivateKey = ${client_private_key_["$i"]}
+Address = $client_private_address_1
+PrivateKey = $client_private_key_1
 DNS = $client_dns
 
 [Peer]
 PublicKey = $sever_public_key_output
 Endpoint = $server_public_address:$server_listen_port
 AllowedIPs = 0.0.0.0/0
-PersistentKeepalive = 21" > "$my_working_dir"/client_configs/"${client_name_["$i"]}".conf
-    # Adding client info to the server config
-    echo -e "
-    ${BGreen}Adding client info to the server config${Color_Off}"
-    echo -e "
-[Peer]
-PublicKey = ${client_public_key_["$i"]}
-AllowedIPs = ${client_private_address_["$i"]}/32
-" >> /etc/wireguard/"$config_file_name".conf
-  done
+PersistentKeepalive = 21" > "$my_working_dir"/client_configs/client_1.conf
 
+# Generating client 1 config
+echo -e "
+${BGreen}Generating client 2 config${Color_Off}"
+echo "
+[Interface]
+Address = $client_private_address_2
+PrivateKey = $client_private_key_2
+DNS = $client_dns
+
+[Peer]
+PublicKey = $sever_public_key_output
+Endpoint = $server_public_address:$server_listen_port
+AllowedIPs = 0.0.0.0/0
+PersistentKeepalive = 21" > "$my_working_dir"/client_configs/client_2.conf
+
+# Adding client 1 info to the server config
+
+  echo -e "
+  ${BGreen}Adding client 1 info to the server config${Color_Off}"
+  echo -e "
+[Peer]
+PublicKey = $client_public_key_1
+AllowedIPs = $client_private_address_1/32
+" >> /etc/wireguard/"$config_file_name".conf
+
+# Adding client 2 info to the server config
+
+echo -e "
+${BGreen}Adding client 2 info to the server config${Color_Off}"
+echo -e "
+[Peer]
+PublicKey = $client_public_key_2
+AllowedIPs = $client_private_address_2/32
+" >> /etc/wireguard/"$config_file_name".conf
   ####### ENABLE wg_0 INTERFACE AND SERVICE  BEGINS #######
   echo -e "
   ${BGreen}ENABLE wg_0 INTERFACE AND SERVICE${Color_Off}"
