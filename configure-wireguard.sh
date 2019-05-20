@@ -20,9 +20,9 @@
 
 my_working_dir=$(pwd)
 
-source "$(find ~ | grep WireGuard-Ligase/doc/colours.sh)"
+source "$(find /home | grep /WireGuard-Ligase/doc/colours.sh)"
 
-logo=$(cat "$my_working_dir"/doc/ascii-logo)
+logo=$(cat $(find /home | grep /WireGuard-Ligase/doc/ascii-logo))
 
 echo -e "${BPurple}$logo${Color_Off}"
 
@@ -50,12 +50,16 @@ ${BWhite}3 = I just need commands to configure IPTABLEs.${Color_Off}
 
 read -r scope_of_script
 
-if [[ $scope_of_script == 1 ]]; then
-  sudo bash "$my_working_dir"/Scripts/deploy_new_server.sh
-elif [[ $scope_of_script == 2 ]]; then
-  sudo bash "$my_working_dir"/Scripts/client_config.sh
-elif [[ $scope_of_script == 3 ]]; then
-  sudo bash "$my_working_dir"/Scripts/setup_iptables.sh
-else
-  echo "Sorry, wrong choise. Rerun the script and try again"
-fi
+case "$scope_of_script" in
+  "1")
+  sudo bash "$(find /home | grep WireGuard-Ligase/Scripts/deploy_new_server.sh)"
+    ;;
+  "2")
+  sudo bash "$(find /home | grep WireGuard-Ligase/Scripts/client_config.sh)"
+    ;;
+  "3")
+  sudo bash "$(find /home | grep WireGuard-Ligase/Scripts/setup_iptables.sh)"
+    ;;
+  *)
+  echo -e "${BRed}Sorry, wrong choise. Rerun the script and try again${Color_Off}"
+esac
