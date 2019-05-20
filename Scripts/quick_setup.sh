@@ -127,8 +127,10 @@ case "$proceed_quick_setup" in
     chmod 600 "$my_working_dir"/keys/client_"$i"_Privatekey
     chmod 600 "$my_working_dir"/keys/client_"$i"_Publickey
 
-    client_private_key_["$i"]=$(cat "$my_working_dir"/keys/client_"$i"_Privatekey)
-    client_public_key_["$i"]=$(cat "$my_working_dir"/keys/client_"$i"_Publickey)
+    client_private_key_1=$(cat "$my_working_dir"/keys/client_1_Privatekey)
+    client_private_key_2=$(cat "$my_working_dir"/keys/client_1_Privatekey)
+    client_public_key_1=$(cat "$my_working_dir"/keys/client_2_Publickey)
+    client_public_key_2=$(cat "$my_working_dir"/keys/client_2_Publickey)
   done
   # Generating client 1 config
   echo -e "
