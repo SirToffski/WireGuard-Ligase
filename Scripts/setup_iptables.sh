@@ -1,53 +1,64 @@
 #!/usr/bin/env bash
 
-echo "
-We are going to setup some basic iptables so the server can function correctly.
+find_colours_dir="$(find /home | grep /WireGuard-Ligase/doc/colours.sh)"
+source "$find_colours_dir"
+my_separator="--------------------------------------"
 
-Please provide the server subnet information to be used.
+echo -e "
+${IWhite}We are going to setup some basic iptables so the server can function correctly.
 
-Example: If you server IP is 10.0.0.1/24, then please type 10.0.0.0/24
+Please provide the server subnet information to be used.${Color_Off}
+
+${BWhite}Example:${IWhite} If you server IP is ${BRed}10.0.0.1/24${IWhite}, then please type ${BRed}10.0.0.0/24${Color_Off}
 "
-
+echo -e "$my_separator"
 read -r server_subnet
+echo -e "$my_separator"
 
-echo "Please also provide the listen port of your server.
+echo -e "
+${IWhite}Please also provide the listen port of your server.${Color_Off}
 
-Example: 51820"
+${BWhite}Example: ${BRed}51820${Color_Off}"
 
+echo -e "$my_separator"
 read -r listen_port
+echo -e "$my_separator"
 
-echo "Finally, specify the interface name to be used for wireguard. Usually it matches your WireGuard *.conf file.
+echo -e "
+${IWhite}Finally, specify the interface name to be used for wireguard. Usually it matches your WireGuard *.conf file.${Color_Off}
 
-Example: if your server config file is wg0.conf, interface is wg0.
+${BWhite}Example: ${IWhite}if your server config file is ${BRed}wg0.conf, ${IWhite}interface is ${BRed}wg0${Color_Off}
 
-HINT: You can also check using 'ip a' or 'ifconfig' command"
+${IGreen}HINT: You can also check using 'ip a' or 'ifconfig' command${Color_Off}"
 
+echo -e "$my_separator"
 read -r interface_name
+echo -e "$my_separator"
 
-echo "
-The following iptables will be configured:
+echo -e "
+${IWhite}The following iptables will be configured:${Color_Off}
 
 # Track VPN connection
-iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+${IYellow}iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT${Color_Off}
 
 # Allow incoming traffic on a specified port
-iptables -A INPUT -p udp -m udp --dport $listen_port -m conntrack --ctstate NEW -j ACCEPT
+${IYellow}iptables -A INPUT -p udp -m udp --dport ${BRed}$listen_port ${IYellow}-m conntrack --ctstate NEW -j ACCEPT${Color_Off}
 
 #Forward packets in the VPN tunnel
-iptables -A FORWARD -i $interface_name -o $interface_name -m conntrack --ctstate NEW -j ACCEPT
+${IYellow}iptables -A FORWARD -i ${BRed}$interface_name${IYellow} -o ${BRed}$interface_name ${IYellow}-m conntrack --ctstate NEW -j ACCEPT${Color_Off}
 
 # Enable NAT
-iptables -t nat -A POSTROUTING -s $server_subnet -o eth0 -j MASQUERADE
+${IYellow}iptables -t nat -A POSTROUTING -s ${BRed}$server_subnet ${IYellow}-o eth0 -j MASQUERADE${Color_Off}
 
 In addition to setting up iptables, the following commands will be executed:
 
-#Enabling IP forwarding
-In /etc/sysctl.conf, net.ipv4.ip_forward value will be changed to 1:
-net.ipv4.ip_forward=1
+# Enabling IP forwarding
+# In /etc/sysctl.conf, net.ipv4.ip_forward value will be changed to 1:
+${IYellow}net.ipv4.ip_forward=1${Color_Off}
 
 #To avoid the need to reboot the server
-sysctl -p
+${IYellow}sysctl -p${Color_Off}
 
 -------------------------------------------
 "
@@ -68,22 +79,22 @@ iptables -A INPUT -p udp -m udp --dport "$listen_port" -m conntrack --ctstate NE
 iptables -A FORWARD -i "$interface_name" -o "$interface_name" -m conntrack --ctstate NEW -j ACCEPT
 iptables -t nat -A POSTROUTING -s "$server_subnet" -o eth0 -j MASQUERADE
 
-echo "Done!"
+echo -e "${BWhite}Done!${Color_Off}"
 
-echo "
-In order to make the above iptables rules persistent after system reboot,
-iptables-persistent need to be installed.
+echo -e "
+${IWhite}In order to make the above iptables rules persistent after system reboot,
+${BRed}iptables-persistent ${IWhite} package needs to be installed.
 
 Would you like the script to install iptables-persistent and to enable the service?
 
-NOTE: * At this time this applies to Ubuntu only *
+${BGreen}NOTE: * At this time this applies to Ubuntu only *
 
-Following commands would be used:
+${IWhite}Following commands would be used:
 
 
-apt-get install iptables-persistent
+${IYellow}apt-get install iptables-persistent
 systemctl enable netfilter-persistent
-netfilter-persistent save"
+netfilter-persistent save${Color_Off}"
 
 read -n 1 -s -r -p "
 Review the above commands.
@@ -94,5 +105,5 @@ apt-get install iptables-persistent
 systemctl enable netfilter-persistent
 netfilter-persistent save
 
-echo "
+echo -e "
 Ending the script...."
