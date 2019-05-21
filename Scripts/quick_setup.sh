@@ -6,7 +6,7 @@ source "$find_colours_dir"
 my_separator="--------------------------------------"
 ############################ DEFINE VARIABLES ############################
 server_private_range="10.10.100.1"
-server_listen_port="51820"
+server_listen_port="9201"
 client_dns="1.1.1.1"
 number_of_clients="2"
 client_private_address_1="10.10.100.2"
