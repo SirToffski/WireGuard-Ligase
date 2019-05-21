@@ -6,6 +6,8 @@ The main goals of Wireguard Ligase are:
 - To provide a platform for me to learn bash.
 - To show that deploying your own VPN can be as easy as that.
 
+For a comprehensive overview and guide, check out the [**Wiki**](https://github.com/SirToffski/WireGuard-Ligase/wiki).
+
 Table of Contents
 =================
 
@@ -113,9 +115,9 @@ For other Operating Systems, please check the [**official website**](https://www
 
 ## TODO
 
-  * Add an option for a quick hands-free server deployment / host configuration. Especially useful for people who dont want to answer a lot of questions and are not too fussy about naming clients, etc. ✅✅✅
-  * Customize server config depending on the distro in use (Arch vs Ubuntu, vs RHEL, etc)
-  * Add option to configure other UNIX OS types (such as OpenBSD)
+  - [x] Add an option for a quick hands-free server deployment / host configuration. Especially useful for people who dont want to answer a lot of questions and are not too fussy about naming clients, etc.
+  - [ ] Customize server config depending on the distro in use (Arch vs Ubuntu, vs RHEL, etc)
+  - [ ] Add option to configure other UNIX OS types (such as OpenBSD)
 
 ## Disclaimer
 
