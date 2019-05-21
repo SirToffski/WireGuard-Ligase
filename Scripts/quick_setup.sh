@@ -34,7 +34,7 @@ echo -e "
 ${IWhite} This script will perform a quick server setup with minimal user input.
 
 The following will be auto-configured:
-1) Listen port: UPD ${BRed}$server_listen_port ${IWhite}
+1) Listen port: UDP ${BRed}$server_listen_port ${IWhite}
 2) Server public / private keys
 3) Server private IP of ${BRed}$server_private_range/24${IWhite}
 4) Two clients (client_1.conf,client_2.conf) each with a public / private key; clients will have IPs of ${BRed}$client_private_address_1/32${IWhite} and ${BRed}$client_private_address_2/32${IWhite}
