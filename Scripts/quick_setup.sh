@@ -21,7 +21,7 @@ check_for_keys_directory=$(ls "$my_working_dir" | grep -c --count keys)
 if [[ $check_for_keys_directory == 0 ]]; then
   mkdir keys
 fi
-                                                                                         #
+
 # Check if a directory /client_configs/ exists, if not, it will be made
 check_for_clients_directory=$(ls "$my_working_dir" | grep -c --count client_configs)
 
