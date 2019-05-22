@@ -93,7 +93,7 @@ $ sudo dnf install wireguard-dkms wireguard-tools
 
 ### Others
 
-For other Operating Systems, please check the [**Wiki**](https://github.com/SirToffski/WireGuard-Ligase/wiki).
+For other Operating Systems, please check the [**Wiki**](https://github.com/SirToffski/WireGuard-Ligase/wiki/Getting-Started).
 
 ## Changelog
 
