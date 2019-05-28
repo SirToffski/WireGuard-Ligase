@@ -100,11 +100,13 @@ case "$proceed_quick_setup" in
   # Generating server keys
   echo -e "
   ${BGreen}Generating server keys${Color_Off}"
+  sleep 1
   wg genkey | tee "$my_working_dir"/keys/ServerPrivatekey | wg pubkey > "$my_working_dir"/keys/ServerPublickey
   chmod 600 "$my_working_dir"/keys/ServerPrivatekey && chmod 600 "$my_working_dir"/keys/ServerPublickey
   sever_private_key_output=$(cat "$my_working_dir"/keys/ServerPrivatekey)
   sever_public_key_output=$(cat "$my_working_dir"/keys/ServerPublickey)
   # Generating server config
+  sleep 1
   echo -e "
   ${BGreen}Generating server config${Color_Off}"
   new_server_config=$(echo -e "
@@ -117,6 +119,7 @@ case "$proceed_quick_setup" in
   PrivateKey = $sever_private_key_output
   ")
   # Saving server config
+  sleep 1
   echo -e "
   ${BGreen}Saving server config${Color_Off}"
   echo "$new_server_config" > "$config_file_name".txt && echo "$new_server_config" > /etc/wireguard/"$config_file_name".conf
@@ -133,6 +136,7 @@ case "$proceed_quick_setup" in
     client_public_key_2=$(cat "$my_working_dir"/keys/client_2_Publickey)
   done
   # Generating client 1 config
+  sleep 1
   echo -e "
 ${BGreen}Generating client 1 config${Color_Off}"
   echo "
@@ -148,6 +152,7 @@ AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 21" > "$my_working_dir"/client_configs/client_1.conf
 
 # Generating client 1 config
+sleep 1
 echo -e "
 ${BGreen}Generating client 2 config${Color_Off}"
 echo "
@@ -163,7 +168,7 @@ AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 21" > "$my_working_dir"/client_configs/client_2.conf
 
 # Adding client 1 info to the server config
-
+  sleep 1
   echo -e "
   ${BGreen}Adding client 1 info to the server config${Color_Off}"
   echo -e "
@@ -173,7 +178,7 @@ AllowedIPs = $client_private_address_1/32
 " >> /etc/wireguard/"$config_file_name".conf
 
 # Adding client 2 info to the server config
-
+sleep 1
 echo -e "
 ${BGreen}Adding client 2 info to the server config${Color_Off}"
 echo -e "
@@ -182,6 +187,7 @@ PublicKey = $client_public_key_2
 AllowedIPs = $client_private_address_2/32
 " >> /etc/wireguard/"$config_file_name".conf
   ####### ENABLE wg_0 INTERFACE AND SERVICE  BEGINS #######
+  sleep 1
   echo -e "
   ${BGreen}ENABLE wg_0 INTERFACE AND SERVICE${Color_Off}"
   chown -v root:root /etc/wireguard/"$config_file_name".conf
@@ -191,6 +197,7 @@ AllowedIPs = $client_private_address_2/32
   ####### ENABLE wg_0 INTERFACE AND SERVICE  ENDS #######
 
   ####### IPTABLES BEGIN #######
+  sleep 1
   echo -e "
   ${BGreen}Configuring iptables and IP forwarding${Color_Off}"
   sed -i 's/net.ipv4.ip_forward=0/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
@@ -205,6 +212,7 @@ AllowedIPs = $client_private_address_2/32
   iptables -t nat -A POSTROUTING -s "$server_subnet" -o eth0 -j MASQUERADE
   ####### IPTABLES END #######
 
+  sleep 2
   echo -e "${BPurple}
 * Server config was generated: /etc/wireguard/wg_0.conf
 * Client configs are available in $my_working_dir/client_configs/

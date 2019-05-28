@@ -97,6 +97,8 @@ if [[ "$save_server_config" == 1 ]]; then
     echo "
     Found existing config file with the same name. Backing up to /etc/wireguard/$config_file_name.conf.bak"
 
+    sleep 1
+
     mv /etc/wireguard/"$config_file_name".conf /etc/wireguard/"$config_file_name".conf.bak
   fi
   new_server_config=$(echo -e "
@@ -110,6 +112,8 @@ if [[ "$save_server_config" == 1 ]]; then
   ")
 
   echo "$new_server_config" > server_config.txt
+  echo -e "Generating server config file...."
+  sleep 1
   echo -e "Congrats! Server config is ready and saved to /etc/wireguard/$config_file_name.conf. The config is shown below. It has also been written to a file $config_file_name.txt
 
   ------------------------
