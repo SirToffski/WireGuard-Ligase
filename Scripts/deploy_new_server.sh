@@ -93,7 +93,7 @@ if [[ "$save_server_config" == 1 ]]; then
 
   # The if statement checks whether a config with the same filename already exists.
   # If it does, the falue will always be less than zero, hence it needs to be backed up.
-  if [[ $save_server_config == 1 ]] && [[ $check_for_existing_config -ge $save_server_config ]]; then
+  if [[ $save_server_config == 1 ]] && [[ $check_for_existing_config -ge 1 ]]; then
     echo "
     Found existing config file with the same name. Backing up to /etc/wireguard/$config_file_name.conf.bak"
 
