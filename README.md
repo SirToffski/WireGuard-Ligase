@@ -69,6 +69,8 @@ The script will guide you through the rest of the process.
 ```bash
 $ sudo pacman -S wireguard-tools
 ```
+Note that `wireguard-dkms` will require headers for the Linux kernel installed / intended for use. Headers can be installed via Pacman.
+
 ### Ubuntu
 ```bash
 $ sudo add-apt-repository ppa:wireguard/wireguard
@@ -91,7 +93,7 @@ $ sudo dnf install wireguard-dkms wireguard-tools
 
 ### Others
 
-For other Operating Systems, please check the [**official website**](https://www.wireguard.com/install/).
+For other Operating Systems, please check the [**Wiki**](https://github.com/SirToffski/WireGuard-Ligase/wiki/Getting-Started).
 
 ## Changelog
 
