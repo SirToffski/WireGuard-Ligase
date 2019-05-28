@@ -101,9 +101,9 @@ if [[ $configure_server_with_clients == 1 ]]; then
   read -r server_file_for_clients
   for c in $(seq 1 "$number_of_clients"); do
     echo "
-  [Peer]
-  PublicKey = ${client_public_key_["$c"]}
-  AllowedIPs = ${client_private_address_["$c"]}/32
+[Peer]
+PublicKey = ${client_public_key_["$c"]}
+AllowedIPs = ${client_private_address_["$c"]}/32
   " >> /etc/wireguard/"$server_file_for_clients".conf
   done
 else
