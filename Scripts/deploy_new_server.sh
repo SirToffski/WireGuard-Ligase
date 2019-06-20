@@ -71,6 +71,23 @@ fi
 sever_private_key_output=$(cat "$my_working_dir"/keys/ServerPrivatekey)
 sever_public_key_output=$(cat "$my_working_dir"/keys/ServerPublickey)
 
+echo -e "Generating server config file...."
+
+new_server_config=$(echo -e "
+[Interface]
+Address = $server_private_range
+SaveConfig = true
+PostUp = iptables -A FORWARD -i $config_file_name -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE; ip6tables -A FORWARD -i $config_file_name -j ACCEPT; ip6tables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+PostDown = iptables -D FORWARD -i $config_file_name -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE; ip6tables -D FORWARD -i $config_file_name -j ACCEPT; ip6tables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+ListenPort = $server_listen_port
+PrivateKey = $sever_private_key_output
+  ")
+
+echo "$new_server_config" > "$my_working_dir"/server_config.txt
+chmod 600 "$my_working_dir"/server_config.txt
+
+echo -e "Server config has been written to a file $my_working_dir/server_config.txt"
+
 echo -e "
 ${IWhite}Save config to /etc/wireguard/?${Color_Off}
 
@@ -80,7 +97,6 @@ NOTE: ${UWhite}Choosing to save the config under the same file-name as an existi
 
 This script will check if a config file with the same name already exists and will back existing config up before overriting it.
 "
-
 read -r save_server_config
 if [[ "$save_server_config" == 1 ]]; then
   echo -e "
@@ -96,25 +112,12 @@ if [[ "$save_server_config" == 1 ]]; then
   if [[ $save_server_config == 1 ]] && [[ $check_for_existing_config -ge 1 ]]; then
     echo "
     Found existing config file with the same name. Backing up to /etc/wireguard/$config_file_name.conf.bak"
-
     sleep 1
-
     mv /etc/wireguard/"$config_file_name".conf /etc/wireguard/"$config_file_name".conf.bak
   fi
-  new_server_config=$(echo -e "
-  [Interface]
-  Address = $server_private_range
-  SaveConfig = true
-  PostUp = iptables -A FORWARD -i $config_file_name -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE; ip6tables -A FORWARD -i $config_file_name -j ACCEPT; ip6tables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-  PostDown = iptables -D FORWARD -i $config_file_name -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE; ip6tables -D FORWARD -i $config_file_name -j ACCEPT; ip6tables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
-  ListenPort = $server_listen_port
-  PrivateKey = $sever_private_key_output
-  ")
-
-  echo "$new_server_config" > server_config.txt
-  echo -e "Generating server config file...."
   sleep 1
-  echo -e "Congrats! Server config is ready and saved to /etc/wireguard/$config_file_name.conf. The config is shown below. It has also been written to a file $config_file_name.txt
+echo "$new_server_config" > /etc/wireguard/"$config_file_name".conf
+echo -e "Congrats! Server config is ready and saved to /etc/wireguard/$config_file_name.conf. The config is shown below.
 
   ------------------------
 
@@ -122,8 +125,6 @@ if [[ "$save_server_config" == 1 ]]; then
 
   ------------------------
 "
-  echo "$new_server_config" > /etc/wireguard/"$config_file_name".conf
-
 fi
 
 echo -e "
