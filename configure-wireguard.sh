@@ -20,9 +20,9 @@
 
 my_working_dir=$(pwd)
 
-source "$(find /home | grep /WireGuard-Ligase/doc/colours.sh)"
+source "$(find ~/*/WireGuard-Ligase/ -name colours.sh)"
 
-logo=$(cat $(find /home | grep /WireGuard-Ligase/doc/ascii-logo))
+logo=$(cat $(find ~/*/WireGuard-Ligase/ -name ascii-logo))
 
 echo -e "${BPurple}$logo${Color_Off}"
 
@@ -56,16 +56,16 @@ read -r scope_of_script
 
 case "$scope_of_script" in
   "1")
-  sudo bash "$(find /home | grep WireGuard-Ligase/Scripts/quick_setup.sh)"
+  sudo bash "$(find ~/*/WireGuard-Ligase/ -name quick_setup.sh)"
     ;;
   "2")
-  sudo bash "$(find /home | grep WireGuard-Ligase/Scripts/deploy_new_server.sh)"
+  sudo bash "$(find ~/*/WireGuard-Ligase/ -name deploy_new_server.sh)"
     ;;
   "3")
-  sudo bash "$(find /home | grep WireGuard-Ligase/Scripts/client_config.sh)"
+  sudo bash "$(find ~/*/WireGuard-Ligase/ -name client_config.sh)"
     ;;
   "4")
-  sudo bash "$(find /home | grep WireGuard-Ligase/Scripts/setup_iptables.sh)"
+  sudo bash "$(find ~/*/WireGuard-Ligase/ -name setup_iptables.sh)"
     ;;
   *)
   echo -e "${BRed}Sorry, wrong choise. Rerun the script and try again${Color_Off}"

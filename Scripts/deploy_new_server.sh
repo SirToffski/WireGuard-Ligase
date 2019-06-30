@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 my_working_dir=$(pwd)
-find_colours_dir="$(find /home | grep /WireGuard-Ligase/doc/colours.sh)"
+find_colours_dir="$(find ~/*/WireGuard-Ligase/ -name colours.sh)"
 source "$find_colours_dir"
 
 ######################## Pre-checks ##############################
