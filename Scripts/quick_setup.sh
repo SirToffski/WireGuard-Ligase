@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
+my_wgl_folder=$(find /home -type d -name WireGuard-Ligase)
 my_working_dir=$(pwd)
-find_colours_dir="$(find ~/*/WireGuard-Ligase/ -name colours.sh)"
-source "$find_colours_dir"
+source "$my_wgl_folder"/doc/colours.sh
 my_separator="--------------------------------------"
 ############################ DEFINE VARIABLES ############################
 server_private_range="10.10.100.1"

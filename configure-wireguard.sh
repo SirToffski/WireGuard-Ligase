@@ -18,11 +18,11 @@
 # - https://en.wikipedia.org/wiki/Ligase (May 19th, 2019)
 
 
-my_working_dir=$(pwd)
+my_wgl_folder=$(find /home -type d -name WireGuard-Ligase)
 
-source "$(find ~/*/WireGuard-Ligase/ -name colours.sh)"
+source "$my_wgl_folder"/doc/colours.sh
 
-logo=$(cat $(find ~/*/WireGuard-Ligase/ -name ascii-logo))
+logo=$(cat "$my_wgl_folder"/doc/ascii-logo)
 
 echo -e "${BPurple}$logo${Color_Off}"
 
@@ -56,16 +56,16 @@ read -r scope_of_script
 
 case "$scope_of_script" in
   "1")
-  sudo bash "$(find ~/*/WireGuard-Ligase/ -name quick_setup.sh)"
+  sudo bash "$my_wgl_folder"/Scripts/quick_setup.sh
     ;;
   "2")
-  sudo bash "$(find ~/*/WireGuard-Ligase/ -name deploy_new_server.sh)"
+  sudo bash "$my_wgl_folder"/Scripts/deploy_new_server.sh
     ;;
   "3")
-  sudo bash "$(find ~/*/WireGuard-Ligase/ -name client_config.sh)"
+  sudo bash "$my_wgl_folder"/Scripts/client_config.sh
     ;;
   "4")
-  sudo bash "$(find ~/*/WireGuard-Ligase/ -name setup_iptables.sh)"
+  sudo bash "$my_wgl_folder"/Scripts/setup_iptables.sh
     ;;
   *)
   echo -e "${BRed}Sorry, wrong choise. Rerun the script and try again${Color_Off}"

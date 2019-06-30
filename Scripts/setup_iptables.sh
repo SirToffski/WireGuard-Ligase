@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-find_colours_dir="$(find find ~/*/WireGuard-Ligase/ -name colours.sh)"
-source "$find_colours_dir"
+my_wgl_folder=$(find /home -type d -name WireGuard-Ligase)
+source "$my_wgl_folder"/doc/colours.sh
 my_separator="--------------------------------------"
 
 echo -e "
