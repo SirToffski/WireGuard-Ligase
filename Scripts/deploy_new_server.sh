@@ -1,7 +1,40 @@
 #!/usr/bin/env bash
 
+if [ "$EUID" -ne 0 ]; then
+    echo "Please run the script as root."
+    exit 1
+fi
+
+############## Determine OS Type ##############
+###############################################
+ubuntu_os=$(lsb_release -a | grep -c Ubuntu)
+arch_os=$(lsb_release -a | grep -c Arch)
+cent_os=$(lsb_release -a | grep -c CentOS)
+debian_os=$(lsb_release -a | grep -c Debian)
+fedora_os=$(lsb_release -a | grep -c Fedora)
+manjaro_os=$(lsb_release -a | grep -c Manjaro)
+
+if [[ "$ubuntu_os" -gt 0 ]]; then
+  distro=ubuntu
+elif [[ "$arch_os" -gt 0 ]]; then
+  distro=arch
+elif [[ "$cent_os" -gt 0 ]]; then
+  distro=centos
+elif [[ "$debian_os" -gt 0 ]]; then
+  distro=debian
+elif [[ "$fedora_os" -gt 0 ]]; then
+  distro=fedora
+elif [[ "$manjaro_os" -gt 0 ]]; then
+  distro=manjaro
+else
+  echo -e "The operating system is not supported by this script. The script will continue but will be unable to install Wireguard packages. Hence script's functionality will be limited to generating server / client configurations."
+fi
+###############################################
+###############################################
+
 my_wgl_folder=$(find /home -type d -name WireGuard-Ligase)
 my_working_dir=$(pwd)
+check_pub_ip=$(curl https://checkip.amazonaws.com)
 
 source "$my_wgl_folder"/doc/colours.sh
 
@@ -34,8 +67,17 @@ read -r server_listen_port
 
 # Public IP address of the server hosting the WireGuard server
 echo -e "
-${BWhite}Step 3)${Color_Off} ${IWhite}Specify public IP address of the server.${Color_Off}"
-read -r server_public_address
+${BWhite}Step 3)${Color_Off} ${IWhite}The public IP address of this machine is $check_pub_ip. Is this the address you would like to use? ${Color_Off}
+
+${BWhite}1 = yes, 2 = no${Color_Off}"
+read -r public_address
+if [[ "$public_address" == 1 ]]; then
+  server_public_address=$check_pub_ip
+elif [[ "$public_address" == 2 ]]; then
+  echo -e "
+  ${IWhite}Please specify the public address of the server.${Color_Off}"
+  read -r server_public_address
+fi
 
 read -n 1 -s -r -p "
 Review the above and press any key to continue"
