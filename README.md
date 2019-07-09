@@ -65,7 +65,7 @@ The script will guide you through the rest of the process.
 
 ## Installing Wireguard
 
-The script has an ability to detect and install Wireguard of the following distributins:
+The script has an ability to detect and install Wireguard of the following distributions:
 * Arch Linux
 * CentOS
 * Debian
