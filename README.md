@@ -57,7 +57,7 @@ As mentioned before, using the script is very simple.
 ```bash
 $ git clone https://github.com/SirToffski/WireGuard-Ligase.git # (1) Clone the repository.
 $ cd WireGuard-Ligase/ # (2) cd into the repository.
-$ bash configure-wireguard.sh # (3) Run the script.
+$ sudo bash configure-wireguard.sh # (3) Run the script.
 ```
 
 
