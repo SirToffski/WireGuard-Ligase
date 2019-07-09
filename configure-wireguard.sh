@@ -17,6 +17,10 @@
 # A: In biochemistry, a ligase is an enzyme that can catalyze the joining of two large molecules by forming a new chemical bond -
 # - https://en.wikipedia.org/wiki/Ligase (May 19th, 2019)
 
+if [ "$EUID" -ne 0 ]; then
+    echo "Please run the script as root."
+    exit 1
+fi
 
 my_wgl_folder=$(find /home -type d -name WireGuard-Ligase)
 

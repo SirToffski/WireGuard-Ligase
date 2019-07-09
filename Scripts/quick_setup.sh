@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+if [ "$EUID" -ne 0 ]; then
+    echo "Please run the script as root."
+    exit 1
+fi
+
+
 my_wgl_folder=$(find /home -type d -name WireGuard-Ligase)
 my_working_dir=$(pwd)
 source "$my_wgl_folder"/doc/colours.sh
