@@ -29,10 +29,10 @@ Table of Contents
 
 Main reasons behind using this script:
 
-* No need to install anything
-  * Bash is installed and configured as a default shell on nearly any Linux distro.
-  * ~~This script does NOT install any software on your system.~~ It's designed to create .conf config files and add some iptables rules.
-    * The aforementioned point regarding the script not installing any software does not apply since an option to install iptables-persistent on Ubuntu has been added on the 6th of May 2019.
+* Bash is installed and configured as a default shell on nearly any Linux distro.
+* As of July 9th 2019 this script supports Arch, CentOS, Debian, Fedora, Manjaro, and Ubuntu
+  * The script will check if it's running on a supported OS, then check if WireGuard is already installed.
+  * If WireGuard is not installed, the script will offer to install it.
 * You are in control
   * Any system changes are shown to the user and user confirmation is required BEFORE any changes are made.
 * Easily readable
@@ -45,9 +45,9 @@ Using the script is fairly simple. There are a number of requirements for runnin
 
 ### Pre-requisites
 
-1.  A server with a public IP address (DigitalOcean, LightSail, Vultr, etc) running Linux.
+1.  A server with a public IP address, either physical or cloud (DigitalOcean, LightSail, Vultr, etc), running Linux.
 
-2.  Wireguard MUST be installed on the server before running the script. See installation guides for popular Linux distros.
+2.  The script will check if WireGuard is installed on Arch, CentOS, Debian, Fedora, Manjaro and Ubuntu. On other distributions, WireGuard must be installed BEFORE running the script. See [Installing Wireguard](#installing-wireguard) for more info.
 
 3.  A user with sudo privileges for making any system changes.
 
@@ -65,35 +65,15 @@ The script will guide you through the rest of the process.
 
 ## Installing Wireguard
 
-### Arch
-```bash
-$ sudo pacman -S wireguard-tools
-```
-Note that `wireguard-dkms` will require headers for the Linux kernel installed / intended for use. Headers can be installed via Pacman.
+The script has an ability to detect and install Wireguard of the following distributins:
+* Arch Linux
+* CentOS
+* Debian
+* Fedora
+* Manjaro
+* Ubuntu
 
-### Ubuntu
-```bash
-$ sudo add-apt-repository ppa:wireguard/wireguard
-$ sudo apt-get update
-$ sudo apt-get install wireguard
-```
-
-### RHEL / CentOS
-```bash
-$ sudo curl -Lo /etc/yum.repos.d/wireguard.repo https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo
-$ sudo yum install epel-release
-$ sudo yum install wireguard-dkms wireguard-tools
-```
-
-### Fedora
-```bash
-$ sudo dnf copr enable jdoss/wireguard
-$ sudo dnf install wireguard-dkms wireguard-tools
-```
-
-### Others
-
-For other Operating Systems, please check the [**Wiki**](https://github.com/SirToffski/WireGuard-Ligase/wiki/Getting-Started).
+For installation on other Operating Systems, please check the [**Wiki**](https://github.com/SirToffski/WireGuard-Ligase/wiki/Getting-Started).
 
 ## Changelog
 
@@ -114,11 +94,16 @@ For other Operating Systems, please check the [**Wiki**](https://github.com/SirT
 * May 20th, 2019
   * New Features:
     * Option for a quick-setup was added!
+* July 9th, 2019
+  * The script now checks if running as root.
+  * New features:
+    * Public IP of the machine on which the script is runnign is now automatically fetched via AWS `curl https://checkip.amazonaws.com`
+    * Script now also checks if it's running on a supported OS and whether WireGuard is installed. If WireGuard is not installed, the script will offer to install it.
 
 ## TODO
 
   - [x] Add an option for a quick hands-free server deployment / host configuration. Especially useful for people who dont want to answer a lot of questions and are not too fussy about naming clients, etc.
-  - [ ] Customize server config depending on the distro in use (Arch vs Ubuntu, vs RHEL, etc)
+  - [x] Customize server config depending on the distro in use (Arch vs Ubuntu, vs RHEL, etc)
   - [ ] Add option to configure other UNIX OS types (such as OpenBSD)
 
 ## Disclaimer
