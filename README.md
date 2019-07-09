@@ -33,6 +33,7 @@ Main reasons behind using this script:
 * As of July 9th 2019 this script supports Arch, CentOS, Debian, Fedora, Manjaro, and Ubuntu
   * The script will check if it's running on a supported OS, then check if WireGuard is already installed.
   * If WireGuard is not installed, the script will offer to install it.
+  * For Arch, Debian, Fedora, Manjaro, and Ubuntu - the script will choose an appropriate way to save netfilter rules in order for those to persist after reboot. See [Changelog](#changelog) for details.
 * You are in control
   * Any system changes are shown to the user and user confirmation is required BEFORE any changes are made.
 * Easily readable
