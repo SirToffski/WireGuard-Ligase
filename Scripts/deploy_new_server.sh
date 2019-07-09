@@ -216,7 +216,7 @@ ${BWhite}Step 3)${Color_Off} ${IWhite}The public IP address of this machine is $
 ${BWhite}1 = yes, 2 = no${Color_Off}"
 read -r public_address
 if [[ "$public_address" == 1 ]]; then
-  server_public_address=$check_pub_ip
+  server_public_address="$check_pub_ip"
 elif [[ "$public_address" == 2 ]]; then
   echo -e "
   ${IWhite}Please specify the public address of the server.${Color_Off}"
