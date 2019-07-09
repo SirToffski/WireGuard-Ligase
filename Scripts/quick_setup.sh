@@ -12,6 +12,7 @@ source "$my_wgl_folder"/doc/colours.sh
 my_separator="--------------------------------------"
 ############################ DEFINE VARIABLES ############################
 server_private_range="10.10.100.1"
+local_interface="eth0"
 server_listen_port="9201"
 client_dns="1.1.1.1"
 number_of_clients="2"
@@ -19,6 +20,7 @@ client_private_address_1="10.10.100.2"
 client_private_address_2="10.10.100.3"
 config_file_name="wg0"
 server_subnet="10.10.100.0/24"
+check_pub_ip=$(curl https://checkip.amazonaws.com)
 ##########################################################################
 
 ######################## Pre-checks ######################################################
@@ -216,8 +218,8 @@ The following will be auto-configured:
 2) Server public / private keys
 3) Server private IP of ${BRed}$server_private_range/24${IWhite}
 4) Two clients (client_1.conf,client_2.conf) each with a public / private key; clients will have IPs of ${BRed}$client_private_address_1/32${IWhite} and ${BRed}$client_private_address_2/32${IWhite}
-5) Server PostUp: iptables -A FORWARD -i ${BRed}$config_file_name${IWhite} -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE; ip6tables -A FORWARD -i ${BRed}$config_file_name${IWhite} -j ACCEPT; ip6tables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-6) Server PostDown: iptables -D FORWARD -i ${BRed}$config_file_name${IWhite} -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE; ip6tables -D FORWARD -i ${BRed}$config_file_name${IWhite} -j ACCEPT; ip6tables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+5) Server PostUp: iptables -A FORWARD -i ${BRed}$config_file_name${IWhite} -j ACCEPT; iptables -t nat -A POSTROUTING $local_interface -j MASQUERADE; ip6tables -A FORWARD -i ${BRed}$config_file_name${IWhite} -j ACCEPT; ip6tables -t nat -A POSTROUTING $local_interface -j MASQUERADE
+6) Server PostDown: iptables -D FORWARD -i ${BRed}$config_file_name${IWhite} -j ACCEPT; iptables -t nat -D POSTROUTING $local_interface -j MASQUERADE; ip6tables -D FORWARD -i ${BRed}$config_file_name${IWhite} -j ACCEPT; ip6tables -t nat -D POSTROUTING $local_interface -j MASQUERADE
 7) Clients will use Cloudflare public DNS of ${BRed}$client_dns${IWhite}
 8) Server config ${BRed}/etc/wireguard/$config_file_name.conf${IWhite}
 9) Tunnel interface ${BRed}$config_file_name${IWhite} will be enabled and service configured to enable at startup.
@@ -227,6 +229,10 @@ chmod -v 600 ${BRed}/etc/wireguard/$config_file_name.conf${IYellow}
 wg-quick up ${BRed}$config_file_name${IYellow}
 systemctl enable wg-quick@${BRed}${IYellow}$config_file_name.service${Color_Off}
 -----------------------------------------------------------------------
+
+================================================
+For Arch, Debian, Fedora, Manjaro and Ubuntu
+================================================
 ${IWhite}10) iptables:${Color_Off}
 # Track VPN connection
 ${IYellow}iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
@@ -239,7 +245,7 @@ ${IYellow}iptables -A INPUT -p udp -m udp --dport ${BRed}$server_listen_port ${I
 ${IYellow}iptables -A FORWARD -i ${BRed}$config_file_name${IYellow} -o ${BRed}$config_file_name ${IYellow}-m conntrack --ctstate NEW -j ACCEPT${Color_Off}
 
 # Enable NAT
-${IYellow}iptables -t nat -A POSTROUTING -s ${BRed}$server_subnet ${IYellow}-o eth0 -j MASQUERADE${Color_Off}
+${IYellow}iptables -t nat -A POSTROUTING -s ${BRed}$server_subnet ${IYellow}$local_interface -j MASQUERADE${Color_Off}
 
 In addition to setting up iptables, the following commands will be executed:
 
@@ -249,7 +255,30 @@ ${IYellow}net.ipv4.ip_forward=1${Color_Off}
 
 #To avoid the need to reboot the server
 ${IYellow}sysctl -p${Color_Off}
+
+================================================
+For CentOS
+================================================
+
+The following firewall rules will be configured:${Color_Off}
+
+${IYellow}
+firewall-cmd --zone=public --add-port=$listen_port/udp
+firewall-cmd --zone=trusted --add-source=$server_subnet
+firewall-cmd --permanent --zone=public --add-port=$listen_port/udp
+firewall-cmd --permanent --zone=trusted --add-source=$server_subnet
+firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -s $server_subnet ! -d $server_subnet -j SNAT --to $server_public_address
+firewall-cmd --permanent --direct --add-rule ipv4 nat POSTROUTING 0 -s $server_subnet ! -d $server_subnet -j SNAT --to $server_public_address
+${Color_Off}
+
+# Enabling IP forwarding
+# In /etc/sysctl.conf, net.ipv4.ip_forward value will be changed to 1:
+${IYellow}net.ipv4.ip_forward=1${Color_Off}
+
+#To avoid the need to reboot the server
+${IYellow}sysctl -p${Color_Off}
 "
+
 
 echo -e "$my_separator"
 
@@ -257,12 +286,20 @@ read -n 1 -s -r -p "
 Review the above commands.
 
 Press any key to continue or CTRL+C to stop."
-
-# Public IP address of the server hosting the WireGuard server
-echo -e "
-${IWhite}Specify public IP address of the server.${Color_Off}"
 echo -e "$my_separator"
-read -r server_public_address
+echo -e "
+${IWhite}The public IP address of this machine is $check_pub_ip. Is this the address you would like to use? ${Color_Off}
+
+${BWhite}1 = yes, 2 = no${Color_Off}"
+read -r public_address
+if [[ "$public_address" == 1 ]]; then
+  server_public_address="$check_pub_ip"
+elif [[ "$public_address" == 2 ]]; then
+  echo -e "
+  ${IWhite}Please specify the public address of the server.${Color_Off}"
+  read -r server_public_address
+fi
+
 echo -e "$my_separator"
 
 echo -e "
@@ -291,8 +328,8 @@ case "$proceed_quick_setup" in
   [Interface]
   Address = $server_private_range
   SaveConfig = true
-  PostUp = iptables -A FORWARD -i $config_file_name -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE; ip6tables -A FORWARD -i $config_file_name -j ACCEPT; ip6tables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-  PostDown = iptables -D FORWARD -i $config_file_name -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE; ip6tables -D FORWARD -i $config_file_name -j ACCEPT; ip6tables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+  PostUp = iptables -A FORWARD -i $config_file_name -j ACCEPT; iptables -t nat -A POSTROUTING $local_interface -j MASQUERADE; ip6tables -A FORWARD -i $config_file_name -j ACCEPT; ip6tables -t nat -A POSTROUTING $local_interface -j MASQUERADE
+  PostDown = iptables -D FORWARD -i $config_file_name -j ACCEPT; iptables -t nat -D POSTROUTING $local_interface -j MASQUERADE; ip6tables -D FORWARD -i $config_file_name -j ACCEPT; ip6tables -t nat -D POSTROUTING $local_interface -j MASQUERADE
   ListenPort = $server_listen_port
   PrivateKey = $sever_private_key_output
   ")
@@ -387,7 +424,7 @@ AllowedIPs = $client_private_address_2/32
   iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
   iptables -A INPUT -p udp -m udp --dport "$server_listen_port" -m conntrack --ctstate NEW -j ACCEPT
   iptables -A FORWARD -i "$config_file_name" -o "$config_file_name" -m conntrack --ctstate NEW -j ACCEPT
-  iptables -t nat -A POSTROUTING -s "$server_subnet" -o eth0 -j MASQUERADE
+  iptables -t nat -A POSTROUTING -s "$server_subnet" "$local_interface" -j MASQUERADE
   ####### IPTABLES END #######
 
   sleep 2
@@ -397,13 +434,107 @@ AllowedIPs = $client_private_address_2/32
 * Client info has been added to the server config
 * Server/client keys have been saved in $my_working_dir/keys/
 * Interface $config_file_name was enabled and service configured
-* iptables were configured and IP forwarding was enables ${Color_Off}"
+* iptables were configured and IP forwarding was enables ${Color_Off}
+"
 
-echo -e "${BRed}
-TODO:
-* You need to install iptables-persistent to keep the above added iptables rules after reboot
-* Add configurations to the client devices.
-  * For mobile devices, 'qrencode' can be used${Color_Off}"
+if [[ "$distro" != "centos" ]]; then
+  echo -e "
+  ${IWhite} Netfilter iptables rules will need to be saved to persist after reboot.
+
+  ${BWhite} Save rules now?
+  1 = yes, 2 = no${Color_Off}
+  "
+  read -r save_netfilter
+  if [[ "$save_netfilter" == 1 ]]; then
+    if [[ "$distro" = "ubuntu" ]] || [[ "$distro" = "debian" ]]; then
+      echo -e "
+      ${IWhite}In order to make the above iptables rules persistent after system reboot,
+      ${BRed}iptables-persistent ${IWhite} package needs to be installed.
+
+      Would you like the script to install iptables-persistent and to enable the service?
+
+      ${IWhite}Following commands would be used:
+
+
+      ${IYellow}apt-get install iptables-persistent
+      systemctl enable netfilter-persistent
+      netfilter-persistent save${Color_Off}"
+
+      read -n 1 -s -r -p "
+      Review the above commands.
+
+      Press any key to continue or CTRL+C to stop."
+
+      apt-get install iptables-persistent
+      systemctl enable netfilter-persistent
+      netfilter-persistent save
+    elif [[ "$distro" = "fedora" ]]; then
+      echo -e "
+      ${IWhite}In order to make the above iptables rules persistent after system reboot,
+      netfilter rules will need to be saved.
+
+      Would you like the script to save the netfilter rules?
+
+      ${IWhite}Following commands would be used:
+
+
+      ${IYellow}/sbin/service iptables save${Color_Off}"
+      read -n 1 -s -r -p "
+      Review the above commands.
+
+      Press any key to continue or CTRL+C to stop."
+
+      /sbin/service iptables save
+
+    elif [[ "$distro" = "arch" ]] || [[ "$distro" = "manjaro" ]]; then
+      echo -e "
+      ${IWhite}In order to make the above iptables rules persistent after system reboot,
+      netfilter rules will need to be saved.
+
+      Would you like the script to save the netfilter rules?
+
+      ${IWhite}Following commands would be used:
+
+      # Check if iptables.rules file exists and create if needed
+      ${IYellow}check_iptables_rules=\$(ls /etc/iptables/ | grep -c iptables.rules)
+      if [[ \$check_iptables_rules == 0 ]]; then
+        touch /etc/iptables/iptables.rules
+      fi
+
+      systemctl enable iptables.service
+      systemctl start iptables.service
+      iptables-save > /etc/iptables/iptables.rules
+      systemctl restart iptables.service
+      ${Color_Off}
+      "
+      read -n 1 -s -r -p "
+      Review the above commands.
+
+      Press any key to continue or CTRL+C to stop."
+
+      check_iptables_rules=$(ls /etc/iptables/ | grep -c iptables.rules)
+      if [[ "$check_iptables_rules" == 0 ]]; then
+        touch /etc/iptables/iptables.rules
+      fi
+      systemctl enable iptables.service
+      systemctl start iptables.service
+      iptables-save > /etc/iptables/iptables.rules
+      systemctl restart iptables.service
+    fi
+  elif [[ "$save_netfilter" == 2 ]]; then
+    echo -e "${BRed}
+    TODO:
+    * Add configurations to the client devices.
+      * For mobile devices, 'qrencode' can be used${Color_Off}"
+  fi
+else
+  echo -e "${BRed}
+  TODO:
+  * Add configurations to the client devices.
+    * For mobile devices, qrencode can be used${Color_Off}"
+fi
+
+
 #########################################################################
 #                          CASE ANSWER y/Y ENDS                         #
 #########################################################################
