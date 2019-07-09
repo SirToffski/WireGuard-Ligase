@@ -223,6 +223,16 @@ elif [[ "$public_address" == 2 ]]; then
   read -r server_public_address
 fi
 
+# Internet facing iface of the server hosting the WireGuard server
+echo -e "
+${BWhite}Step 4)${IWhite}Please also provide the internet facing interface of the server. Can be obrained with ${BRed}ip a ${IWhite}or ${BRed}ifconfig${Color_Off}
+
+${BWhite}Example: ${BRed}eth0${Color_Off}"
+
+echo -e "$my_separator"
+read -r local_interface
+echo -e "$my_separator"
+
 read -n 1 -s -r -p "
 Review the above and press any key to continue"
 
@@ -264,8 +274,8 @@ new_server_config=$(echo -e "
 [Interface]
 Address = $server_private_range
 SaveConfig = true
-PostUp = iptables -A FORWARD -i $config_file_name -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE; ip6tables -A FORWARD -i $config_file_name -j ACCEPT; ip6tables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-PostDown = iptables -D FORWARD -i $config_file_name -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE; ip6tables -D FORWARD -i $config_file_name -j ACCEPT; ip6tables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+PostUp = iptables -A FORWARD -i $config_file_name -j ACCEPT; iptables -t nat -A POSTROUTING $local_interface -j MASQUERADE; ip6tables -A FORWARD -i $config_file_name -j ACCEPT; ip6tables -t nat -A POSTROUTING $local_interface -j MASQUERADE
+PostDown = iptables -D FORWARD -i $config_file_name -j ACCEPT; iptables -t nat -D POSTROUTING $local_interface -j MASQUERADE; ip6tables -D FORWARD -i $config_file_name -j ACCEPT; ip6tables -t nat -D POSTROUTING $local_interface -j MASQUERADE
 ListenPort = $server_listen_port
 PrivateKey = $sever_private_key_output
   ")
@@ -317,7 +327,7 @@ fi
 echo -e "
 ${IWhite}Configure clients?${Color_Off}
 
-${BWhite}1=yes, 2=no"${Color_Off}
+${BWhite}1=yes, 2=no${Color_Off}"
 
 read -r client_config_answer
 
@@ -511,13 +521,13 @@ elif [[ $enable_on_boot == 2 ]] && [[ $check_for_existing_config -ge $save_serve
   systemctl enable wg-quick@$config_file_name.service${Color_Off}"
 fi
 
-echo -e "${IWhite}Before ending this script, would you like to setup IPTABLES for the new server?${Color_Off}
+echo -e "${IWhite}Before ending this script, would you like to setup firewall rules for the new server? (recommended)${Color_Off}
 
 ${BWhite}1 = yes, 2 = no${Color_Off}
 "
 read -r iptables_setup
 if [[ $iptables_setup == 1 ]]; then
- sudo bash "$my_working_dir"/Scripts/setup_iptables.sh
+ sudo bash "$my_wgl_folder"/Scripts/setup_iptables.sh
 else
   echo "Sounds good. Ending the scritp..."
 fi
