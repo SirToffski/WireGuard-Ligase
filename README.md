@@ -99,6 +99,7 @@ For installation on other Operating Systems, please check the [**Wiki**](https:/
   * New features:
     * Public IP of the machine on which the script is runnign is now automatically fetched via AWS `curl https://checkip.amazonaws.com`
     * Script now also checks if it's running on a supported OS and whether WireGuard is installed. If WireGuard is not installed, the script will offer to install it.
+    * The script now customizes firewall rules based on the disstribution. On CentOS `firewall-cmd` will ne used. On Arch, Debian, Fedora, Manjaro and Ubuntu netfilter `iptables` are used. Furthermore, for the latter distributions, the script chooses an appropriate way to save netfilter rules. For example, on Debian and Ubuntu, `iptables-persistent` will be installed. On Fedora, netfilter rules are saved with `/sbin/service iptables save`. Finally, on Arch and Manjaro, systemd `iptables.service` is used with configuration saved to `/etc/iptables/iptables.rules`.
 
 ## TODO
 
