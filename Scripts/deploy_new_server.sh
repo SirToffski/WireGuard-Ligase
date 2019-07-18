@@ -268,14 +268,18 @@ fi
 sever_private_key_output=$(cat "$my_working_dir"/keys/ServerPrivatekey)
 sever_public_key_output=$(cat "$my_working_dir"/keys/ServerPublickey)
 
+echo -e "Specify wireguard server interface name (will be the same as config name, without .conf)"
+
+read -r wg_sev_iface
+
 echo -e "Generating server config file...."
 
 new_server_config=$(echo -e "
 [Interface]
 Address = $server_private_range
 SaveConfig = true
-PostUp = iptables -A FORWARD -i $config_file_name -j ACCEPT; iptables -t nat -A POSTROUTING $local_interface -j MASQUERADE; ip6tables -A FORWARD -i $config_file_name -j ACCEPT; ip6tables -t nat -A POSTROUTING $local_interface -j MASQUERADE
-PostDown = iptables -D FORWARD -i $config_file_name -j ACCEPT; iptables -t nat -D POSTROUTING $local_interface -j MASQUERADE; ip6tables -D FORWARD -i $config_file_name -j ACCEPT; ip6tables -t nat -D POSTROUTING $local_interface -j MASQUERADE
+PostUp = iptables -A FORWARD -i $wg_sev_iface -j ACCEPT; iptables -t nat -A POSTROUTING $local_interface -j MASQUERADE; ip6tables -A FORWARD -i $wg_sev_iface -j ACCEPT; ip6tables -t nat -A POSTROUTING $local_interface -j MASQUERADE
+PostDown = iptables -D FORWARD -i $wg_sev_iface -j ACCEPT; iptables -t nat -D POSTROUTING $local_interface -j MASQUERADE; ip6tables -D FORWARD -i $wg_sev_iface -j ACCEPT; ip6tables -t nat -D POSTROUTING $local_interface -j MASQUERADE
 ListenPort = $server_listen_port
 PrivateKey = $sever_private_key_output
   ")
