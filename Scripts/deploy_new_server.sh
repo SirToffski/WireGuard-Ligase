@@ -278,8 +278,8 @@ new_server_config=$(echo -e "
 [Interface]
 Address = $server_private_range
 SaveConfig = true
-PostUp = iptables -A FORWARD -i $wg_sev_iface -j ACCEPT; iptables -t nat -A POSTROUTING $local_interface -j MASQUERADE; ip6tables -A FORWARD -i $wg_sev_iface -j ACCEPT; ip6tables -t nat -A POSTROUTING $local_interface -j MASQUERADE
-PostDown = iptables -D FORWARD -i $wg_sev_iface -j ACCEPT; iptables -t nat -D POSTROUTING $local_interface -j MASQUERADE; ip6tables -D FORWARD -i $wg_sev_iface -j ACCEPT; ip6tables -t nat -D POSTROUTING $local_interface -j MASQUERADE
+PostUp = iptables -A FORWARD -i $wg_sev_iface -j ACCEPT; iptables -t nat -A POSTROUTING -o $local_interface -j MASQUERADE; ip6tables -A FORWARD -i $wg_sev_iface -j ACCEPT; ip6tables -t nat -A POSTROUTING -o $local_interface -j MASQUERADE
+PostDown = iptables -D FORWARD -i $wg_sev_iface -j ACCEPT; iptables -t nat -D POSTROUTING -o $local_interface -j MASQUERADE; ip6tables -D FORWARD -i $wg_sev_iface -j ACCEPT; ip6tables -t nat -D POSTROUTING -o $local_interface -j MASQUERADE
 ListenPort = $server_listen_port
 PrivateKey = $sever_private_key_output
   ")
