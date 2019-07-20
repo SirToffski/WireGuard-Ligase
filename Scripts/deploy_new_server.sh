@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 if [ "$EUID" -ne 0 ]; then
-    echo "Please run the script as root."
-    exit 1
+  echo "Please run the script as root."
+  exit 1
 fi
 
 ############## Determine OS Type ##############
@@ -40,13 +40,13 @@ source "$my_wgl_folder"/doc/colours.sh
 
 ######################## Pre-checks ##############################
 # Check if a directory /keys/ exists, if not, it will be made
-check_for_keys_directory=$(ls "$my_working_dir" | grep -c --count keys)
+check_for_keys_directory=$(ls "$my_working_dir" | grep -c keys)
 if [[ $check_for_keys_directory == 0 ]]; then
   mkdir keys
 fi
 
 # Check if a directory /client_configs/ exists, if not, it will be made
-check_for_clients_directory=$(ls "$my_working_dir" | grep -c --count client_configs)
+check_for_clients_directory=$(ls "$my_working_dir" | grep -c client_configs)
 
 if [[ $check_for_clients_directory == 0 ]]; then
   mkdir client_configs
@@ -59,25 +59,26 @@ First, let's check if wireguard is installed..."
 
 ########### UBUNTU ###########
 ##############################
-if [[ "$distro" = "ubuntu" ]]; then
+if [[ "$distro" == "ubuntu" ]]; then
   check_if_wg_installed=$(dpkg-query -l | grep -i -c wireguard-tools)
-# If WireGuard is NOT installed, offer to install
+  # If WireGuard is NOT installed, offer to install
   if [[ "$check_if_wg_installed" == 0 ]]; then
     echo "
-    OS Type: Ubuntu
-    Wireguard-Tools: NOT installed
-
-    Would you like to have Wireguard installed?
-
++---------------------------------------------+
+    ${BWhite}OS Type: Ubuntu
+    Wireguard-Tools: NOT installed${Color_Off}
++---------------------------------------------+
+      ${BWhite}Would you like to have Wireguard installed?${Color_Off}
++---------------------------------------------+
     ${BWhite}1 = yes, 2 = no${Color_Off}"
     read -r install_wireguard
     if [[ "$install_wireguard" == 1 ]]; then
-# If chosen to install, proceed with installation
+      # If chosen to install, proceed with installation
       add-apt-repository ppa:wireguard/wireguard
       apt-get update
       apt-get install wireguard
     elif [[ "$install_wireguard" == 2 ]]; then
-# If chosen NOT to install, move along
+      # If chosen NOT to install, move along
       echo -e "
       Understood, moving on with the script."
     fi
@@ -87,24 +88,25 @@ if [[ "$distro" = "ubuntu" ]]; then
 
 ########### ARCH OR MANJARO ###########
 #######################################
-elif [[ "$distro" = "arch" ]] || [[ "$distro" = "manjaro" ]]; then
+elif [[ "$distro" == "arch" ]] || [[ "$distro" == "manjaro" ]]; then
   check_if_wg_installed=$(pacman -Qe | grep -i -c wireguard-tools)
-# If WireGuard is NOT installed, offer to instal
+  # If WireGuard is NOT installed, offer to instal
   if [[ "$check_if_wg_installed" == 0 ]]; then
     echo "
-    OS Type: $distro
-    Wireguard-Tools: NOT installed
-
-    Would you like to have Wireguard installed?
-
++---------------------------------------------+
+    ${BWhite}OS Type: $distro
+    Wireguard-Tools: NOT installed${Color_Off}
++---------------------------------------------+
+    ${BWhite}Would you like to have Wireguard installed?${Color_Off}
++---------------------------------------------+
     ${BWhite}1 = yes, 2 = no${Color_Off}"
     read -r install_wireguard
     if [[ "$install_wireguard" == 1 ]]; then
-# If chosen to install, proceed with installation
+      # If chosen to install, proceed with installation
       pacman -Syyy
       pacman -S wireguard-dkms wireguard-tools --noconfirm
     elif [[ "$install_wireguard" == 2 ]]; then
-# If chosen NOT to install, move along
+      # If chosen NOT to install, move along
       echo -e "
       Understood, moving on with the script."
     fi
@@ -114,25 +116,26 @@ elif [[ "$distro" = "arch" ]] || [[ "$distro" = "manjaro" ]]; then
 
 ########### CENTOS ###########
 ##############################
-elif [[ "$distro" = "centos" ]]; then
+elif [[ "$distro" == "centos" ]]; then
   check_if_wg_installed=$(yum list installed | grep -i -c wireguard-tools)
-# If WireGuard is NOT installed, offer to instal
+  # If WireGuard is NOT installed, offer to instal
   if [[ "$check_if_wg_installed" == 0 ]]; then
     echo "
-    OS Type: CentOS
-    Wireguard-Tools: NOT installed
-
-    Would you like to have Wireguard installed?
-
++---------------------------------------------+
+      ${BWhite}OS Type: CentOS
+    Wireguard-Tools: NOT installed${Color_Off}
++---------------------------------------------+
+      ${BWhite}Would you like to have Wireguard installed?${Color_Off}
++---------------------------------------------+
     ${BWhite}1 = yes, 2 = no${Color_Off}"
     read -r install_wireguard
     if [[ "$install_wireguard" == 1 ]]; then
-# If chosen to install, proceed with installation
+      # If chosen to install, proceed with installation
       curl -Lo /etc/yum.repos.d/wireguard.repo https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo
       yum install epel-release
       yum install wireguard-dkms wireguard-tools
     elif [[ "$install_wireguard" == 2 ]]; then
-# If chosen NOT to install, move along
+      # If chosen NOT to install, move along
       echo -e "
       Understood, moving on with the script."
     fi
@@ -142,24 +145,25 @@ elif [[ "$distro" = "centos" ]]; then
 
 ########### Fedora ###########
 ##############################
-elif [[ "$distro" = "fedora" ]]; then
+elif [[ "$distro" == "fedora" ]]; then
   check_if_wg_installed=$(dnf list installed | grep -i -c wireguard-tools)
-# If WireGuard is NOT installed, offer to instal
+  # If WireGuard is NOT installed, offer to instal
   if [[ "$check_if_wg_installed" == 0 ]]; then
     echo "
-    OS Type: Fedora
-    Wireguard-Tools: NOT installed
-
-    Would you like to have Wireguard installed?
-
++---------------------------------------------+
+      ${BWhite}OS Type: Fedora
+    Wireguard-Tools: NOT installed${Color_Off}
++---------------------------------------------+
+      ${BWhite}Would you like to have Wireguard installed?${Color_Off}
++---------------------------------------------+
     ${BWhite}1 = yes, 2 = no${Color_Off}"
     read -r install_wireguard
     if [[ "$install_wireguard" == 1 ]]; then
-# If chosen to install, proceed with installation
+      # If chosen to install, proceed with installation
       dnf copr enable jdoss/wireguard
       dnf install wireguard-dkms wireguard-tools
     elif [[ "$install_wireguard" == 2 ]]; then
-# If chosen NOT to install, move along
+      # If chosen NOT to install, move along
       echo -e "
       Understood, moving on with the script."
     fi
@@ -169,26 +173,27 @@ elif [[ "$distro" = "fedora" ]]; then
 
 ########### Debian ###########
 ##############################
-elif [[ "$distro" = "debian" ]]; then
+elif [[ "$distro" == "debian" ]]; then
   check_if_wg_installed=$(dpkg-query -l | grep -i -c wireguard-tools)
-# If WireGuard is NOT installed, offer to instal
+  # If WireGuard is NOT installed, offer to instal
   if [[ "$check_if_wg_installed" == 0 ]]; then
     echo "
-    OS Type: Debian
-    Wireguard-Tools: NOT installed
-
-    Would you like to have Wireguard installed?
-
++---------------------------------------------+
+    ${BWhite}OS Type: Debian
+    Wireguard-Tools: NOT installed${Color_Off}
++---------------------------------------------+
+    ${BWhite}Would you like to have Wireguard installed?${Color_Off}
++---------------------------------------------+
     ${BWhite}1 = yes, 2 = no${Color_Off}"
     read -r install_wireguard
     if [[ "$install_wireguard" == 1 ]]; then
-# If chosen to install, proceed with installation
-      echo "deb http://deb.debian.org/debian/ unstable main" > /etc/apt/sources.list.d/unstable.list
-      printf 'Package: *\nPin: release a=unstable\nPin-Priority: 90\n' > /etc/apt/preferences.d/limit-unstable
+      # If chosen to install, proceed with installation
+      echo "deb http://deb.debian.org/debian/ unstable main" >/etc/apt/sources.list.d/unstable.list
+      printf 'Package: *\nPin: release a=unstable\nPin-Priority: 90\n' >/etc/apt/preferences.d/limit-unstable
       apt update
       apt install wireguard
     elif [[ "$install_wireguard" == 2 ]]; then
-# If chosen NOT to install, move along
+      # If chosen NOT to install, move along
       echo -e "
       Understood, moving on with the script."
     fi
@@ -197,7 +202,6 @@ elif [[ "$distro" = "debian" ]]; then
 ##############################
 fi
 ############### FINISHED CHECKING OS AND OFFER TO INSTALL WIREGUARD ###############
-
 
 # Private address could be any address within RFC 1918, usually the first useable address in a /24 range. This however is completely up to you.
 echo -e "
@@ -244,8 +248,8 @@ ${BWhite}1 = yes, 2 = no${Color_Off}
 "
 read -r generate_server_key
 
-if  [[ "$generate_server_key" == 1 ]] ; then
-  wg genkey | tee "$my_working_dir"/keys/ServerPrivatekey | wg pubkey > "$my_working_dir"/keys/ServerPublickey
+if [[ "$generate_server_key" == 1 ]]; then
+  wg genkey | tee "$my_working_dir"/keys/ServerPrivatekey | wg pubkey >"$my_working_dir"/keys/ServerPublickey
   chmod 600 "$my_working_dir"/keys/ServerPrivatekey && chmod 600 "$my_working_dir"/keys/ServerPublickey
 
 # The else statement assumes the user already has server keys,
@@ -257,11 +261,11 @@ else
   echo -e "
   ${IWhite}Specify server private key.${Color_Off}"
   read -r server_private_key
-  echo "$server_private_key" > "$my_working_dir"/keys/ServerPrivatekey
+  echo "$server_private_key" >"$my_working_dir"/keys/ServerPrivatekey
   echo -e "
   ${IWhite}Specify server public key.${Color_Off}"
   read -r server_public_key
-  echo "$server_public_key" > "$my_working_dir"/keys/ServerPublickey
+  echo "$server_public_key" >"$my_working_dir"/keys/ServerPublickey
   chmod 600 "$my_working_dir"/keys/ServerPrivatekey && chmod 600 "$my_working_dir"/keys/ServerPrivatekey
 fi
 
@@ -284,7 +288,7 @@ ListenPort = $server_listen_port
 PrivateKey = $sever_private_key_output
   ")
 
-echo "$new_server_config" > "$my_working_dir"/server_config.txt
+echo "$new_server_config" >"$my_working_dir"/server_config.txt
 chmod 600 "$my_working_dir"/server_config.txt
 
 echo -e "Server config has been written to a file $my_working_dir/server_config.txt"
@@ -298,27 +302,27 @@ NOTE: ${UWhite}Choosing to save the config under the same file-name as an existi
 
 This script will check if a config file with the same name already exists and will back existing config up before overriting it.
 "
+
+check_for_existing_config=$(ls /etc/wireguard/ | grep -c "$wg_sev_iface".conf)
+
 read -r save_server_config
-if [[ "$save_server_config" == 1 ]]; then
-  echo -e "
-  ${IWhite}Provide file name of the config, without the .conf part.${Color_Off}
 
-  Example: wg0
-  "
-  read -r config_file_name
-  check_for_existing_config=$(ls /etc/wireguard/ | grep -c --count "$config_file_name")
-
-  # The if statement checks whether a config with the same filename already exists.
-  # If it does, the falue will always be less than zero, hence it needs to be backed up.
-  if [[ $save_server_config == 1 ]] && [[ $check_for_existing_config -ge 1 ]]; then
-    echo "
-    Found existing config file with the same name. Backing up to /etc/wireguard/$config_file_name.conf.bak"
-    sleep 1
-    mv /etc/wireguard/"$config_file_name".conf /etc/wireguard/"$config_file_name".conf.bak
-  fi
+# The if statement checks whether a config with the same filename already exists.
+# If it does, the falue will always be less than zero, hence it needs to be backed up.
+if [[ $save_server_config == 1 ]] && [[ $check_for_existing_config -gt 0 ]]; then
+  echo "
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    Found existing config file with the same name. Backing up to /etc/wireguard/$wg_sev_iface.conf.bak
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   sleep 1
-echo "$new_server_config" > /etc/wireguard/"$config_file_name".conf
-echo -e "Congrats! Server config is ready and saved to /etc/wireguard/$config_file_name.conf. The config is shown below.
+  mv /etc/wireguard/"$wg_sev_iface".conf /etc/wireguard/"$wg_sev_iface".conf.bak
+  sleep 1
+  echo "$new_server_config" >/etc/wireguard/"$wg_sev_iface".conf
+elif [[ $save_server_config -eq 1 ]] && [[ $check_for_existing_config -eq 0 ]]; then
+  sleep 1
+  echo "$new_server_config" >/etc/wireguard/"$wg_sev_iface".conf
+fi
+echo -e "Congrats! Server config is ready and saved to /etc/wireguard/$wg_sev_iface.conf. The config is shown below.
 
   ------------------------
 
@@ -326,7 +330,6 @@ echo -e "Congrats! Server config is ready and saved to /etc/wireguard/$config_fi
 
   ------------------------
 "
-fi
 
 echo -e "
 ${IWhite}Configure clients?${Color_Off}
@@ -343,30 +346,30 @@ ${IWhite}How many clients would you like to configure?${Color_Off}
   echo -e "
 ${IWhite}Specify the DNS server your clients will use.${Color_Off}
   "
-# This would usually be a public DNS server, for example 1.1.1.1,
-# 8.8.8.8, etc.
+  # This would usually be a public DNS server, for example 1.1.1.1,
+  # 8.8.8.8, etc.
   read -r client_dns
   echo "
 Next steps will ask to provide private address and a name for each client, one at a time.
   "
-# Private address would be within the RFC 1918 range of the server.
-# For example if the server IP is 10.10.10.1/24, the first client
-# would usually have an IP of 10.10.10.2; though this can be any
-# address as long as it's within the range specified for the server.
-  for (( i = 1; i <= "$number_of_clients"; i++ )); do
+  # Private address would be within the RFC 1918 range of the server.
+  # For example if the server IP is 10.10.10.1/24, the first client
+  # would usually have an IP of 10.10.10.2; though this can be any
+  # address as long as it's within the range specified for the server.
+  for ((i = 1; i <= "$number_of_clients"; i++)); do
     echo -e "
 ${IWhite}Private address of a client (do NOT include /32):${Color_Off}
     "
     read -r client_private_address_[$i]
-# Client name can be anything, mainly to easily identify the device
-# to be used. Some exampmles are:
-# Tom_iPhone
-# Wendy_laptop
+    # Client name can be anything, mainly to easily identify the device
+    # to be used. Some exampmles are:
+    # Tom_iPhone
+    # Wendy_laptop
     echo -e "
 ${IWhite}Provide the name of the client${Color_Off}
     "
     read -r client_name_[$i]
-    wg genkey | tee "$my_working_dir"/keys/"${client_name_["$i"]}"Privatekey | wg pubkey > "$my_working_dir"/keys/"${client_name_["$i"]}"Publickey
+    wg genkey | tee "$my_working_dir"/keys/"${client_name_["$i"]}"Privatekey | wg pubkey >"$my_working_dir"/keys/"${client_name_["$i"]}"Publickey
 
     chmod 600 "$my_working_dir"/keys/"${client_name_["$i"]}"Privatekey
     chmod 600 "$my_working_dir"/keys/"${client_name_["$i"]}"Publickey
@@ -384,7 +387,7 @@ DNS = $client_dns
 PublicKey = $sever_public_key_output
 Endpoint = $server_public_address:$server_listen_port
 AllowedIPs = 0.0.0.0/0
-PersistentKeepalive = 21" > "$my_working_dir"/client_configs/"${client_name_["$i"]}".conf
+PersistentKeepalive = 21" >"$my_working_dir"/client_configs/"${client_name_["$i"]}".conf
   done
   echo -e "
 Awesome!
@@ -408,35 +411,18 @@ ${IWhite}Would you like to add client info to the server config now?${Color_Off}
 
 ${BWhite}1 = yes, 2 = no${Color_Off}"
 read -r configure_server_with_clients
-check_server_config_name=$(ls /etc/wireguard/ | grep -c --count wg0.conf)
+check_server_config_name=$(ls /etc/wireguard/ | grep -c wg0.conf)
 # If you chose to add client info to the server config AND to save the server config
 # to /etc/wireguard/, then the script will add the clients to that config
-if [[ $configure_server_with_clients == 1 ]] && [[ $save_server_config == 1 ]]; then
+if [[ $configure_server_with_clients -eq 1 ]] && [[ $check_for_existing_config -gt 0 ]]; then
   for a in $(seq 1 "$number_of_clients"); do
     echo "
 [Peer]
 PublicKey = ${client_public_key_["$a"]}
 AllowedIPs = ${client_private_address_["$a"]}/32
-" >> /etc/wireguard/"$config_file_name".conf
+" >>/etc/wireguard/"$wg_sev_iface".conf
   done
-# If there is already a config wg0.conf in /etc/wireguard/, then the script will back it up
-# and will add client info to it
-elif [[ $configure_server_with_clients == 1 ]] && [[ $check_server_config_name == 1 ]]; then
-  echo "
-  Found an existing config file wg0.conf. Backing up the file to /etc/wireguard/wg0.conf.bak and adding client info.
-  "
-  mv /etc/wireguard/wg0.conf /etc/wireguard/wg0.conf.bak
-
-  for b in $(seq 1 "$number_of_clients"); do
-    echo "
-[Peer]
-PublicKey = ${client_public_key_["$b"]}
-AllowedIPs = ${client_private_address_["$b"]}/32
-" >> /etc/wireguard/wg0.conf
-  done
-# If you chose to add client info to the server config and the script is not sure to which
-# file the info needs to be added, you will be asked to specify the filename
-elif [[  $configure_server_with_clients == 1 ]] && [[ $check_server_config_name == 0 ]]; then
+elif [[ $configure_server_with_clients -eq 1 ]] && [[ $check_for_existing_config -eq 0 ]]; then
   echo -e "
   ${IWhite}It appears the script is not sure what config file the save client info to Please type the file name without .conf to save the client info to.${Color_Off}
   "
@@ -446,7 +432,7 @@ elif [[  $configure_server_with_clients == 1 ]] && [[ $check_server_config_name 
 [Peer]
 PublicKey = ${client_public_key_["$c"]}
 AllowedIPs = ${client_private_address_["$c"]}/32
-" >> /etc/wireguard/"$server_file_for_clients".conf
+" >>/etc/wireguard/"$server_file_for_clients".conf
   done
 # If you chose not to add the client info to the server config at this time,
 # the script will show the information which will have to be added to the
@@ -479,23 +465,23 @@ ${BWhite}1 = yes, 2 = no${Color_Off}
 
 read -r enable_on_boot
 
-if [[ $enable_on_boot == 1 ]] && [[ $check_for_existing_config -ge $enable_on_boot ]]; then
+if [[ $enable_on_boot -eq 1 ]] && [[ $check_for_existing_config -gt 0 ]]; then
   echo -e "
-  ${IYellow}chown -v root:root /etc/wireguard/$config_file_name.conf
-  chmod -v 600 /etc/wireguard/$config_file_name.conf
-  wg-quick up $config_file_name
-  systemctl enable wg-quick@$config_file_name.service${Color_Off}"
+  ${IYellow}chown -v root:root /etc/wireguard/$wg_sev_iface.conf
+  chmod -v 600 /etc/wireguard/$wg_sev_iface.conf
+  wg-quick up $wg_sev_iface
+  systemctl enable wg-quick@$wg_sev_iface.service${Color_Off}"
   read -n 1 -s -r -p "
   Review the above commands.
 
   Press any key to continue or CTRL+C to stop."
-  chown -v root:root /etc/wireguard/"$config_file_name".conf
-  chmod -v 600 /etc/wireguard/"$config_file_name".conf
-  wg-quick up "$config_file_name"
-  systemctl enable wg-quick@"$config_file_name".service
+  chown -v root:root /etc/wireguard/"$wg_sev_iface".conf
+  chmod -v 600 /etc/wireguard/"$wg_sev_iface".conf
+  wg-quick up "$wg_sev_iface"
+  systemctl enable wg-quick@"$wg_sev_iface".service
 # Conversely, if the script cannot find the server config in /etc/wireguard/
 # the used will be asked to specify the config name
-elif [[ $enable_on_boot == 1 ]] && [[ $check_for_existing_config -le "0" ]]; then
+elif [[ $enable_on_boot -eq 1 ]] && [[ $check_for_existing_config -eq 0 ]]; then
   echo -e "${IWhite} Existing config/interface was not found. Please specify server config filename without .conf part.
 
   Example: for /etc/wireguard/wg0.conf, type wg0${Color_Off}"
@@ -516,13 +502,13 @@ elif [[ $enable_on_boot == 1 ]] && [[ $check_for_existing_config -le "0" ]]; the
 # Finally, if the user chose not to enable WireGuard tunnel interface, but the script
 # has found a config file which can be used. Then the script will provide the commands
 # to issue manually.
-elif [[ $enable_on_boot == 2 ]] && [[ $check_for_existing_config -ge $save_server_config ]]; then
+elif [[ $enable_on_boot == 2 ]] && [[ $check_for_existing_config -gt 0 ]]; then
   echo -e "${IWhite} To manually enable the service and bring tunnel interface up, the following commands can be used:${Color_Off}"
   echo -e "
-  ${IYellow}chown -v root:root /etc/wireguard/$config_file_name.conf
-  chmod -v 600 /etc/wireguard/$config_file_name.conf
-  wg-quick up $config_file_name
-  systemctl enable wg-quick@$config_file_name.service${Color_Off}"
+  ${IYellow}chown -v root:root /etc/wireguard/$wg_sev_iface.conf
+  chmod -v 600 /etc/wireguard/$wg_sev_iface.conf
+  wg-quick up $wg_sev_iface
+  systemctl enable wg-quick@$wg_sev_iface.service${Color_Off}"
 fi
 
 echo -e "${IWhite}Before ending this script, would you like to setup firewall rules for the new server? (recommended)${Color_Off}
@@ -531,7 +517,7 @@ ${BWhite}1 = yes, 2 = no${Color_Off}
 "
 read -r iptables_setup
 if [[ $iptables_setup == 1 ]]; then
- sudo bash "$my_wgl_folder"/Scripts/setup_iptables.sh
+  sudo bash "$my_wgl_folder"/Scripts/setup_iptables.sh
 else
   echo "Sounds good. Ending the scritp..."
 fi
