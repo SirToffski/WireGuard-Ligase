@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [ "$EUID" -ne 0 ]; then
-  echo "Please run the script as root."
+  echo -e "Please run the script as root."
   exit 1
 fi
 
@@ -53,7 +53,7 @@ if [[ "$check_for_clients_directory" == 0 ]]; then
 fi
 ##################### Pre-checks finished #########################
 
-echo "This script will take you through the steps needed to deploy a new server and configure some clients.
+echo -e "This script will take you through the steps needed to deploy a new server and configure some clients.
 
 First, let's check if wireguard is installed..."
 
@@ -63,7 +63,7 @@ if [[ "$distro" == "ubuntu" ]]; then
   check_if_wg_installed=$(dpkg-query -l | grep -i -c wireguard-tools)
   # If WireGuard is NOT installed, offer to install
   if [[ "$check_if_wg_installed" == 0 ]]; then
-    echo "
+    echo -e "
 +---------------------------------------------+
     ${BWhite}OS Type: Ubuntu
     Wireguard-Tools: NOT installed${Color_Off}
@@ -92,7 +92,7 @@ elif [[ "$distro" == "arch" ]] || [[ "$distro" == "manjaro" ]]; then
   check_if_wg_installed=$(pacman -Qe | grep -i -c wireguard-tools)
   # If WireGuard is NOT installed, offer to instal
   if [[ "$check_if_wg_installed" == 0 ]]; then
-    echo "
+    echo -e "
 +---------------------------------------------+
     ${BWhite}OS Type: $distro
     Wireguard-Tools: NOT installed${Color_Off}
@@ -120,7 +120,7 @@ elif [[ "$distro" == "centos" ]]; then
   check_if_wg_installed=$(yum list installed | grep -i -c wireguard-tools)
   # If WireGuard is NOT installed, offer to instal
   if [[ "$check_if_wg_installed" == 0 ]]; then
-    echo "
+    echo -e "
 +---------------------------------------------+
       ${BWhite}OS Type: CentOS
     Wireguard-Tools: NOT installed${Color_Off}
@@ -149,7 +149,7 @@ elif [[ "$distro" == "fedora" ]]; then
   check_if_wg_installed=$(dnf list installed | grep -i -c wireguard-tools)
   # If WireGuard is NOT installed, offer to instal
   if [[ "$check_if_wg_installed" == 0 ]]; then
-    echo "
+    echo -e "
 +---------------------------------------------+
       ${BWhite}OS Type: Fedora
     Wireguard-Tools: NOT installed${Color_Off}
@@ -177,7 +177,7 @@ elif [[ "$distro" == "debian" ]]; then
   check_if_wg_installed=$(dpkg-query -l | grep -i -c wireguard-tools)
   # If WireGuard is NOT installed, offer to instal
   if [[ "$check_if_wg_installed" == 0 ]]; then
-    echo "
+    echo -e "
 +---------------------------------------------+
     ${BWhite}OS Type: Debian
     Wireguard-Tools: NOT installed${Color_Off}
