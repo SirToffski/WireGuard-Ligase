@@ -41,14 +41,14 @@ source "$my_wgl_folder"/doc/colours.sh
 ######################## Pre-checks ##############################
 # Check if a directory /keys/ exists, if not, it will be made
 check_for_keys_directory=$(ls "$my_working_dir" | grep -c keys)
-if [[ $check_for_keys_directory == 0 ]]; then
+if [[ "$check_for_keys_directory" == 0 ]]; then
   mkdir keys
 fi
 
 # Check if a directory /client_configs/ exists, if not, it will be made
 check_for_clients_directory=$(ls "$my_working_dir" | grep -c client_configs)
 
-if [[ $check_for_clients_directory == 0 ]]; then
+if [[ "$check_for_clients_directory" == 0 ]]; then
   mkdir client_configs
 fi
 ##################### Pre-checks finished #########################
@@ -309,7 +309,7 @@ read -r save_server_config
 
 # The if statement checks whether a config with the same filename already exists.
 # If it does, the falue will always be less than zero, hence it needs to be backed up.
-if [[ $save_server_config == 1 ]] && [[ $check_for_existing_config -gt 0 ]]; then
+if [[ "$save_server_config" == 1 ]] && [[ "$check_for_existing_config" -gt 0 ]]; then
   echo "
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     Found existing config file with the same name. Backing up to /etc/wireguard/$wg_sev_iface.conf.bak
@@ -318,7 +318,7 @@ if [[ $save_server_config == 1 ]] && [[ $check_for_existing_config -gt 0 ]]; the
   mv /etc/wireguard/"$wg_sev_iface".conf /etc/wireguard/"$wg_sev_iface".conf.bak
   sleep 1
   echo "$new_server_config" >/etc/wireguard/"$wg_sev_iface".conf
-elif [[ $save_server_config -eq 1 ]] && [[ $check_for_existing_config -eq 0 ]]; then
+elif [[ "$save_server_config" -eq 1 ]] && [[ "$check_for_existing_config" -eq 0 ]]; then
   sleep 1
   echo "$new_server_config" >/etc/wireguard/"$wg_sev_iface".conf
 fi
@@ -399,7 +399,7 @@ ${IWhite}Before ending this script, would you like to setup IPTABLES for the new
 ${BWhite}1 = yes, 2 = no${Color_Off}
   "
   read -r iptables_setup
-  if [[ $iptables_setup == 1 ]]; then
+  if [[ "$iptables_setup" == 1 ]]; then
     sudo bash setup_iptables.sh
   fi
   echo -e "Ending the script...."
@@ -411,10 +411,10 @@ ${IWhite}Would you like to add client info to the server config now?${Color_Off}
 
 ${BWhite}1 = yes, 2 = no${Color_Off}"
 read -r configure_server_with_clients
-check_server_config_name=$(ls /etc/wireguard/ | grep -c wg0.conf)
+
 # If you chose to add client info to the server config AND to save the server config
 # to /etc/wireguard/, then the script will add the clients to that config
-if [[ $configure_server_with_clients -eq 1 ]] && [[ $check_for_existing_config -gt 0 ]]; then
+if [[ "$configure_server_with_clients" -eq 1 ]] && [[ "$check_for_existing_config" -gt 0 ]]; then
   for a in $(seq 1 "$number_of_clients"); do
     echo "
 [Peer]
@@ -422,7 +422,7 @@ PublicKey = ${client_public_key_["$a"]}
 AllowedIPs = ${client_private_address_["$a"]}/32
 " >>/etc/wireguard/"$wg_sev_iface".conf
   done
-elif [[ $configure_server_with_clients -eq 1 ]] && [[ $check_for_existing_config -eq 0 ]]; then
+elif [[ "$configure_server_with_clients" -eq 1 ]] && [[ "$check_for_existing_config" -eq 0 ]]; then
   echo -e "
   ${IWhite}It appears the script is not sure what config file the save client info to Please type the file name without .conf to save the client info to.${Color_Off}
   "
@@ -465,7 +465,7 @@ ${BWhite}1 = yes, 2 = no${Color_Off}
 
 read -r enable_on_boot
 
-if [[ $enable_on_boot -eq 1 ]] && [[ $check_for_existing_config -gt 0 ]]; then
+if [[ "$enable_on_boot" -eq 1 ]] && [[ "$check_for_existing_config" -gt 0 ]]; then
   echo -e "
   ${IYellow}chown -v root:root /etc/wireguard/$wg_sev_iface.conf
   chmod -v 600 /etc/wireguard/$wg_sev_iface.conf
@@ -481,7 +481,7 @@ if [[ $enable_on_boot -eq 1 ]] && [[ $check_for_existing_config -gt 0 ]]; then
   systemctl enable wg-quick@"$wg_sev_iface".service
 # Conversely, if the script cannot find the server config in /etc/wireguard/
 # the used will be asked to specify the config name
-elif [[ $enable_on_boot -eq 1 ]] && [[ $check_for_existing_config -eq 0 ]]; then
+elif [[ "$enable_on_boot" -eq 1 ]] && [[ "$check_for_existing_config" -eq 0 ]]; then
   echo -e "${IWhite} Existing config/interface was not found. Please specify server config filename without .conf part.
 
   Example: for /etc/wireguard/wg0.conf, type wg0${Color_Off}"
@@ -502,7 +502,7 @@ elif [[ $enable_on_boot -eq 1 ]] && [[ $check_for_existing_config -eq 0 ]]; then
 # Finally, if the user chose not to enable WireGuard tunnel interface, but the script
 # has found a config file which can be used. Then the script will provide the commands
 # to issue manually.
-elif [[ $enable_on_boot == 2 ]] && [[ $check_for_existing_config -gt 0 ]]; then
+elif [[ "$enable_on_boot" == 2 ]] && [[ "$check_for_existing_config" -gt 0 ]]; then
   echo -e "${IWhite} To manually enable the service and bring tunnel interface up, the following commands can be used:${Color_Off}"
   echo -e "
   ${IYellow}chown -v root:root /etc/wireguard/$wg_sev_iface.conf
@@ -516,7 +516,7 @@ echo -e "${IWhite}Before ending this script, would you like to setup firewall ru
 ${BWhite}1 = yes, 2 = no${Color_Off}
 "
 read -r iptables_setup
-if [[ $iptables_setup == 1 ]]; then
+if [[ "$iptables_setup" == 1 ]]; then
   sudo bash "$my_wgl_folder"/Scripts/setup_iptables.sh
 else
   echo "Sounds good. Ending the scritp..."
