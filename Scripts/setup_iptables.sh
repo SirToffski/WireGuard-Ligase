@@ -312,7 +312,7 @@ elif [[ "$distro" == "arch" ]] || [[ "$distro" == "manjaro" ]]; then
   systemctl start iptables.service
   iptables-save >/etc/iptables/iptables.rules
   systemctl restart iptables.service
-elif [[ "$distro" == centos ]]; then
+elif [[ "$distro" == "centos" ]]; then
   if [[ "$check_if_firewalld_installed" == 0 ]]; then
     echo -e "
   ${IWhite}In order to make the above iptables rules persistent after system reboot,
