@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 if [ "$EUID" -ne 0 ]; then
-    echo "Please run the script as root."
-    exit 1
+  echo "Please run the script as root."
+  exit 1
 fi
 
 my_working_dir=$(pwd)
@@ -52,7 +52,7 @@ read -r client_dns
 echo "
 Next steps will ask to provide private address and a name for each client, one at a time.
 "
-for (( i = 1; i <= "$number_of_clients"; i++ )); do
+for ((i = 1; i <= "$number_of_clients"; i++)); do
   echo "
   Private address of a client (do NOT include /32):
   "
@@ -61,10 +61,9 @@ for (( i = 1; i <= "$number_of_clients"; i++ )); do
   Provide the name of the client
   "
 
-
   read -r client_name_[$i]
 
-  wg genkey | tee "$my_working_dir"/keys/"${client_name_["$i"]}"Privatekey | wg pubkey > "$my_working_dir"/keys/"${client_name_["$i"]}"Publickey
+  wg genkey | tee "$my_working_dir"/keys/"${client_name_["$i"]}"Privatekey | wg pubkey >"$my_working_dir"/keys/"${client_name_["$i"]}"Publickey
 
   chmod 600 "$my_working_dir"/keys/"${client_name_["$i"]}"Privatekey
   chmod 600 "$my_working_dir"/keys/"${client_name_["$i"]}"Publickey
@@ -82,7 +81,7 @@ DNS = $client_dns
 PublicKey = $sever_public_key_output
 Endpoint = $server_details
 AllowedIPs = 0.0.0.0/0
-PersistentKeepalive = 21" > "$my_working_dir"/client_configs/"${client_name_["$i"]}".conf
+PersistentKeepalive = 21" >"$my_working_dir"/client_configs/"${client_name_["$i"]}".conf
 done
 
 echo "
@@ -109,7 +108,7 @@ if [[ $configure_server_with_clients == 1 ]]; then
 [Peer]
 PublicKey = ${client_public_key_["$c"]}
 AllowedIPs = ${client_private_address_["$c"]}/32
-  " >> /etc/wireguard/"$server_file_for_clients".conf
+  " >>/etc/wireguard/"$server_file_for_clients".conf
   done
 else
   echo "
@@ -124,5 +123,5 @@ PublicKey = ${client_public_key_["$d"]}
 AllowedIPs = ${client_private_address_["$d"]}/32
 "
   done
-echo "-----------------"
+  echo "-----------------"
 fi

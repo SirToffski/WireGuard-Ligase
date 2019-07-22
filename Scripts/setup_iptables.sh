@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 if [ "$EUID" -ne 0 ]; then
-    echo "Please run the script as root."
-    exit 1
+  echo "Please run the script as root."
+  exit 1
 fi
 
 ############## Determine OS Type ##############
@@ -79,7 +79,6 @@ ${BWhite}Example: ${BRed}eth0${Color_Off}"
 echo -e "$my_separator"
 read -r local_interface
 echo -e "$my_separator"
-
 
 echo -e "
 ${IWhite}Finally, specify the interface name to be used for wireguard. Usually it matches your WireGuard *.conf file.${Color_Off}
@@ -181,7 +180,7 @@ else
   echo -e "${BWhite}Done!${Color_Off}"
 fi
 
-if [[ "$distro" = "ubuntu" ]] || [[ "$distro" = "debian" ]]; then
+if [[ "$distro" == "ubuntu" ]] || [[ "$distro" == "debian" ]]; then
   echo -e "
   ${IWhite}In order to make the above iptables rules persistent after system reboot,
   ${BRed}iptables-persistent ${IWhite} package needs to be installed.
@@ -203,7 +202,7 @@ if [[ "$distro" = "ubuntu" ]] || [[ "$distro" = "debian" ]]; then
   apt-get install iptables-persistent
   systemctl enable netfilter-persistent
   netfilter-persistent save
-elif [[ "$distro" = "fedora" ]]; then
+elif [[ "$distro" == "fedora" ]]; then
   echo -e "
   ${IWhite}In order to make the above iptables rules persistent after system reboot,
   netfilter rules will need to be saved.
@@ -221,7 +220,7 @@ elif [[ "$distro" = "fedora" ]]; then
 
   /sbin/service iptables save
 
-elif [[ "$distro" = "arch" ]] || [[ "$distro" = "manjaro" ]]; then
+elif [[ "$distro" == "arch" ]] || [[ "$distro" == "manjaro" ]]; then
   echo -e "
   ${IWhite}In order to make the above iptables rules persistent after system reboot,
   netfilter rules will need to be saved.
@@ -253,7 +252,7 @@ elif [[ "$distro" = "arch" ]] || [[ "$distro" = "manjaro" ]]; then
   fi
   systemctl enable iptables.service
   systemctl start iptables.service
-  iptables-save > /etc/iptables/iptables.rules
+  iptables-save >/etc/iptables/iptables.rules
   systemctl restart iptables.service
 fi
 

@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 
 if [ "$EUID" -ne 0 ]; then
-    echo "Please run the script as root."
-    exit 1
+  echo "Please run the script as root."
+  exit 1
 fi
-
 
 my_wgl_folder=$(find /home -type d -name WireGuard-Ligase)
 my_working_dir=$(pwd)
@@ -71,9 +70,9 @@ First, let's check if wireguard is installed..."
 
 ########### UBUNTU ###########
 ##############################
-if [[ "$distro" = "ubuntu" ]]; then
+if [[ "$distro" == "ubuntu" ]]; then
   check_if_wg_installed=$(dpkg-query -l | grep -i -c wireguard-tools)
-# If WireGuard is NOT installed, offer to install
+  # If WireGuard is NOT installed, offer to install
   if [[ "$check_if_wg_installed" == 0 ]]; then
     echo "
     OS Type: Ubuntu
@@ -84,12 +83,12 @@ if [[ "$distro" = "ubuntu" ]]; then
     ${BWhite}1 = yes, 2 = no${Color_Off}"
     read -r install_wireguard
     if [[ "$install_wireguard" == 1 ]]; then
-# If chosen to install, proceed with installation
+      # If chosen to install, proceed with installation
       add-apt-repository ppa:wireguard/wireguard
       apt-get update
       apt-get install wireguard
     elif [[ "$install_wireguard" == 2 ]]; then
-# If chosen NOT to install, move along
+      # If chosen NOT to install, move along
       echo -e "
       Understood, moving on with the script."
     fi
@@ -99,9 +98,9 @@ if [[ "$distro" = "ubuntu" ]]; then
 
 ########### ARCH OR MANJARO ###########
 #######################################
-elif [[ "$distro" = "arch" ]] || [[ "$distro" = "manjaro" ]]; then
+elif [[ "$distro" == "arch" ]] || [[ "$distro" == "manjaro" ]]; then
   check_if_wg_installed=$(pacman -Qe | grep -i -c wireguard-tools)
-# If WireGuard is NOT installed, offer to instal
+  # If WireGuard is NOT installed, offer to instal
   if [[ "$check_if_wg_installed" == 0 ]]; then
     echo "
     OS Type: $distro
@@ -112,11 +111,11 @@ elif [[ "$distro" = "arch" ]] || [[ "$distro" = "manjaro" ]]; then
     ${BWhite}1 = yes, 2 = no${Color_Off}"
     read -r install_wireguard
     if [[ "$install_wireguard" == 1 ]]; then
-# If chosen to install, proceed with installation
+      # If chosen to install, proceed with installation
       pacman -Syyy
       pacman -S wireguard-dkms wireguard-tools --noconfirm
     elif [[ "$install_wireguard" == 2 ]]; then
-# If chosen NOT to install, move along
+      # If chosen NOT to install, move along
       echo -e "
       Understood, moving on with the script."
     fi
@@ -126,9 +125,9 @@ elif [[ "$distro" = "arch" ]] || [[ "$distro" = "manjaro" ]]; then
 
 ########### CENTOS ###########
 ##############################
-elif [[ "$distro" = "centos" ]]; then
+elif [[ "$distro" == "centos" ]]; then
   check_if_wg_installed=$(yum list installed | grep -i -c wireguard-tools)
-# If WireGuard is NOT installed, offer to instal
+  # If WireGuard is NOT installed, offer to instal
   if [[ "$check_if_wg_installed" == 0 ]]; then
     echo "
     OS Type: CentOS
@@ -139,12 +138,12 @@ elif [[ "$distro" = "centos" ]]; then
     ${BWhite}1 = yes, 2 = no${Color_Off}"
     read -r install_wireguard
     if [[ "$install_wireguard" == 1 ]]; then
-# If chosen to install, proceed with installation
+      # If chosen to install, proceed with installation
       curl -Lo /etc/yum.repos.d/wireguard.repo https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo
       yum install epel-release
       yum install wireguard-dkms wireguard-tools
     elif [[ "$install_wireguard" == 2 ]]; then
-# If chosen NOT to install, move along
+      # If chosen NOT to install, move along
       echo -e "
       Understood, moving on with the script."
     fi
@@ -154,9 +153,9 @@ elif [[ "$distro" = "centos" ]]; then
 
 ########### Fedora ###########
 ##############################
-elif [[ "$distro" = "fedora" ]]; then
+elif [[ "$distro" == "fedora" ]]; then
   check_if_wg_installed=$(dnf list installed | grep -i -c wireguard-tools)
-# If WireGuard is NOT installed, offer to instal
+  # If WireGuard is NOT installed, offer to instal
   if [[ "$check_if_wg_installed" == 0 ]]; then
     echo "
     OS Type: Fedora
@@ -167,11 +166,11 @@ elif [[ "$distro" = "fedora" ]]; then
     ${BWhite}1 = yes, 2 = no${Color_Off}"
     read -r install_wireguard
     if [[ "$install_wireguard" == 1 ]]; then
-# If chosen to install, proceed with installation
+      # If chosen to install, proceed with installation
       dnf copr enable jdoss/wireguard
       dnf install wireguard-dkms wireguard-tools
     elif [[ "$install_wireguard" == 2 ]]; then
-# If chosen NOT to install, move along
+      # If chosen NOT to install, move along
       echo -e "
       Understood, moving on with the script."
     fi
@@ -181,9 +180,9 @@ elif [[ "$distro" = "fedora" ]]; then
 
 ########### Debian ###########
 ##############################
-elif [[ "$distro" = "debian" ]]; then
+elif [[ "$distro" == "debian" ]]; then
   check_if_wg_installed=$(dpkg-query -l | grep -i -c wireguard-tools)
-# If WireGuard is NOT installed, offer to instal
+  # If WireGuard is NOT installed, offer to instal
   if [[ "$check_if_wg_installed" == 0 ]]; then
     echo "
     OS Type: Debian
@@ -194,13 +193,13 @@ elif [[ "$distro" = "debian" ]]; then
     ${BWhite}1 = yes, 2 = no${Color_Off}"
     read -r install_wireguard
     if [[ "$install_wireguard" == 1 ]]; then
-# If chosen to install, proceed with installation
-      echo "deb http://deb.debian.org/debian/ unstable main" > /etc/apt/sources.list.d/unstable.list
-      printf 'Package: *\nPin: release a=unstable\nPin-Priority: 90\n' > /etc/apt/preferences.d/limit-unstable
+      # If chosen to install, proceed with installation
+      echo "deb http://deb.debian.org/debian/ unstable main" >/etc/apt/sources.list.d/unstable.list
+      printf 'Package: *\nPin: release a=unstable\nPin-Priority: 90\n' >/etc/apt/preferences.d/limit-unstable
       apt update
       apt install wireguard
     elif [[ "$install_wireguard" == 2 ]]; then
-# If chosen NOT to install, move along
+      # If chosen NOT to install, move along
       echo -e "
       Understood, moving on with the script."
     fi
@@ -279,7 +278,6 @@ ${IYellow}net.ipv4.ip_forward=1${Color_Off}
 ${IYellow}sysctl -p${Color_Off}
 "
 
-
 echo -e "$my_separator"
 
 read -n 1 -s -r -p "
@@ -308,15 +306,15 @@ ${BWhite}Review the above. Do you wish to proceed? (y/n)${Color_Off}"
 read -r proceed_quick_setup
 
 case "$proceed_quick_setup" in
-  #########################################################################
-  #                          CASE ANSWER y/Y STARTS                       #
-  #########################################################################
-  "y"|"Y")
+#########################################################################
+#                          CASE ANSWER y/Y STARTS                       #
+#########################################################################
+"y" | "Y")
   # Generating server keys
   echo -e "
   ${BGreen}Generating server keys${Color_Off}"
   sleep 1
-  wg genkey | tee "$my_working_dir"/keys/ServerPrivatekey | wg pubkey > "$my_working_dir"/keys/ServerPublickey
+  wg genkey | tee "$my_working_dir"/keys/ServerPrivatekey | wg pubkey >"$my_working_dir"/keys/ServerPublickey
   chmod 600 "$my_working_dir"/keys/ServerPrivatekey && chmod 600 "$my_working_dir"/keys/ServerPublickey
   sever_private_key_output=$(cat "$my_working_dir"/keys/ServerPrivatekey)
   sever_public_key_output=$(cat "$my_working_dir"/keys/ServerPublickey)
@@ -337,10 +335,10 @@ case "$proceed_quick_setup" in
   sleep 1
   echo -e "
   ${BGreen}Saving server config${Color_Off}"
-  echo "$new_server_config" > "$config_file_name".txt && echo "$new_server_config" > /etc/wireguard/"$config_file_name".conf
+  echo "$new_server_config" >"$config_file_name".txt && echo "$new_server_config" >/etc/wireguard/"$config_file_name".conf
   # Generating client keys
-  for (( i = 1; i <= "$number_of_clients"; i++ )); do
-    wg genkey | tee "$my_working_dir"/keys/client_"$i"_Privatekey | wg pubkey > "$my_working_dir"/keys/client_"$i"_Publickey
+  for ((i = 1; i <= "$number_of_clients"; i++)); do
+    wg genkey | tee "$my_working_dir"/keys/client_"$i"_Privatekey | wg pubkey >"$my_working_dir"/keys/client_"$i"_Publickey
 
     chmod 600 "$my_working_dir"/keys/client_"$i"_Privatekey
     chmod 600 "$my_working_dir"/keys/client_"$i"_Publickey
@@ -364,13 +362,13 @@ DNS = $client_dns
 PublicKey = $sever_public_key_output
 Endpoint = $server_public_address:$server_listen_port
 AllowedIPs = 0.0.0.0/0
-PersistentKeepalive = 21" > "$my_working_dir"/client_configs/client_1.conf
+PersistentKeepalive = 21" >"$my_working_dir"/client_configs/client_1.conf
 
-# Generating client 1 config
-sleep 1
-echo -e "
+  # Generating client 1 config
+  sleep 1
+  echo -e "
 ${BGreen}Generating client 2 config${Color_Off}"
-echo "
+  echo "
 [Interface]
 Address = $client_private_address_2
 PrivateKey = $client_private_key_2
@@ -380,9 +378,9 @@ DNS = $client_dns
 PublicKey = $sever_public_key_output
 Endpoint = $server_public_address:$server_listen_port
 AllowedIPs = 0.0.0.0/0
-PersistentKeepalive = 21" > "$my_working_dir"/client_configs/client_2.conf
+PersistentKeepalive = 21" >"$my_working_dir"/client_configs/client_2.conf
 
-# Adding client 1 info to the server config
+  # Adding client 1 info to the server config
   sleep 1
   echo -e "
   ${BGreen}Adding client 1 info to the server config${Color_Off}"
@@ -390,17 +388,17 @@ PersistentKeepalive = 21" > "$my_working_dir"/client_configs/client_2.conf
 [Peer]
 PublicKey = $client_public_key_1
 AllowedIPs = $client_private_address_1/32
-" >> /etc/wireguard/"$config_file_name".conf
+" >>/etc/wireguard/"$config_file_name".conf
 
-# Adding client 2 info to the server config
-sleep 1
-echo -e "
+  # Adding client 2 info to the server config
+  sleep 1
+  echo -e "
 ${BGreen}Adding client 2 info to the server config${Color_Off}"
-echo -e "
+  echo -e "
 [Peer]
 PublicKey = $client_public_key_2
 AllowedIPs = $client_private_address_2/32
-" >> /etc/wireguard/"$config_file_name".conf
+" >>/etc/wireguard/"$config_file_name".conf
   ####### ENABLE wg_0 INTERFACE AND SERVICE  BEGINS #######
   sleep 1
   echo -e "
@@ -437,17 +435,17 @@ AllowedIPs = $client_private_address_2/32
 * iptables were configured and IP forwarding was enables ${Color_Off}
 "
 
-if [[ "$distro" != "centos" ]]; then
-  echo -e "
+  if [[ "$distro" != "centos" ]]; then
+    echo -e "
   ${IWhite} Netfilter iptables rules will need to be saved to persist after reboot.
 
   ${BWhite} Save rules now?
   1 = yes, 2 = no${Color_Off}
   "
-  read -r save_netfilter
-  if [[ "$save_netfilter" == 1 ]]; then
-    if [[ "$distro" = "ubuntu" ]] || [[ "$distro" = "debian" ]]; then
-      echo -e "
+    read -r save_netfilter
+    if [[ "$save_netfilter" == 1 ]]; then
+      if [[ "$distro" == "ubuntu" ]] || [[ "$distro" == "debian" ]]; then
+        echo -e "
       ${IWhite}In order to make the above iptables rules persistent after system reboot,
       ${BRed}iptables-persistent ${IWhite} package needs to be installed.
 
@@ -460,16 +458,16 @@ if [[ "$distro" != "centos" ]]; then
       systemctl enable netfilter-persistent
       netfilter-persistent save${Color_Off}"
 
-      read -n 1 -s -r -p "
+        read -n 1 -s -r -p "
       Review the above commands.
 
       Press any key to continue or CTRL+C to stop."
 
-      apt-get install iptables-persistent
-      systemctl enable netfilter-persistent
-      netfilter-persistent save
-    elif [[ "$distro" = "fedora" ]]; then
-      echo -e "
+        apt-get install iptables-persistent
+        systemctl enable netfilter-persistent
+        netfilter-persistent save
+      elif [[ "$distro" == "fedora" ]]; then
+        echo -e "
       ${IWhite}In order to make the above iptables rules persistent after system reboot,
       netfilter rules will need to be saved.
 
@@ -479,15 +477,15 @@ if [[ "$distro" != "centos" ]]; then
 
 
       ${IYellow}/sbin/service iptables save${Color_Off}"
-      read -n 1 -s -r -p "
+        read -n 1 -s -r -p "
       Review the above commands.
 
       Press any key to continue or CTRL+C to stop."
 
-      /sbin/service iptables save
+        /sbin/service iptables save
 
-    elif [[ "$distro" = "arch" ]] || [[ "$distro" = "manjaro" ]]; then
-      echo -e "
+      elif [[ "$distro" == "arch" ]] || [[ "$distro" == "manjaro" ]]; then
+        echo -e "
       ${IWhite}In order to make the above iptables rules persistent after system reboot,
       netfilter rules will need to be saved.
 
@@ -507,44 +505,44 @@ if [[ "$distro" != "centos" ]]; then
       systemctl restart iptables.service
       ${Color_Off}
       "
-      read -n 1 -s -r -p "
+        read -n 1 -s -r -p "
       Review the above commands.
 
       Press any key to continue or CTRL+C to stop."
 
-      check_iptables_rules=$(ls /etc/iptables/ | grep -c iptables.rules)
-      if [[ "$check_iptables_rules" == 0 ]]; then
-        touch /etc/iptables/iptables.rules
+        check_iptables_rules=$(ls /etc/iptables/ | grep -c iptables.rules)
+        if [[ "$check_iptables_rules" == 0 ]]; then
+          touch /etc/iptables/iptables.rules
+        fi
+        systemctl enable iptables.service
+        systemctl start iptables.service
+        iptables-save >/etc/iptables/iptables.rules
+        systemctl restart iptables.service
       fi
-      systemctl enable iptables.service
-      systemctl start iptables.service
-      iptables-save > /etc/iptables/iptables.rules
-      systemctl restart iptables.service
-    fi
-  elif [[ "$save_netfilter" == 2 ]]; then
-    echo -e "${BRed}
+    elif [[ "$save_netfilter" == 2 ]]; then
+      echo -e "${BRed}
     TODO:
     * Add configurations to the client devices.
       * For mobile devices, 'qrencode' can be used${Color_Off}"
-  fi
-else
-  echo -e "${BRed}
+    fi
+  else
+    echo -e "${BRed}
   TODO:
   * Add configurations to the client devices.
     * For mobile devices, qrencode can be used${Color_Off}"
-fi
+  fi
 
-
-#########################################################################
-#                          CASE ANSWER y/Y ENDS                         #
-#########################################################################
-    ;;
-  "n"|"N")
+  #########################################################################
+  #                          CASE ANSWER y/Y ENDS                         #
+  #########################################################################
+  ;;
+"n" | "N")
   echo -e "
   Ending the script...."
   exit
-    ;;
-  *)
+  ;;
+*)
   echo -e "${BRed}Sorry, wrong choise. Rerun the script and try again${Color_Off}"
   exit
+  ;;
 esac

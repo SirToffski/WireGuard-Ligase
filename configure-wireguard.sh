@@ -18,8 +18,8 @@
 # - https://en.wikipedia.org/wiki/Ligase (May 19th, 2019)
 
 if [ "$EUID" -ne 0 ]; then
-    echo "Please run the script as root."
-    exit 1
+  echo "Please run the script as root."
+  exit 1
 fi
 
 my_wgl_folder=$(find /home -type d -name WireGuard-Ligase)
@@ -59,18 +59,19 @@ ${BWhite}4 = IPTABLES: I just need commands to configure IPTABLEs.${Color_Off}
 read -r scope_of_script
 
 case "$scope_of_script" in
-  "1")
+"1")
   sudo bash "$my_wgl_folder"/Scripts/quick_setup.sh
-    ;;
-  "2")
+  ;;
+"2")
   sudo bash "$my_wgl_folder"/Scripts/deploy_new_server.sh
-    ;;
-  "3")
+  ;;
+"3")
   sudo bash "$my_wgl_folder"/Scripts/client_config.sh
-    ;;
-  "4")
+  ;;
+"4")
   sudo bash "$my_wgl_folder"/Scripts/setup_iptables.sh
-    ;;
-  *)
+  ;;
+*)
   echo -e "${BRed}Sorry, wrong choise. Rerun the script and try again${Color_Off}"
+  ;;
 esac
