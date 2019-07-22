@@ -101,6 +101,10 @@ For installation on other Operating Systems, please check the [**Wiki**](https:/
     * Public IP of the machine on which the script is runnign is now automatically fetched via AWS `curl https://checkip.amazonaws.com`
     * Script now also checks if it's running on a supported OS and whether WireGuard is installed. If WireGuard is not installed, the script will offer to install it.
     * The script now customizes firewall rules based on the disstribution. On CentOS `firewall-cmd` will ne used. On Arch, Debian, Fedora, Manjaro and Ubuntu netfilter `iptables` are used. Furthermore, for the latter distributions, the script chooses an appropriate way to save netfilter rules. For example, on Debian and Ubuntu, `iptables-persistent` will be installed. On Fedora, netfilter rules are saved with `/sbin/service iptables save`. Finally, on Arch and Manjaro, systemd `iptables.service` is used with configuration saved to `/etc/iptables/iptables.rules`.
+* July 22nd, 2019
+  * Tons of minor bug fixes and some re-writes to save config logic
+  * The script has been officially tested on CentOS 7 running in EC2 for the first time. Tons of minor adjustments had to be made.
+    * CentOS 7 in EC2 does not have `firewalld` pre-installed and instead uses `iptables`. The iptables script has been written to take this into account. If OS type is CentOS and `firewalld` is installed, then `firewall-cmd` commands are used. If `firewalld` is not installed, `iptables` will be used by default. Also, the user will be offered to have `iptables-service` installed and enabled via `systemd` to have the rules persist after reboot.
 
 ## TODO
 
