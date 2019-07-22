@@ -229,9 +229,9 @@ wg-quick up ${BRed}$config_file_name${IYellow}
 systemctl enable wg-quick@${BRed}${IYellow}$config_file_name.service${Color_Off}
 -----------------------------------------------------------------------
 
-================================================
-For Arch, Debian, Fedora, Manjaro and Ubuntu
-================================================
+=============================================================================
+For Arch, Debian, Fedora, Manjaro, and CentOS (if firewalld is not installed)
+=============================================================================
 ${IWhite}10) iptables:${Color_Off}
 # Track VPN connection
 ${IYellow}iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
@@ -262,9 +262,9 @@ For CentOS
 The following firewall rules will be configured:${Color_Off}
 
 ${IYellow}
-firewall-cmd --zone=public --add-port=$listen_port/udp
+firewall-cmd --zone=public --add-port=$server_listen_port/udp
 firewall-cmd --zone=trusted --add-source=$server_subnet
-firewall-cmd --permanent --zone=public --add-port=$listen_port/udp
+firewall-cmd --permanent --zone=public --add-port=$server_listen_port/udp
 firewall-cmd --permanent --zone=trusted --add-source=$server_subnet
 firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -s $server_subnet ! -d $server_subnet -j SNAT --to $server_public_address
 firewall-cmd --permanent --direct --add-rule ipv4 nat POSTROUTING 0 -s $server_subnet ! -d $server_subnet -j SNAT --to $server_public_address
@@ -410,19 +410,42 @@ AllowedIPs = $client_private_address_2/32
   ####### ENABLE wg_0 INTERFACE AND SERVICE  ENDS #######
 
   ####### IPTABLES BEGIN #######
-  sleep 1
-  echo -e "
-  ${BGreen}Configuring iptables and IP forwarding${Color_Off}"
-  sed -i 's/net.ipv4.ip_forward=0/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
-  sed -i 's/#net.ipv4.ip_forward=0/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
-  sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
-  sysctl -p
+  if [[ "$distro" == centos ]]; then
+    check_if_firewalld_installed=$(yum list installed | grep -i -c firewalld)
+    sed -i 's/net.ipv4.ip_forward=0//g' /etc/sysctl.conf
+    sed -i 's/#net.ipv4.ip_forward=0//g' /etc/sysctl.conf
+    sed -i 's/#net.ipv4.ip_forward=1//g' /etc/sysctl.conf
+    echo "net.ipv4.ip_forward=1" >>/etc/sysctl.conf
+    sysctl -p
+    if [[ "$check_if_firewalld_installed" == 0 ]]; then
+      iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+      iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+      iptables -A INPUT -p udp -m udp --dport "$server_listen_port" -m conntrack --ctstate NEW -j ACCEPT
+      iptables -A FORWARD -i "$config_file_name" -o "$config_file_name" -m conntrack --ctstate NEW -j ACCEPT
+      iptables -t nat -A POSTROUTING -s "$server_subnet" -o "$local_interface" -j MASQUERADE
+    elif [[ "$check_if_firewalld_installed" == 1 ]]; then
+      firewall-cmd --zone=public --add-port="$server_listen_port"/udp
+      firewall-cmd --zone=trusted --add-source="$server_subnet"
+      firewall-cmd --permanent --zone=public --add-port="$server_listen_port"/udp
+      firewall-cmd --permanent --zone=trusted --add-source="$server_subnet"
+      firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -s "$server_subnet" ! -d "$server_subnet" -j SNAT --to "$server_public_address"
+      firewall-cmd --permanent --direct --add-rule ipv4 nat POSTROUTING 0 -s "$server_subnet" ! -d "$server_subnet" -j SNAT --to "$server_public_address"
+    fi
+  else
+    sleep 1
+    echo -e "
+    ${BGreen}Configuring iptables and IP forwarding${Color_Off}"
+    sed -i 's/net.ipv4.ip_forward=0/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
+    sed -i 's/#net.ipv4.ip_forward=0/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
+    sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
+    sysctl -p
 
-  iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-  iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-  iptables -A INPUT -p udp -m udp --dport "$server_listen_port" -m conntrack --ctstate NEW -j ACCEPT
-  iptables -A FORWARD -i "$config_file_name" -o "$config_file_name" -m conntrack --ctstate NEW -j ACCEPT
-  iptables -t nat -A POSTROUTING -s "$server_subnet" "$local_interface" -j MASQUERADE
+    iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+    iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+    iptables -A INPUT -p udp -m udp --dport "$server_listen_port" -m conntrack --ctstate NEW -j ACCEPT
+    iptables -A FORWARD -i "$config_file_name" -o "$config_file_name" -m conntrack --ctstate NEW -j ACCEPT
+    iptables -t nat -A POSTROUTING -s "$server_subnet" "$local_interface" -j MASQUERADE
+  fi
   ####### IPTABLES END #######
 
   sleep 2
@@ -524,6 +547,32 @@ AllowedIPs = $client_private_address_2/32
     TODO:
     * Add configurations to the client devices.
       * For mobile devices, 'qrencode' can be used${Color_Off}"
+    fi
+  elif [[ "$distro" == "centos" ]]; then
+    if [[ "$check_if_firewalld_installed" == 0 ]]; then
+      echo -e "
+  ${IWhite}In order to make the above iptables rules persistent after system reboot,
+  netfilter rules will need to be saved.
+
+  First, iptables-service needs to be intalled.
+
+  Would you like the script to install iptables-service and save the netfilter rules?
+
+  ${IWhite}Following commands would be used:
+
+  ${IYellow}
+  sudo yum install iptables-services
+  sudo systemctl enable iptables
+  sudo service iptables save
+  ${Color_Off}
+  "
+      read -n 1 -s -r -p "
+  Review the above commands.
+
+  Press any key to continue or CTRL+C to stop."
+      sudo yum install iptables-services
+      sudo systemctl enable iptables
+      sudo service iptables save
     fi
   else
     echo -e "${BRed}
