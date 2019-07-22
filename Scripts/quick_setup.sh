@@ -262,7 +262,7 @@ ${IYellow}net.ipv4.ip_forward=1${Color_Off}
 ${IYellow}sysctl -p${Color_Off}
 
 ================================================
-For CentOS
+For CentOS (firewalld is installed)
 ================================================
 
 The following firewall rules will be configured:${Color_Off}
