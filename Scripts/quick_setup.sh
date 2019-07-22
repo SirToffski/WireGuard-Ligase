@@ -41,7 +41,7 @@ fi
 ###############################################
 ubuntu_os=$(lsb_release -a | grep -c Ubuntu)
 arch_os=$(lsb_release -a | grep -c Arch)
-cent_os=$(lsb_release -a | grep -c CentOS)
+cent_os=$(hostnamectl | grep -c CentOS)
 debian_os=$(lsb_release -a | grep -c Debian)
 fedora_os=$(lsb_release -a | grep -c Fedora)
 manjaro_os=$(lsb_release -a | grep -c Manjaro)
