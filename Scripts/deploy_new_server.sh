@@ -118,9 +118,9 @@ elif [[ "$distro" == "arch" ]] || [[ "$distro" == "manjaro" ]]; then
 ##############################
 elif [[ "$distro" == "centos" ]]; then
   check_if_wg_installed=$(yum list installed | grep -i -c wireguard-tools)
+  mkdir /etc/wireguard/
   # If WireGuard is NOT installed, offer to instal
   if [[ "$check_if_wg_installed" == 0 ]]; then
-    mkdir /etc/wireguard/
     echo -e "
 +---------------------------------------------+
       ${BWhite}OS Type: CentOS
