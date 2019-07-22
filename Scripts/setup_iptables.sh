@@ -92,46 +92,102 @@ read -r interface_name
 echo -e "$my_separator"
 
 if [[ "$cent_os" -gt 0 ]]; then
-  echo -e "
-  ${IWhite}
-  OS Type: CentOS
-  The following firewall rules will be configured:${Color_Off}
+  check_if_firewalld_installed=$(yum list installed | grep -i -c firewalld)
+  if [[ "$check_if_firewalld_installed" == 1 ]]; then
+    echo -e "
+    ${IWhite}
+    OS Type: CentOS
+    Firewalld: installed
+    The following firewall rules will be configured:${Color_Off}
 
-  ${IYellow}
-  firewall-cmd --zone=public --add-port=$listen_port/udp
-  firewall-cmd --zone=trusted --add-source=$server_subnet
-  firewall-cmd --permanent --zone=public --add-port=$listen_port/udp
-  firewall-cmd --permanent --zone=trusted --add-source=$server_subnet
-  firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -s $server_subnet ! -d $server_subnet -j SNAT --to $server_public_address
-  firewall-cmd --permanent --direct --add-rule ipv4 nat POSTROUTING 0 -s $server_subnet ! -d $server_subnet -j SNAT --to $server_public_address
-  ${Color_Off}
+    ${IYellow}
+    firewall-cmd --zone=public --add-port=$listen_port/udp
+    firewall-cmd --zone=trusted --add-source=$server_subnet
+    firewall-cmd --permanent --zone=public --add-port=$listen_port/udp
+    firewall-cmd --permanent --zone=trusted --add-source=$server_subnet
+    firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -s $server_subnet ! -d $server_subnet -j SNAT --to $server_public_address
+    firewall-cmd --permanent --direct --add-rule ipv4 nat POSTROUTING 0 -s $server_subnet ! -d $server_subnet -j SNAT --to $server_public_address
+    ${Color_Off}
 
-  # Enabling IP forwarding
-  # In /etc/sysctl.conf, net.ipv4.ip_forward value will be changed to 1:
-  ${IYellow}net.ipv4.ip_forward=1${Color_Off}
+    # Enabling IP forwarding
+    # In /etc/sysctl.conf, net.ipv4.ip_forward value will be changed to 1:
+    ${IYellow}net.ipv4.ip_forward=1${Color_Off}
 
-  #To avoid the need to reboot the server
-  ${IYellow}sysctl -p${Color_Off}
-  "
-  read -n 1 -s -r -p "
-  Review the above commands.
+    #To avoid the need to reboot the server
+    ${IYellow}sysctl -p${Color_Off}
+    "
+    read -n 1 -s -r -p "
+    Review the above commands.
 
-  Press any key to continue or CTRL+C to stop."
+    Press any key to continue or CTRL+C to stop."
 
-  sed -i 's/net.ipv4.ip_forward=0/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
-  sed -i 's/#net.ipv4.ip_forward=0/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
-  sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
-  sysctl -p
+    sed -i 's/net.ipv4.ip_forward=0/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
+    sed -i 's/#net.ipv4.ip_forward=0/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
+    sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
+    sysctl -p
 
-  firewall-cmd --zone=public --add-port="$listen_port"/udp
-  firewall-cmd --zone=trusted --add-source="$server_subnet"
-  firewall-cmd --permanent --zone=public --add-port="$listen_port"/udp
-  firewall-cmd --permanent --zone=trusted --add-source="$server_subnet"
-  firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -s "$server_subnet" ! -d "$server_subnet" -j SNAT --to "$server_public_address"
-  firewall-cmd --permanent --direct --add-rule ipv4 nat POSTROUTING 0 -s "$server_subnet" ! -d "$server_subnet" -j SNAT --to "$server_public_address"
+    firewall-cmd --zone=public --add-port="$listen_port"/udp
+    firewall-cmd --zone=trusted --add-source="$server_subnet"
+    firewall-cmd --permanent --zone=public --add-port="$listen_port"/udp
+    firewall-cmd --permanent --zone=trusted --add-source="$server_subnet"
+    firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -s "$server_subnet" ! -d "$server_subnet" -j SNAT --to "$server_public_address"
+    firewall-cmd --permanent --direct --add-rule ipv4 nat POSTROUTING 0 -s "$server_subnet" ! -d "$server_subnet" -j SNAT --to "$server_public_address"
 
-  echo -e "
-  ${BWhite}Done!${Color_Off}"
+    echo -e "
+    ${BWhite}Done!${Color_Off}"
+  elif [[ "$check_if_firewalld_installed" == 0 ]]; then
+    echo -e "
+    OS Type: CentOS
+    Firewalld: NOT installed - using iptables
+    The following firewall rules will be configured:${Color_Off}"
+
+    echo -e "
+    ${IWhite}The following iptables will be configured:${Color_Off}
+
+    # Track VPN connection
+    ${IYellow}iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+    iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT${Color_Off}
+
+    # Allow incoming traffic on a specified port
+    ${IYellow}iptables -A INPUT -p udp -m udp --dport ${BRed}$listen_port ${IYellow}-m conntrack --ctstate NEW -j ACCEPT${Color_Off}
+
+    #Forward packets in the VPN tunnel
+    ${IYellow}iptables -A FORWARD -i ${BRed}$interface_name${IYellow} -o ${BRed}$interface_name ${IYellow}-m conntrack --ctstate NEW -j ACCEPT${Color_Off}
+
+    # Enable NAT
+    ${IYellow}iptables -t nat -A POSTROUTING -s ${BRed}$server_subnet ${IYellow}-o $local_interface -j MASQUERADE${Color_Off}
+
+    In addition to setting up iptables, the following commands will be executed:
+
+    # Enabling IP forwarding
+    # In /etc/sysctl.conf, net.ipv4.ip_forward value will be changed to 1:
+    ${IYellow}net.ipv4.ip_forward=1${Color_Off}
+
+    #To avoid the need to reboot the server
+    ${IYellow}sysctl -p${Color_Off}
+
+    -------------------------------------------
+    "
+
+    read -n 1 -s -r -p "
+    Review the above commands.
+
+    Press any key to continue or CTRL+C to stop."
+
+    sed -i 's/net.ipv4.ip_forward=0/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
+    sed -i 's/#net.ipv4.ip_forward=0/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
+    sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
+    sysctl -p
+
+    iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+    iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+    iptables -A INPUT -p udp -m udp --dport "$listen_port" -m conntrack --ctstate NEW -j ACCEPT
+    iptables -A FORWARD -i "$interface_name" -o "$interface_name" -m conntrack --ctstate NEW -j ACCEPT
+    iptables -t nat -A POSTROUTING -s "$server_subnet" -o "$local_interface" -j MASQUERADE
+
+    echo -e "${BWhite}Done!${Color_Off}"
+  fi
+
 else
   echo -e "
   ${IWhite}The following iptables will be configured:${Color_Off}
@@ -254,6 +310,32 @@ elif [[ "$distro" == "arch" ]] || [[ "$distro" == "manjaro" ]]; then
   systemctl start iptables.service
   iptables-save >/etc/iptables/iptables.rules
   systemctl restart iptables.service
+elif [[ "$distro" == centos ]]; then
+  if [[ "$check_if_firewalld_installed" == 0 ]]; then
+    echo -e "
+  ${IWhite}In order to make the above iptables rules persistent after system reboot,
+  netfilter rules will need to be saved.
+
+  Would you like the script to save the netfilter rules?
+
+  ${IWhite}Following commands would be used:
+
+  ${IYellow}
+  sudo iptables-save > /etc/sysconfig/iptables
+  sudo iptables-restore < /etc/sysconfig/iptables
+  sudo chkconfig iptables on
+  sudo service iptables save
+  ${Color_Off}
+  "
+    read -n 1 -s -r -p "
+  Review the above commands.
+
+  Press any key to continue or CTRL+C to stop."
+    sudo iptables-save >/etc/sysconfig/iptables
+    sudo iptables-restore </etc/sysconfig/iptables
+    sudo chkconfig iptables on
+    sudo service iptables save
+  fi
 fi
 
 echo -e "
