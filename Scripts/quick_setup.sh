@@ -74,12 +74,13 @@ if [[ "$distro" == "ubuntu" ]]; then
   check_if_wg_installed=$(dpkg-query -l | grep -i -c wireguard-tools)
   # If WireGuard is NOT installed, offer to install
   if [[ "$check_if_wg_installed" == 0 ]]; then
-    echo "
-    OS Type: Ubuntu
-    Wireguard-Tools: NOT installed
-
-    Would you like to have Wireguard installed?
-
+    echo -e "
++---------------------------------------------+
+    ${BWhite}OS Type: Ubuntu
+    Wireguard-Tools: NOT installed${Color_Off}
++---------------------------------------------+
+      ${BWhite}Would you like to have Wireguard installed?${Color_Off}
++---------------------------------------------+
     ${BWhite}1 = yes, 2 = no${Color_Off}"
     read -r install_wireguard
     if [[ "$install_wireguard" == 1 ]]; then
@@ -102,12 +103,13 @@ elif [[ "$distro" == "arch" ]] || [[ "$distro" == "manjaro" ]]; then
   check_if_wg_installed=$(pacman -Qe | grep -i -c wireguard-tools)
   # If WireGuard is NOT installed, offer to instal
   if [[ "$check_if_wg_installed" == 0 ]]; then
-    echo "
-    OS Type: $distro
-    Wireguard-Tools: NOT installed
-
-    Would you like to have Wireguard installed?
-
+    echo -e "
++---------------------------------------------+
+    ${BWhite}OS Type: $distro
+    Wireguard-Tools: NOT installed${Color_Off}
++---------------------------------------------+
+    ${BWhite}Would you like to have Wireguard installed?${Color_Off}
++---------------------------------------------+
     ${BWhite}1 = yes, 2 = no${Color_Off}"
     read -r install_wireguard
     if [[ "$install_wireguard" == 1 ]]; then
@@ -127,14 +129,16 @@ elif [[ "$distro" == "arch" ]] || [[ "$distro" == "manjaro" ]]; then
 ##############################
 elif [[ "$distro" == "centos" ]]; then
   check_if_wg_installed=$(yum list installed | grep -i -c wireguard-tools)
+  mkdir /etc/wireguard/
   # If WireGuard is NOT installed, offer to instal
   if [[ "$check_if_wg_installed" == 0 ]]; then
-    echo "
-    OS Type: CentOS
-    Wireguard-Tools: NOT installed
-
-    Would you like to have Wireguard installed?
-
+    echo -e "
++---------------------------------------------+
+      ${BWhite}OS Type: CentOS
+    Wireguard-Tools: NOT installed${Color_Off}
++---------------------------------------------+
+      ${BWhite}Would you like to have Wireguard installed?${Color_Off}
++---------------------------------------------+
     ${BWhite}1 = yes, 2 = no${Color_Off}"
     read -r install_wireguard
     if [[ "$install_wireguard" == 1 ]]; then
@@ -157,12 +161,13 @@ elif [[ "$distro" == "fedora" ]]; then
   check_if_wg_installed=$(dnf list installed | grep -i -c wireguard-tools)
   # If WireGuard is NOT installed, offer to instal
   if [[ "$check_if_wg_installed" == 0 ]]; then
-    echo "
-    OS Type: Fedora
-    Wireguard-Tools: NOT installed
-
-    Would you like to have Wireguard installed?
-
+    echo -e "
++---------------------------------------------+
+      ${BWhite}OS Type: Fedora
+    Wireguard-Tools: NOT installed${Color_Off}
++---------------------------------------------+
+      ${BWhite}Would you like to have Wireguard installed?${Color_Off}
++---------------------------------------------+
     ${BWhite}1 = yes, 2 = no${Color_Off}"
     read -r install_wireguard
     if [[ "$install_wireguard" == 1 ]]; then
@@ -184,12 +189,13 @@ elif [[ "$distro" == "debian" ]]; then
   check_if_wg_installed=$(dpkg-query -l | grep -i -c wireguard-tools)
   # If WireGuard is NOT installed, offer to instal
   if [[ "$check_if_wg_installed" == 0 ]]; then
-    echo "
-    OS Type: Debian
-    Wireguard-Tools: NOT installed
-
-    Would you like to have Wireguard installed?
-
+    echo -e "
++---------------------------------------------+
+    ${BWhite}OS Type: Debian
+    Wireguard-Tools: NOT installed${Color_Off}
++---------------------------------------------+
+    ${BWhite}Would you like to have Wireguard installed?${Color_Off}
++---------------------------------------------+
     ${BWhite}1 = yes, 2 = no${Color_Off}"
     read -r install_wireguard
     if [[ "$install_wireguard" == 1 ]]; then
