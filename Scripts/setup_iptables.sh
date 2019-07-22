@@ -121,9 +121,10 @@ if [[ "$cent_os" -gt 0 ]]; then
 
     Press any key to continue or CTRL+C to stop."
 
-    sed -i 's/net.ipv4.ip_forward=0/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
-    sed -i 's/#net.ipv4.ip_forward=0/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
-    sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
+    sed -i 's/net.ipv4.ip_forward=0//g' /etc/sysctl.conf
+    sed -i 's/#net.ipv4.ip_forward=0//g' /etc/sysctl.conf
+    sed -i 's/#net.ipv4.ip_forward=1//g' /etc/sysctl.conf
+    echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
     sysctl -p
 
     firewall-cmd --zone=public --add-port="$listen_port"/udp
@@ -174,9 +175,10 @@ if [[ "$cent_os" -gt 0 ]]; then
 
     Press any key to continue or CTRL+C to stop."
 
-    sed -i 's/net.ipv4.ip_forward=0/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
-    sed -i 's/#net.ipv4.ip_forward=0/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
-    sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
+    sed -i 's/net.ipv4.ip_forward=0//g' /etc/sysctl.conf
+    sed -i 's/#net.ipv4.ip_forward=0//g' /etc/sysctl.conf
+    sed -i 's/#net.ipv4.ip_forward=1//g' /etc/sysctl.conf
+    echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
     sysctl -p
 
     iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
