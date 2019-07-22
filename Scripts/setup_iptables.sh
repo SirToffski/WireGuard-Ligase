@@ -316,14 +316,15 @@ elif [[ "$distro" == centos ]]; then
   ${IWhite}In order to make the above iptables rules persistent after system reboot,
   netfilter rules will need to be saved.
 
-  Would you like the script to save the netfilter rules?
+First, iptables-service needs to be intalled.
+
+  Would you like the script to install iptables-service and save the netfilter rules?
 
   ${IWhite}Following commands would be used:
 
   ${IYellow}
-  sudo iptables-save > /etc/sysconfig/iptables
-  sudo iptables-restore < /etc/sysconfig/iptables
-  sudo chkconfig iptables on
+  sudo yum install iptables-services
+  sudo systemctl enable iptables
   sudo service iptables save
   ${Color_Off}
   "
@@ -331,9 +332,8 @@ elif [[ "$distro" == centos ]]; then
   Review the above commands.
 
   Press any key to continue or CTRL+C to stop."
-    sudo iptables-save >/etc/sysconfig/iptables
-    sudo iptables-restore </etc/sysconfig/iptables
-    sudo chkconfig iptables on
+    sudo yum install iptables-services
+    sudo systemctl enable iptables
     sudo service iptables save
   fi
 fi
