@@ -10,15 +10,25 @@ my_working_dir=$(pwd)
 source "$my_wgl_folder"/doc/colours.sh
 my_separator="--------------------------------------"
 ############################ DEFINE VARIABLES ############################
-server_private_range="10.10.100.1"
+### The first three octets of server_private_address, client_private_range and server_subnet
+### HAVE to be same for all subnets starting from /24 and up. The way this works now is
+### not ideal and will be re-written at some point. For the time being, if you change
+### server address, remember to change the client_private_range and server_subnet as well
+server_private_address="10.10.100.1"
+client_private_range="10.10.100"
+### If you need more than five clients, your best bet is not go go over /27
+### With the current script logic /28 will support max 5 clients
+# The reason is how the script handles the fourth octet in client addresses
+# it will start with ".10" aka 9 + 1 (minimum possible number of clients), incrementing
+#  by 1  for every new client. In other words if five clients are to be configured
+# their fourth octets would be 10,11,12,13,14
+server_subnet="10.10.100.0/25"
+# client_fourth_octet="$((i + 9))" --- this is un-used at the moment and reserved for future
 local_interface="eth0"
 server_listen_port="9201"
 client_dns="1.1.1.1"
-number_of_clients="2"
-client_private_address_1="10.10.100.2"
-client_private_address_2="10.10.100.3"
+number_of_clients="4"
 config_file_name="wg0"
-server_subnet="10.10.100.0/24"
 check_pub_ip=$(curl https://checkip.amazonaws.com)
 ##########################################################################
 
@@ -215,16 +225,25 @@ elif [[ "$distro" == "debian" ]]; then
 fi
 ############### FINISHED CHECKING OS AND OFFER TO INSTALL WIREGUARD ###############
 
+function create_client_ip_range() {
+  for i in $(seq 1 "$number_of_clients"); do
+    echo -e "
+  ${BRed}$client_private_range.$((i + 9))"
+  done
+}
+
 echo -e "
 ${IWhite} This script will perform a quick server setup with minimal user input.
 
 The following will be auto-configured:
 1) Listen port: UDP ${BRed}$server_listen_port ${IWhite}
 2) Server public / private keys
-3) Server private IP of ${BRed}$server_private_range/24${IWhite}
-4) Two clients (client_1.conf,client_2.conf) each with a public / private key; clients will have IPs of ${BRed}$client_private_address_1/32${IWhite} and ${BRed}$client_private_address_2/32${IWhite}
-5) Server PostUp: iptables -A FORWARD -i ${BRed}$config_file_name${IWhite} -j ACCEPT; iptables -t nat -A POSTROUTING $local_interface -j MASQUERADE; ip6tables -A FORWARD -i ${BRed}$config_file_name${IWhite} -j ACCEPT; ip6tables -t nat -A POSTROUTING $local_interface -j MASQUERADE
-6) Server PostDown: iptables -D FORWARD -i ${BRed}$config_file_name${IWhite} -j ACCEPT; iptables -t nat -D POSTROUTING $local_interface -j MASQUERADE; ip6tables -D FORWARD -i ${BRed}$config_file_name${IWhite} -j ACCEPT; ip6tables -t nat -D POSTROUTING $local_interface -j MASQUERADE
+3) Server private IP of ${BRed}$server_private_address/24${IWhite}
+4) $number_of_clients clients each with a public / private key; clients will have IPs of:"
+create_client_ip_range
+echo -e "
+5) Server PostUp: iptables -A FORWARD -i ${BRed}$config_file_name${IWhite} -j ACCEPT; iptables -t nat -A POSTROUTING -o $local_interface -j MASQUERADE; ip6tables -A FORWARD -i ${BRed}$config_file_name${IWhite} -j ACCEPT; ip6tables -t nat -A POSTROUTING -o $local_interface -j MASQUERADE
+6) Server PostDown: iptables -D FORWARD -i ${BRed}$config_file_name${IWhite} -j ACCEPT; iptables -t nat -D POSTROUTING -o $local_interface -j MASQUERADE; ip6tables -D FORWARD -i ${BRed}$config_file_name${IWhite} -j ACCEPT; ip6tables -t nat -D POSTROUTING -o $local_interface -j MASQUERADE
 7) Clients will use Cloudflare public DNS of ${BRed}$client_dns${IWhite}
 8) Server config ${BRed}/etc/wireguard/$config_file_name.conf${IWhite}
 9) Tunnel interface ${BRed}$config_file_name${IWhite} will be enabled and service configured to enable at startup.
@@ -330,10 +349,10 @@ case "$proceed_quick_setup" in
   ${BGreen}Generating server config${Color_Off}"
   new_server_config=$(echo -e "
   [Interface]
-  Address = $server_private_range
+  Address = $server_private_address
   SaveConfig = true
-  PostUp = iptables -A FORWARD -i $config_file_name -j ACCEPT; iptables -t nat -A POSTROUTING $local_interface -j MASQUERADE; ip6tables -A FORWARD -i $config_file_name -j ACCEPT; ip6tables -t nat -A POSTROUTING $local_interface -j MASQUERADE
-  PostDown = iptables -D FORWARD -i $config_file_name -j ACCEPT; iptables -t nat -D POSTROUTING $local_interface -j MASQUERADE; ip6tables -D FORWARD -i $config_file_name -j ACCEPT; ip6tables -t nat -D POSTROUTING $local_interface -j MASQUERADE
+  PostUp = iptables -A FORWARD -i $config_file_name -j ACCEPT; iptables -t nat -A POSTROUTING -o $local_interface -j MASQUERADE; ip6tables -A FORWARD -i $config_file_name -j ACCEPT; ip6tables -t nat -A POSTROUTING -o $local_interface -j MASQUERADE
+  PostDown = iptables -D FORWARD -i $config_file_name -j ACCEPT; iptables -t nat -D POSTROUTING -o $local_interface -j MASQUERADE; ip6tables -D FORWARD -i $config_file_name -j ACCEPT; ip6tables -t nat -D POSTROUTING -o $local_interface -j MASQUERADE
   ListenPort = $server_listen_port
   PrivateKey = $sever_private_key_output
   ")
@@ -343,72 +362,47 @@ case "$proceed_quick_setup" in
   ${BGreen}Saving server config${Color_Off}"
   echo "$new_server_config" >"$config_file_name".txt && echo "$new_server_config" >/etc/wireguard/"$config_file_name".conf
   # Generating client keys
-  for ((i = 1; i <= "$number_of_clients"; i++)); do
+  for i in $(seq 1 "$number_of_clients"); do
     wg genkey | tee "$my_working_dir"/keys/client_"$i"_Privatekey | wg pubkey >"$my_working_dir"/keys/client_"$i"_Publickey
 
     chmod 600 "$my_working_dir"/keys/client_"$i"_Privatekey
     chmod 600 "$my_working_dir"/keys/client_"$i"_Publickey
 
-    client_private_key_1=$(cat "$my_working_dir"/keys/client_1_Privatekey)
-    client_private_key_2=$(cat "$my_working_dir"/keys/client_2_Privatekey)
-    client_public_key_1=$(cat "$my_working_dir"/keys/client_1_Publickey)
-    client_public_key_2=$(cat "$my_working_dir"/keys/client_2_Publickey)
+    client_private_key_["$i"]=$(cat "$my_working_dir"/keys/client_"$i"_Privatekey)
+    client_public_key_["$i"]=$(cat "$my_working_dir"/keys/client_"$i"_Publickey)
+
+    # Generating client config
+    sleep 1
+    echo -e "
+${BGreen}Generating client $i config${Color_Off}"
+    echo "
+[Interface]
+Address = $client_private_range.$((i + 9))
+PrivateKey = ${client_private_key_["$i"]}
+DNS = $client_dns
+
+[Peer]
+PublicKey = $sever_public_key_output
+Endpoint = $server_public_address:$server_listen_port
+AllowedIPs = 0.0.0.0/0
+PersistentKeepalive = 21" >"$my_working_dir"/client_configs/client_["$i"].conf
+
+    # Adding client info to the server config
+    sleep 1
+    echo -e "
+${BGreen}Adding client info to the server config${Color_Off}"
+    echo -e "
+[Peer]
+PublicKey = ${client_public_key_["$i"]}
+AllowedIPs = $client_private_range.$((i + 9))/32
+" >>/etc/wireguard/"$config_file_name".conf
+
   done
-  # Generating client 1 config
+
+  ####### ENABLE WireGuard INTERFACE AND SERVICE  BEGINS #######
   sleep 1
   echo -e "
-${BGreen}Generating client 1 config${Color_Off}"
-  echo "
-[Interface]
-Address = $client_private_address_1
-PrivateKey = $client_private_key_1
-DNS = $client_dns
-
-[Peer]
-PublicKey = $sever_public_key_output
-Endpoint = $server_public_address:$server_listen_port
-AllowedIPs = 0.0.0.0/0
-PersistentKeepalive = 21" >"$my_working_dir"/client_configs/client_1.conf
-
-  # Generating client 1 config
-  sleep 1
-  echo -e "
-${BGreen}Generating client 2 config${Color_Off}"
-  echo "
-[Interface]
-Address = $client_private_address_2
-PrivateKey = $client_private_key_2
-DNS = $client_dns
-
-[Peer]
-PublicKey = $sever_public_key_output
-Endpoint = $server_public_address:$server_listen_port
-AllowedIPs = 0.0.0.0/0
-PersistentKeepalive = 21" >"$my_working_dir"/client_configs/client_2.conf
-
-  # Adding client 1 info to the server config
-  sleep 1
-  echo -e "
-  ${BGreen}Adding client 1 info to the server config${Color_Off}"
-  echo -e "
-[Peer]
-PublicKey = $client_public_key_1
-AllowedIPs = $client_private_address_1/32
-" >>/etc/wireguard/"$config_file_name".conf
-
-  # Adding client 2 info to the server config
-  sleep 1
-  echo -e "
-${BGreen}Adding client 2 info to the server config${Color_Off}"
-  echo -e "
-[Peer]
-PublicKey = $client_public_key_2
-AllowedIPs = $client_private_address_2/32
-" >>/etc/wireguard/"$config_file_name".conf
-  ####### ENABLE wg_0 INTERFACE AND SERVICE  BEGINS #######
-  sleep 1
-  echo -e "
-  ${BGreen}ENABLE wg_0 INTERFACE AND SERVICE${Color_Off}"
+  ${BGreen}ENABLE $config_file_name INTERFACE AND SERVICE${Color_Off}"
   chown -v root:root /etc/wireguard/"$config_file_name".conf
   chmod -v 600 /etc/wireguard/"$config_file_name".conf
   wg-quick up "$config_file_name"
@@ -450,7 +444,7 @@ AllowedIPs = $client_private_address_2/32
     iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
     iptables -A INPUT -p udp -m udp --dport "$server_listen_port" -m conntrack --ctstate NEW -j ACCEPT
     iptables -A FORWARD -i "$config_file_name" -o "$config_file_name" -m conntrack --ctstate NEW -j ACCEPT
-    iptables -t nat -A POSTROUTING -s "$server_subnet" "$local_interface" -j MASQUERADE
+    iptables -t nat -A POSTROUTING -s "$server_subnet" -o "$local_interface" -j MASQUERADE
   fi
   ####### IPTABLES END #######
 
