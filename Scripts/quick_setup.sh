@@ -413,6 +413,25 @@ AllowedIPs = $client_private_range.$((i + 9))/32
     * For mobile devices, qrencode can be used${Color_Off}"
   fi
 
+  echo -e "
+  ${IWhite}If you've got qrencode installed, the script can generate QR codes for the client configs.
+
+  Would you like to have QR codes generated?
+
+  1= yes, 2 = no${Color_Off}"
+
+  read -r generate_qr_code
+
+  if [[ "$generate_qr_code" == 1 ]]; then
+      for q in $(seq 1 "$number_of_clients"); do
+        qrencode -t ansiutf8 >"$my_working_dir"/client_configs/client_["$q"].conf
+    done
+  elif [[ "$generate_qr_code" == 2 ]]; then
+    echo -e "
+    Understood!"
+  else
+    echo -e "Sorry, wrong choice! Moving on with the script."
+  fi
   #########################################################################
   #                          CASE ANSWER y/Y ENDS                         #
   #########################################################################

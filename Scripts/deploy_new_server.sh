@@ -96,11 +96,11 @@ else
   echo -e "
   ${IWhite}Specify server private key.${Color_Off}"
   read -r server_private_key
-  echo "$server_private_key" >"$my_working_dir"/keys/ServerPrivatekey
+  echo -e "$server_private_key" >"$my_working_dir"/keys/ServerPrivatekey
   echo -e "
   ${IWhite}Specify server public key.${Color_Off}"
   read -r server_public_key
-  echo "$server_public_key" >"$my_working_dir"/keys/ServerPublickey
+  echo -e "$server_public_key" >"$my_working_dir"/keys/ServerPublickey
   chmod 600 "$my_working_dir"/keys/ServerPrivatekey && chmod 600 "$my_working_dir"/keys/ServerPrivatekey
 fi
 
@@ -124,7 +124,7 @@ ListenPort = $server_listen_port
 PrivateKey = $sever_private_key_output
   ")
 
-echo "$new_server_config" >"$my_working_dir"/server_config.txt
+echo -e "$new_server_config" >"$my_working_dir"/server_config.txt
 chmod 600 "$my_working_dir"/server_config.txt
 
 echo -e "Server config has been written to a file $my_working_dir/server_config.txt"
@@ -146,16 +146,16 @@ read -r save_server_config
 # The if statement checks whether a config with the same filename already exists.
 # If it does, the falue will always be less than zero, hence it needs to be backed up.
 if [[ "$save_server_config" == 1 ]] && [[ "$check_for_existing_config" == 1 ]]; then
-  echo "
+  echo -e "
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     Found existing config file with the same name. Backing up to /etc/wireguard/$wg_sev_iface.conf.bak
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   sleep 1
   mv /etc/wireguard/"$wg_sev_iface".conf /etc/wireguard/"$wg_sev_iface".conf.bak
   sleep 1
-  echo "$new_server_config" >/etc/wireguard/"$wg_sev_iface".conf
+  echo -e "$new_server_config" >/etc/wireguard/"$wg_sev_iface".conf
 elif [[ "$save_server_config" == 1 ]] && [[ "$check_for_existing_config" == 0 ]]; then
-  echo "$new_server_config" >/etc/wireguard/"$wg_sev_iface".conf
+  echo -e "$new_server_config" >/etc/wireguard/"$wg_sev_iface".conf
 fi
 
 echo -e "Congrats! Server config is ready and saved to /etc/wireguard/$wg_sev_iface.conf. The config is shown below.
@@ -185,7 +185,8 @@ ${IWhite}Specify the DNS server your clients will use.${Color_Off}
   # This would usually be a public DNS server, for example 1.1.1.1,
   # 8.8.8.8, etc.
   read -r client_dns
-  echo "
+
+  echo -e "
 Next steps will ask to provide private address and a name for each client, one at a time.
   "
   # Private address would be within the RFC 1918 range of the server.
@@ -213,7 +214,7 @@ ${IWhite}Provide the name of the client${Color_Off}
     client_private_key_["$i"]=$(cat "$my_working_dir"/keys/"${client_name_["$i"]}"Privatekey)
     client_public_key_["$i"]=$(cat "$my_working_dir"/keys/"${client_name_["$i"]}"Publickey)
 
-    echo "
+    echo -e "
 [Interface]
 Address = ${client_private_address_["$i"]}
 PrivateKey = ${client_private_key_["$i"]}
@@ -237,9 +238,29 @@ else
   if [[ "$iptables_setup" == 1 ]]; then
     sudo bash "$my_wgl_folder"/Scripts/setup_iptables.sh
   else
-    echo "Sounds good. Ending the scritp..."
+    echo -e "Sounds good. Ending the scritp..."
     exit
   fi
+fi
+
+echo -e "
+${IWhite}If you've got qrencode installed, the script can generate QR codes for the client configs.
+
+Would you like to have QR codes generated?
+
+1= yes, 2 = no${Color_Off}"
+
+read -r generate_qr_code
+
+if [[ "$generate_qr_code" == 1 ]]; then
+    for q in $(seq 1 "$number_of_clients"); do
+      qrencode -t ansiutf8 >"$my_working_dir"/client_configs/"${client_name_["$q"]}".conf
+  done
+elif [[ "$generate_qr_code" == 2 ]]; then
+  echo -e "
+  Alright.. Moving on!"
+else
+  echo -e "Sorry, wrong choice! Moving on with the script."
 fi
 
 echo -e "
@@ -252,14 +273,14 @@ read -r configure_server_with_clients
 # to /etc/wireguard/, then the script will add the clients to that config
 if [[ "$configure_server_with_clients" == 1 ]]; then
   for a in $(seq 1 "$number_of_clients"); do
-    echo "
+    echo -e "
 [Peer]
 PublicKey = ${client_public_key_["$a"]}
 AllowedIPs = ${client_private_address_["$a"]}/32
 " >>/etc/wireguard/"$wg_sev_iface".conf
   done
 elif [[ "$configure_server_with_clients" == 2 ]]; then
-  echo "
+  echo -e "
 Alright, you may add the following to a server config file to setup clients.
 
 -----------------
@@ -273,7 +294,7 @@ AllowedIPs = ${client_private_address_["$d"]}/32${Color_Off}
   done
 fi
 
-echo "-----------------"
+echo -e "-----------------"
 
 # This assumes the WireGuard is already installed on the server.
 # The script checks is there is config in /etc/wireguard/, if there is one,
@@ -319,6 +340,6 @@ read -r iptables_setup
 if [[ "$iptables_setup" == 1 ]]; then
   sudo bash "$my_wgl_folder"/Scripts/setup_iptables.sh
 else
-  echo "Sounds good. Ending the scritp..."
+  echo -e "Sounds good. Ending the scritp..."
 fi
 exit
