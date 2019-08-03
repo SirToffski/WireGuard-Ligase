@@ -33,7 +33,7 @@ fi
 my_wgl_folder=$(find /home -type d -name WireGuard-Ligase)
 source "$my_wgl_folder"/doc/colours.sh
 my_separator="--------------------------------------"
-check_pub_ip=$(curl https://checkip.amazonaws.com)
+check_pub_ip=$(curl -s https://checkip.amazonaws.com)
 
 echo -e "
 ${IWhite}We are going to setup some basic iptables so the server can function correctly.

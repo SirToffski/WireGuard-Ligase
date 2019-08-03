@@ -7,7 +7,7 @@ fi
 
 my_wgl_folder=$(find /home -type d -name WireGuard-Ligase)
 my_working_dir=$(pwd)
-source "$my_wgl_folder"/doc/colours.sh
+source "$my_wgl_folder"/doc/functions.sh
 my_separator="--------------------------------------"
 ############################ DEFINE VARIABLES ############################
 ### The first three octets of server_private_address, client_private_range and server_subnet
@@ -29,7 +29,7 @@ server_listen_port="9201"
 client_dns="1.1.1.1"
 number_of_clients="4"
 config_file_name="wg0"
-check_pub_ip=$(curl https://checkip.amazonaws.com)
+check_pub_ip=$(curl -s https://checkip.amazonaws.com)
 ##########################################################################
 
 ######################## Pre-checks ######################################################
@@ -47,182 +47,14 @@ if [[ $check_for_clients_directory == 0 ]]; then
 fi
 ##########################################################################################
 
-############## Determine OS Type ##############
-###############################################
-ubuntu_os=$(lsb_release -a | grep -c Ubuntu)
-arch_os=$(lsb_release -a | grep -c Arch)
-cent_os=$(hostnamectl | grep -c CentOS)
-debian_os=$(lsb_release -a | grep -c Debian)
-fedora_os=$(lsb_release -a | grep -c Fedora)
-manjaro_os=$(lsb_release -a | grep -c Manjaro)
-
-if [[ "$ubuntu_os" -gt 0 ]]; then
-  distro=ubuntu
-elif [[ "$arch_os" -gt 0 ]]; then
-  distro=arch
-elif [[ "$cent_os" -gt 0 ]]; then
-  distro=centos
-elif [[ "$debian_os" -gt 0 ]]; then
-  distro=debian
-elif [[ "$fedora_os" -gt 0 ]]; then
-  distro=fedora
-elif [[ "$manjaro_os" -gt 0 ]]; then
-  distro=manjaro
-else
-  echo -e "The operating system is not supported by this script. The script will continue but will be unable to install Wireguard packages. Hence script's functionality will be limited to generating server / client configurations."
-fi
-###############################################
-###############################################
-
-echo "This script will take you through the steps needed to deploy a new server and configure some clients.
+echo -e "This script will take you through the steps needed to deploy a new server and configure some clients.
 
 First, let's check if wireguard is installed..."
 
-########### UBUNTU ###########
-##############################
-if [[ "$distro" == "ubuntu" ]]; then
-  check_if_wg_installed=$(dpkg-query -l | grep -i -c wireguard-tools)
-  # If WireGuard is NOT installed, offer to install
-  if [[ "$check_if_wg_installed" == 0 ]]; then
-    echo -e "
-+---------------------------------------------+
-    ${BWhite}OS Type: Ubuntu
-    Wireguard-Tools: NOT installed${Color_Off}
-+---------------------------------------------+
-      ${BWhite}Would you like to have Wireguard installed?${Color_Off}
-+---------------------------------------------+
-    ${BWhite}1 = yes, 2 = no${Color_Off}"
-    read -r install_wireguard
-    if [[ "$install_wireguard" == 1 ]]; then
-      # If chosen to install, proceed with installation
-      add-apt-repository ppa:wireguard/wireguard
-      apt-get update
-      apt-get install wireguard
-    elif [[ "$install_wireguard" == 2 ]]; then
-      # If chosen NOT to install, move along
-      echo -e "
-      Understood, moving on with the script."
-    fi
-  fi
-##############################
-##############################
-
-########### ARCH OR MANJARO ###########
-#######################################
-elif [[ "$distro" == "arch" ]] || [[ "$distro" == "manjaro" ]]; then
-  check_if_wg_installed=$(pacman -Qe | grep -i -c wireguard-tools)
-  # If WireGuard is NOT installed, offer to instal
-  if [[ "$check_if_wg_installed" == 0 ]]; then
-    echo -e "
-+---------------------------------------------+
-    ${BWhite}OS Type: $distro
-    Wireguard-Tools: NOT installed${Color_Off}
-+---------------------------------------------+
-    ${BWhite}Would you like to have Wireguard installed?${Color_Off}
-+---------------------------------------------+
-    ${BWhite}1 = yes, 2 = no${Color_Off}"
-    read -r install_wireguard
-    if [[ "$install_wireguard" == 1 ]]; then
-      # If chosen to install, proceed with installation
-      pacman -Syyy
-      pacman -S wireguard-dkms wireguard-tools --noconfirm
-    elif [[ "$install_wireguard" == 2 ]]; then
-      # If chosen NOT to install, move along
-      echo -e "
-      Understood, moving on with the script."
-    fi
-  fi
-#######################################
-#######################################
-
-########### CENTOS ###########
-##############################
-elif [[ "$distro" == "centos" ]]; then
-  check_if_wg_installed=$(yum list installed | grep -i -c wireguard-tools)
-  mkdir /etc/wireguard/
-  # If WireGuard is NOT installed, offer to instal
-  if [[ "$check_if_wg_installed" == 0 ]]; then
-    echo -e "
-+---------------------------------------------+
-      ${BWhite}OS Type: CentOS
-    Wireguard-Tools: NOT installed${Color_Off}
-+---------------------------------------------+
-      ${BWhite}Would you like to have Wireguard installed?${Color_Off}
-+---------------------------------------------+
-    ${BWhite}1 = yes, 2 = no${Color_Off}"
-    read -r install_wireguard
-    if [[ "$install_wireguard" == 1 ]]; then
-      # If chosen to install, proceed with installation
-      curl -Lo /etc/yum.repos.d/wireguard.repo https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo
-      yum install epel-release
-      yum install wireguard-dkms wireguard-tools
-    elif [[ "$install_wireguard" == 2 ]]; then
-      # If chosen NOT to install, move along
-      echo -e "
-      Understood, moving on with the script."
-    fi
-  fi
-##############################
-##############################
-
-########### Fedora ###########
-##############################
-elif [[ "$distro" == "fedora" ]]; then
-  check_if_wg_installed=$(dnf list installed | grep -i -c wireguard-tools)
-  # If WireGuard is NOT installed, offer to instal
-  if [[ "$check_if_wg_installed" == 0 ]]; then
-    echo -e "
-+---------------------------------------------+
-      ${BWhite}OS Type: Fedora
-    Wireguard-Tools: NOT installed${Color_Off}
-+---------------------------------------------+
-      ${BWhite}Would you like to have Wireguard installed?${Color_Off}
-+---------------------------------------------+
-    ${BWhite}1 = yes, 2 = no${Color_Off}"
-    read -r install_wireguard
-    if [[ "$install_wireguard" == 1 ]]; then
-      # If chosen to install, proceed with installation
-      dnf copr enable jdoss/wireguard
-      dnf install wireguard-dkms wireguard-tools
-    elif [[ "$install_wireguard" == 2 ]]; then
-      # If chosen NOT to install, move along
-      echo -e "
-      Understood, moving on with the script."
-    fi
-  fi
-##############################
-##############################
-
-########### Debian ###########
-##############################
-elif [[ "$distro" == "debian" ]]; then
-  check_if_wg_installed=$(dpkg-query -l | grep -i -c wireguard-tools)
-  # If WireGuard is NOT installed, offer to instal
-  if [[ "$check_if_wg_installed" == 0 ]]; then
-    echo -e "
-+---------------------------------------------+
-    ${BWhite}OS Type: Debian
-    Wireguard-Tools: NOT installed${Color_Off}
-+---------------------------------------------+
-    ${BWhite}Would you like to have Wireguard installed?${Color_Off}
-+---------------------------------------------+
-    ${BWhite}1 = yes, 2 = no${Color_Off}"
-    read -r install_wireguard
-    if [[ "$install_wireguard" == 1 ]]; then
-      # If chosen to install, proceed with installation
-      echo "deb http://deb.debian.org/debian/ unstable main" >/etc/apt/sources.list.d/unstable.list
-      printf 'Package: *\nPin: release a=unstable\nPin-Priority: 90\n' >/etc/apt/preferences.d/limit-unstable
-      apt update
-      apt install wireguard
-    elif [[ "$install_wireguard" == 2 ]]; then
-      # If chosen NOT to install, move along
-      echo -e "
-      Understood, moving on with the script."
-    fi
-  fi
-##############################
-##############################
-fi
+############## Determine OS Type ##############
+# see /doc/functions.sh for more info
+###############################################
+determine_os
 ############### FINISHED CHECKING OS AND OFFER TO INSTALL WIREGUARD ###############
 
 function create_client_ip_range() {

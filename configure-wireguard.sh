@@ -24,7 +24,7 @@ fi
 
 my_wgl_folder=$(find /home -type d -name WireGuard-Ligase)
 
-source "$my_wgl_folder"/doc/colours.sh
+source "$my_wgl_folder"/doc/functions.sh
 
 logo=$(cat "$my_wgl_folder"/doc/ascii-logo)
 
