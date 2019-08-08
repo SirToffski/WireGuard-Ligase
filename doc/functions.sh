@@ -3,7 +3,7 @@
 function determine_os() {
   {
     ubuntu_os=$(lsb_release -a | grep -c Ubuntu)
-    arch_os=$(hostnamectl | grep -c Arch)
+    arch_os=$(hostnamectl | grep -c "Arch Linux")
     cent_os=$(hostnamectl | grep -c CentOS)
     debian_os=$(lsb_release -a | grep -c Debian)
     fedora_os=$(lsb_release -a | grep -c Fedora)
