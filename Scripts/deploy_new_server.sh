@@ -254,7 +254,7 @@ read -r generate_qr_code
 
 if [[ "$generate_qr_code" == 1 ]]; then
     for q in $(seq 1 "$number_of_clients"); do
-      qrencode -t ansiutf8 >"$my_working_dir"/client_configs/"${client_name_["$q"]}".conf
+      qrencode -t ansiutf8 < "$my_working_dir"/client_configs/"${client_name_["$q"]}".conf
   done
 elif [[ "$generate_qr_code" == 2 ]]; then
   echo -e "
