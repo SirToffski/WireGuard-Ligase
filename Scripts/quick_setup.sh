@@ -424,7 +424,7 @@ AllowedIPs = $client_private_range.$((i + 9))/32
 
   if [[ "$generate_qr_code" == 1 ]]; then
       for q in $(seq 1 "$number_of_clients"); do
-        qrencode -t ansiutf8 >"$my_working_dir"/client_configs/client_["$q"].conf
+        qrencode -t ansiutf8 < "$my_working_dir"/client_configs/client_["$q"].conf
     done
   elif [[ "$generate_qr_code" == 2 ]]; then
     echo -e "
