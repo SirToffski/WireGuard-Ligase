@@ -22,48 +22,52 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
-my_wgl_folder=$(find /home -type d -name WireGuard-Ligase)
+my_wgl_folder=$(find /home -ignore_readdir_race -type d -name WireGuard-Ligase)
 
 source "$my_wgl_folder"/doc/functions.sh
+# Setting the colours function
+colours
 
 logo=$(cat "$my_wgl_folder"/doc/ascii-logo)
-
+printf '\e[2J\e[H'
 echo -e "${BPurple}$logo${Color_Off}"
 
 echo -e "${BWhite}Welcome to WG Ligase${Color_Off}.
 
-The script will guide you through the installaton process, allowing to choose a starting point.
-
-The idea is for this script to be equally suitable for new deployments, as well as for configuring a live deployment"
+The script will guide you through the installaton process, allowing to
+choose a starting point. The idea is for this script to be equally
+suitable for new deployments, as well as for configuring a live
+deployment.
+"
 
 echo -e "
 Let's begin. Please select from one of the following options:
 -----------------------------------
 
-${BWhite}1 = Quick Setup. You will only be asked to specify public server IP.${Color_Off}
+${BWhite}1 = Normal Setup:${Color_Off} I would like to configure a new server and clients from scratch.
 
 -----------------------------------
 
-${BWhite}2 = Advanced Setup: I would like to configure a new server and clients from scratch.${Color_Off}
+${BWhite}2 = Quick Setup:${Color_Off} You will only be asked to specify public server IP.${Color_Off}
 
 -----------------------------------
 
-${BWhite}3 = Clients only: I just need to generate some client configs and add those to an existing server.${Color_Off}
+${BWhite}3 = Clients only:${Color_Off} I just need to generate some client configs and add those to an existing server.${Color_Off}
 
 -----------------------------------
 
-${BWhite}4 = IPTABLES: I just need commands to configure IPTABLEs.${Color_Off}
+${BWhite}4 = Firewall:${Color_Off} I just need commands to configure IPTABLEs/firewalld.
 
 ----------------------------------"
 
-read -r scope_of_script
+read -r -p "Option #: " scope_of_script
 
 case "$scope_of_script" in
 "1")
-  sudo bash "$my_wgl_folder"/Scripts/quick_setup.sh
+  sudo bash "$my_wgl_folder"/Scripts/deploy_new_server.sh
   ;;
 "2")
-  sudo bash "$my_wgl_folder"/Scripts/deploy_new_server.sh
+  sudo bash "$my_wgl_folder"/Scripts/quick_setup.sh
   ;;
 "3")
   sudo bash "$my_wgl_folder"/Scripts/client_config.sh

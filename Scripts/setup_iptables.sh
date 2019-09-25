@@ -5,14 +5,19 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
+my_wgl_folder=$(find /home -ignore_readdir_race -type d -name WireGuard-Ligase)
+source "$my_wgl_folder"/doc/functions.sh
+# Setting the colours function
+colours
+
 ############## Determine OS Type ##############
 ###############################################
-ubuntu_os=$(lsb_release -a | grep -c Ubuntu)
+ubuntu_os=$(lsb_release -a | grep -i -c Ubuntu)
 arch_os=$(lsb_release -a | grep -c Arch)
-cent_os=$(hostnamectl | grep -c CentOS)
-debian_os=$(lsb_release -a | grep -c Debian)
-fedora_os=$(lsb_release -a | grep -c Fedora)
-manjaro_os=$(lsb_release -a | grep -c Manjaro)
+cent_os=$(hostnamectl | grep -i -c CentOS)
+debian_os=$(lsb_release -a | grep -i -c Debian)
+fedora_os=$(lsb_release -a | grep -i  -c Fedora)
+manjaro_os=$(lsb_release -a | grep -i -c Manjaro)
 
 if [[ "$ubuntu_os" -gt 0 ]]; then
   distro=ubuntu
@@ -30,66 +35,97 @@ fi
 ###############################################
 ###############################################
 
-my_wgl_folder=$(find /home -type d -name WireGuard-Ligase)
-source "$my_wgl_folder"/doc/colours.sh
 my_separator="--------------------------------------"
 check_pub_ip=$(curl -s https://checkip.amazonaws.com)
 
-echo -e "
-${IWhite}We are going to setup some basic iptables so the server can function correctly.
+printf '\e[2J\e[H'
 
-Please provide the server subnet information to be used.${Color_Off}
+echo -e "
+${IWhite}We are going to setup some basic firewwall rules so the server can
+function correctly.
+
+Step 1) Please provide the server subnet information to be used.${Color_Off}
 
 ${BWhite}Example:${IWhite} If you server IP is ${BRed}10.0.0.1/24${IWhite}, then please type ${BRed}10.0.0.0/24${Color_Off}
 "
-echo -e "$my_separator"
-read -r server_subnet
-echo -e "$my_separator"
+
+read -r -p "Server subnet: " server_subnet
+
+printf '\e[2J\e[H'
 
 echo -e "
-${IWhite}Please also provide the listen port of your server.${Color_Off}
++--------------------------------------------+
+${BWhite}Server subnet = ${BRed}$server_subnet${Color_Off}
++--------------------------------------------+
+
+${IWhite}Step 2) Please also provide the listen port of your server.${Color_Off}
 
 ${BWhite}Example: ${BRed}51820${Color_Off}"
 
-echo -e "$my_separator"
-read -r listen_port
-echo -e "$my_separator"
+read -r -p "Server listen port: " listen_port
+
+printf '\e[2J\e[H'
 
 # Public IP address of the server hosting the WireGuard server
 echo -e "
-${IWhite}The public IP address of this machine is $check_pub_ip. Is this the address you would like to use? ${Color_Off}
++--------------------------------------------+
+${BWhite}Server subnet = ${BRed}$server_subnet${Color_Off}
+${BWhite}Server port = ${BRed}$listen_port${Color_Off}
++--------------------------------------------+
+
+${BWhite}Step 3)${Color_Off} ${IWhite}The public IP address of this machine is $check_pub_ip. 
+Is this the address you would like to use? ${Color_Off}
 
 ${BWhite}1 = yes, 2 = no${Color_Off}"
-read -r public_address
+read -r -p "Choice: " public_address
+
+echo -e "$my_separator"
+
 if [[ "$public_address" == 1 ]]; then
   server_public_address="$check_pub_ip"
 elif [[ "$public_address" == 2 ]]; then
   echo -e "
-  ${IWhite}Please specify the public address of the server.${Color_Off}"
-  read -r server_public_address
+${IWhite}Please specify the public address of the server.${Color_Off}
+"
+  read -r -p "Public IP: " server_public_address
 fi
 
-echo -e "$my_separator"
+printf '\e[2J\e[H'
 
 echo -e "
-${IWhite}Please also provide the internet facing interface of the server. Can be obrained with ${BRed}ip a ${IWhite}or ${BRed}ifconfig${Color_Off}
++--------------------------------------------+
+${BWhite}Server subnet = ${BRed}$server_subnet${Color_Off}
+${BWhite}Server port = ${BRed}$listen_port${Color_Off}
+${BWhite}Server public address = ${BRed}$server_public_address${Color_Off}
++--------------------------------------------+
 
-${BWhite}Example: ${BRed}eth0${Color_Off}"
+${BWhite}Step 4)${IWhite} Please also provide the internet facing interface of the server. 
+${BWhite}Example: ${BRed}eth0${Color_Off}
 
-echo -e "$my_separator"
-read -r local_interface
-echo -e "$my_separator"
+Available interfaces are:
++--------------------+
+$(ip -br a | awk '{print $1}')
++--------------------+
+"
+
+read -r -p "Interface: " local_interface
+printf '\e[2J\e[H'
 
 echo -e "
-${IWhite}Finally, specify the interface name to be used for wireguard. Usually it matches your WireGuard *.conf file.${Color_Off}
++--------------------------------------------+
+${BWhite}Server subnet = ${BRed}$server_subnet${Color_Off}
+${BWhite}Server port = ${BRed}$listen_port${Color_Off}
+${BWhite}Server public address = ${BRed}$server_public_address${Color_Off}
+${BWhite}WAN Interface = ${BRed}$local_interface${Color_Off}
++--------------------------------------------+
 
-${BWhite}Example: ${IWhite}if your server config file is ${BRed}wg0.conf, ${IWhite}interface is ${BRed}wg0${Color_Off}
+${IWhite}Step 5) Specify wireguard server interface name 
+(will be the same as config name, without .conf)${Color_Off}
+"
 
-${IGreen}HINT: You can also check using 'ip a' or 'ifconfig' command${Color_Off}"
+read -r -p "WireGuard Interface: " wg_serv_iface
 
-echo -e "$my_separator"
-read -r interface_name
-echo -e "$my_separator"
+printf '\e[2J\e[H'
 
 if [[ "$cent_os" -gt 0 ]]; then
   check_if_firewalld_installed=$(yum list installed | grep -i -c firewalld)
@@ -117,25 +153,37 @@ if [[ "$cent_os" -gt 0 ]]; then
     ${IYellow}sysctl -p${Color_Off}
     "
     read -n 1 -s -r -p "
-    Review the above commands.
+  Review the above. 
+  Press any key to continue 
+  Press r/R to restart the script
+  Press e/E to exit
+  " your_choice
 
-    Press any key to continue or CTRL+C to stop."
+    case "$your_choice" in
+    [Rr]*)
+      sudo bash "$my_wgl_folder"/Scripts/setup_iptables.sh
+      ;;
+    [Ee]*)
+      exit
+      ;;
+    *)
+      sed -i 's/net.ipv4.ip_forward=0//g' /etc/sysctl.conf
+      sed -i 's/#net.ipv4.ip_forward=0//g' /etc/sysctl.conf
+      sed -i 's/#net.ipv4.ip_forward=1//g' /etc/sysctl.conf
+      echo "net.ipv4.ip_forward=1" >>/etc/sysctl.conf
+      sysctl -p
 
-    sed -i 's/net.ipv4.ip_forward=0//g' /etc/sysctl.conf
-    sed -i 's/#net.ipv4.ip_forward=0//g' /etc/sysctl.conf
-    sed -i 's/#net.ipv4.ip_forward=1//g' /etc/sysctl.conf
-    echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
-    sysctl -p
+      firewall-cmd --zone=public --add-port="$listen_port"/udp
+      firewall-cmd --zone=trusted --add-source="$server_subnet"
+      firewall-cmd --permanent --zone=public --add-port="$listen_port"/udp
+      firewall-cmd --permanent --zone=trusted --add-source="$server_subnet"
+      firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -s "$server_subnet" ! -d "$server_subnet" -j SNAT --to "$server_public_address"
+      firewall-cmd --permanent --direct --add-rule ipv4 nat POSTROUTING 0 -s "$server_subnet" ! -d "$server_subnet" -j SNAT --to "$server_public_address"
 
-    firewall-cmd --zone=public --add-port="$listen_port"/udp
-    firewall-cmd --zone=trusted --add-source="$server_subnet"
-    firewall-cmd --permanent --zone=public --add-port="$listen_port"/udp
-    firewall-cmd --permanent --zone=trusted --add-source="$server_subnet"
-    firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -s "$server_subnet" ! -d "$server_subnet" -j SNAT --to "$server_public_address"
-    firewall-cmd --permanent --direct --add-rule ipv4 nat POSTROUTING 0 -s "$server_subnet" ! -d "$server_subnet" -j SNAT --to "$server_public_address"
+      echo -e "${BWhite}Done!${Color_Off}"
+      ;;
+    esac
 
-    echo -e "
-    ${BWhite}Done!${Color_Off}"
   elif [[ "$check_if_firewalld_installed" == 0 ]]; then
     echo -e "
     OS Type: CentOS
@@ -153,7 +201,7 @@ if [[ "$cent_os" -gt 0 ]]; then
     ${IYellow}iptables -A INPUT -p udp -m udp --dport ${BRed}$listen_port ${IYellow}-m conntrack --ctstate NEW -j ACCEPT${Color_Off}
 
     #Forward packets in the VPN tunnel
-    ${IYellow}iptables -A FORWARD -i ${BRed}$interface_name${IYellow} -o ${BRed}$interface_name ${IYellow}-m conntrack --ctstate NEW -j ACCEPT${Color_Off}
+    ${IYellow}iptables -A FORWARD -i ${BRed}$wg_serv_iface${IYellow} -o ${BRed}$wg_serv_iface ${IYellow}-m conntrack --ctstate NEW -j ACCEPT${Color_Off}
 
     # Enable NAT
     ${IYellow}iptables -t nat -A POSTROUTING -s ${BRed}$server_subnet ${IYellow}-o $local_interface -j MASQUERADE${Color_Off}
@@ -169,28 +217,39 @@ if [[ "$cent_os" -gt 0 ]]; then
 
     -------------------------------------------
     "
-
     read -n 1 -s -r -p "
-    Review the above commands.
+  Review the above. 
+  Press any key to continue 
+  Press r/R to restart the script
+  Press e/E to exit
+  " your_choice
 
-    Press any key to continue or CTRL+C to stop."
+    case "$your_choice" in
+    [Rr]*)
+      sudo bash "$my_wgl_folder"/Scripts/setup_iptables.sh
+      ;;
+    [Ee]*)
+      exit
+      ;;
+    *)
+      sed -i 's/net.ipv4.ip_forward=0//g' /etc/sysctl.conf
+      sed -i 's/#net.ipv4.ip_forward=0//g' /etc/sysctl.conf
+      sed -i 's/#net.ipv4.ip_forward=1//g' /etc/sysctl.conf
+      echo "net.ipv4.ip_forward=1" >>/etc/sysctl.conf
+      sysctl -p
 
-    sed -i 's/net.ipv4.ip_forward=0//g' /etc/sysctl.conf
-    sed -i 's/#net.ipv4.ip_forward=0//g' /etc/sysctl.conf
-    sed -i 's/#net.ipv4.ip_forward=1//g' /etc/sysctl.conf
-    echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
-    sysctl -p
+      iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+      iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+      iptables -A INPUT -p udp -m udp --dport "$listen_port" -m conntrack --ctstate NEW -j ACCEPT
+      iptables -A FORWARD -i "$wg_serv_iface" -o "$wg_serv_iface" -m conntrack --ctstate NEW -j ACCEPT
+      iptables -t nat -A POSTROUTING -s "$server_subnet" -o "$local_interface" -j MASQUERADE
 
-    iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-    iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-    iptables -A INPUT -p udp -m udp --dport "$listen_port" -m conntrack --ctstate NEW -j ACCEPT
-    iptables -A FORWARD -i "$interface_name" -o "$interface_name" -m conntrack --ctstate NEW -j ACCEPT
-    iptables -t nat -A POSTROUTING -s "$server_subnet" -o "$local_interface" -j MASQUERADE
-
-    echo -e "${BWhite}Done!${Color_Off}"
+      echo -e "${BWhite}Done!${Color_Off}"
+      ;;
+    esac
   fi
-
 else
+
   echo -e "
   ${IWhite}The following iptables will be configured:${Color_Off}
 
@@ -202,10 +261,10 @@ else
   ${IYellow}iptables -A INPUT -p udp -m udp --dport ${BRed}$listen_port ${IYellow}-m conntrack --ctstate NEW -j ACCEPT${Color_Off}
 
   #Forward packets in the VPN tunnel
-  ${IYellow}iptables -A FORWARD -i ${BRed}$interface_name${IYellow} -o ${BRed}$interface_name ${IYellow}-m conntrack --ctstate NEW -j ACCEPT${Color_Off}
+  ${IYellow}iptables -A FORWARD -i ${BRed}$wg_serv_iface${IYellow} -o ${BRed}$wg_serv_iface ${IYellow}-m conntrack --ctstate NEW -j ACCEPT${Color_Off}
 
   # Enable NAT
-  ${IYellow}iptables -t nat -A POSTROUTING -s ${BRed}$server_subnet ${IYellow}-o $local_interface -j MASQUERADE${Color_Off}
+  ${IYellow}iptables -t nat -A POSTROUTING -s ${BRed}$server_subnet ${IYellow}-o ${BRed}$local_interface ${IYellow}-j MASQUERADE${Color_Off}
 
   In addition to setting up iptables, the following commands will be executed:
 
@@ -220,22 +279,35 @@ else
   "
 
   read -n 1 -s -r -p "
-  Review the above commands.
+  Review the above. 
+  Press any key to continue 
+  Press r/R to restart the script
+  Press e/E to exit
+  " your_choice
 
-  Press any key to continue or CTRL+C to stop."
+  case "$your_choice" in
+  [Rr]*)
+    sudo bash "$my_wgl_folder"/Scripts/setup_iptables.sh
+    ;;
+  [Ee]*)
+    exit
+    ;;
+  *)
+    sed -i 's/net.ipv4.ip_forward=0/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
+    sed -i 's/#net.ipv4.ip_forward=0/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
+    sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
+    sysctl -p
 
-  sed -i 's/net.ipv4.ip_forward=0/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
-  sed -i 's/#net.ipv4.ip_forward=0/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
-  sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
-  sysctl -p
+    iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+    iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+    iptables -A INPUT -p udp -m udp --dport "$listen_port" -m conntrack --ctstate NEW -j ACCEPT
+    iptables -A FORWARD -i "$wg_serv_iface" -o "$wg_serv_iface" -m conntrack --ctstate NEW -j ACCEPT
+    iptables -t nat -A POSTROUTING -s "$server_subnet" -o "$local_interface" -j MASQUERADE
 
-  iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-  iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-  iptables -A INPUT -p udp -m udp --dport "$listen_port" -m conntrack --ctstate NEW -j ACCEPT
-  iptables -A FORWARD -i "$interface_name" -o "$interface_name" -m conntrack --ctstate NEW -j ACCEPT
-  iptables -t nat -A POSTROUTING -s "$server_subnet" -o "$local_interface" -j MASQUERADE
+    echo -e "${BWhite}Done!${Color_Off}"
+    ;;
+  esac
 
-  echo -e "${BWhite}Done!${Color_Off}"
 fi
 
 if [[ "$distro" == "ubuntu" ]] || [[ "$distro" == "debian" ]]; then

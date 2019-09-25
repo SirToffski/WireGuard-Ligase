@@ -10,10 +10,12 @@ my_working_dir=$(pwd)
 source "$my_wgl_folder"/doc/functions.sh
 my_separator="--------------------------------------"
 ############################ DEFINE VARIABLES ############################
-### The first three octets of server_private_address, client_private_range and server_subnet
-### HAVE to be same for all subnets starting from /24 and up. The way this works now is
-### not ideal and will be re-written at some point. For the time being, if you change
-### server address, remember to change the client_private_range and server_subnet as well
+### The first three octets of server_private_address, client_private_range
+# and server_subnet HAVE to be same for all subnets starting from /24
+# and up. The way this works now is not ideal and will be re-written
+# at some point. For the time being, if you change ## server address,
+# remember to change the client_private_range and server_subnet as well
+
 server_private_address="10.10.100.1"
 client_private_range="10.10.100"
 ### If you need more than five clients, your best bet is not go go over /27
@@ -46,6 +48,8 @@ if [[ $check_for_clients_directory == 0 ]]; then
   mkdir client_configs
 fi
 ##########################################################################################
+
+printf '\e[2J\e[H'
 
 echo -e "This script will take you through the steps needed to deploy a new server and configure some clients.
 
