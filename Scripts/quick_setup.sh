@@ -5,7 +5,7 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
-my_wgl_folder=$(find /home -type d -name WireGuard-Ligase)
+my_wgl_folder="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. >/dev/null 2>&1 && pwd )"
 my_working_dir=$(pwd)
 source "$my_wgl_folder"/doc/functions.sh
 my_separator="--------------------------------------"

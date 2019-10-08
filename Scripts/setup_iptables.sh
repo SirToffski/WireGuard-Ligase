@@ -5,7 +5,7 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
-my_wgl_folder=$(find /home -ignore_readdir_race -type d -name WireGuard-Ligase)
+my_wgl_folder="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. >/dev/null 2>&1 && pwd )"
 source "$my_wgl_folder"/doc/functions.sh
 # Setting the colours function
 colours

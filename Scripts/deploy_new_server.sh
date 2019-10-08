@@ -6,7 +6,7 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 echo "+--------------------------------------------+"
-my_wgl_folder=$(find /home -ignore_readdir_race -type d -name WireGuard-Ligase)
+my_wgl_folder="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. >/dev/null 2>&1 && pwd )"
 my_working_dir=$(pwd)
 check_pub_ip=$(curl -s https://checkip.amazonaws.com)
 
