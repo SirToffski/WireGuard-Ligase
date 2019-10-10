@@ -105,6 +105,12 @@ For installation on other Operating Systems, please check the [**Wiki**](https:/
   * Tons of minor bug fixes and some re-writes to save config logic
   * The script has been officially tested on CentOS 7 running in EC2 for the first time. Tons of minor adjustments had to be made.
     * CentOS 7 in EC2 does not have `firewalld` pre-installed and instead uses `iptables`. The iptables script has been written to take this into account. If OS type is CentOS and `firewalld` is installed, then `firewall-cmd` commands are used. If `firewalld` is not installed, `iptables` will be used by default. Also, the user will be offered to have `iptables-service` installed and enabled via `systemd` to have the rules persist after reboot.
+* Oct 10th, 2019
+  * It's been a while since the changelog has been updated; yet the work hasn't stopped.
+  * Most of the commits were to improve user experience.
+    * The look if the script has changed somewhat. The terminal screen is now cleared when needed and important parts summarized - hard to explain.. but it's a lot better now.
+    * Finally a good solution has been found to check for the directory where the script is running. See commit [7d2d61c](https://github.com/SirToffski/WireGuard-Ligase/commit/7d2d61c61949089a6b4aa363e422a5d53ac0423f). Find worked well on a brand new OS installation. However on a system with plenty of files and directories - it was a mess.
+    * For the time being, work will continue concentrating on improvements to user interface, experience, and overall stability. New features will be implemented at a slower pace until the author is satisfied with UX.
 
 ## TODO
 
