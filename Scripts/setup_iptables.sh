@@ -179,7 +179,7 @@ if [[ "$cent_os" -gt 0 ]]; then
       firewall-cmd --permanent --zone=trusted --add-source="$server_subnet"
       firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -s "$server_subnet" ! -d "$server_subnet" -j SNAT --to "$server_public_address"
       firewall-cmd --permanent --direct --add-rule ipv4 nat POSTROUTING 0 -s "$server_subnet" ! -d "$server_subnet" -j SNAT --to "$server_public_address"
-
+      printf '\e[2J\e[H'
       echo -e "${BWhite}Done!${Color_Off}"
       ;;
     esac
@@ -243,7 +243,7 @@ if [[ "$cent_os" -gt 0 ]]; then
       iptables -A INPUT -p udp -m udp --dport "$listen_port" -m conntrack --ctstate NEW -j ACCEPT
       iptables -A FORWARD -i "$wg_serv_iface" -o "$wg_serv_iface" -m conntrack --ctstate NEW -j ACCEPT
       iptables -t nat -A POSTROUTING -s "$server_subnet" -o "$local_interface" -j MASQUERADE
-
+      printf '\e[2J\e[H'
       echo -e "${BWhite}Done!${Color_Off}"
       ;;
     esac
@@ -303,7 +303,7 @@ else
     iptables -A INPUT -p udp -m udp --dport "$listen_port" -m conntrack --ctstate NEW -j ACCEPT
     iptables -A FORWARD -i "$wg_serv_iface" -o "$wg_serv_iface" -m conntrack --ctstate NEW -j ACCEPT
     iptables -t nat -A POSTROUTING -s "$server_subnet" -o "$local_interface" -j MASQUERADE
-
+    printf '\e[2J\e[H'
     echo -e "${BWhite}Done!${Color_Off}"
     ;;
   esac
@@ -412,5 +412,8 @@ First, iptables-service needs to be intalled.
   fi
 fi
 
+printf '\e[2J\e[H'
 echo -e "
+Congrats, everything should be up and running now!
+
 Ending the script...."
