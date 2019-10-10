@@ -6,13 +6,23 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 echo "+--------------------------------------------+"
-my_wgl_folder="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. >/dev/null 2>&1 && pwd )"
+# Default working directory of the script.
+## Requirements: Cloning the entire repository.
+my_wgl_folder="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. >/dev/null 2>&1 && pwd)"
 my_working_dir=$(pwd)
+# A simple check if the entire repo was cloned.
+## If not, working directory is a directory if the currently running script.
+check_for_full_clone=$(find "$my_wgl_folder" -name 'configure-wireguard.sh' -print)
+if [[ "$check_for_full_clone" == "" ]]; then
+  my_wgl_folder="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+fi
+# Determine the public IP of the host.
 check_pub_ip=$(curl -s https://checkip.amazonaws.com)
 
 source "$my_wgl_folder"/doc/functions.sh
 # Setting the colours function
 colours
+
 
 ######################## Pre-checks ##############################
 # Check if a directory /keys/ exists, if not, it will be made
@@ -41,6 +51,8 @@ First, let's check if wireguard is installed..."
 ###############################################
 determine_os
 ############### FINISHED CHECKING OS AND OFFER TO INSTALL WIREGUARD ###############
+
+printf '\e[2J\e[H'
 
 # Private address could be any address within RFC 1918, usually the first useable address in a /24 range. This however is completely up to you.
 echo -e "
