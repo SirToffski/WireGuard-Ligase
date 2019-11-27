@@ -22,7 +22,9 @@ function determine_os() {
   elif [[ "$manjaro_os" -gt 0 ]]; then
     distro=manjaro
   else
-    echo -e "The operating system is not supported by this script. The script will continue but will be unable to install Wireguard packages. Hence script's functionality will be limited to generating server / client configurations."
+    echo -e "The operating system is not supported by this script.
+    The script will continue but will be unable to install Wireguard packages. 
+    Hence script's functionality will be limited to generating server and client configurations."
   fi
 
   ########### UBUNTU ###########

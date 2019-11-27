@@ -5,10 +5,16 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
-my_wgl_folder="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. >/dev/null 2>&1 && pwd )"
-source "$my_wgl_folder"/doc/functions.sh
-# Setting the colours function
-colours
+my_wgl_folder="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. >/dev/null 2>&1 && pwd)"
+
+check_for_full_clone="$my_wgl_folder/configure-wireguard.sh"
+if [[ ! -f "$check_for_full_clone" ]]; then
+  my_wgl_folder="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+else
+  source "$my_wgl_folder"/doc/functions.sh
+  # Setting the colours function
+  colours
+fi
 
 ############## Determine OS Type ##############
 ###############################################
@@ -40,14 +46,12 @@ check_pub_ip=$(curl -s https://checkip.amazonaws.com)
 
 printf '\e[2J\e[H'
 
-echo -e "
-${IWhite}We are going to setup some basic firewwall rules so the server can
+echo -e "\n${IWhite}We are going to setup some basic firewwall rules so the server can
 function correctly.
 
 Step 1) Please provide the server subnet information to be used.${Color_Off}
 
-${BWhite}Example:${IWhite} If you server IP is ${BRed}10.0.0.1/24${IWhite}, then please type ${BRed}10.0.0.0/24${Color_Off}
-"
+${BWhite}Example:${IWhite} If you server IP is ${BRed}10.0.0.1/24${IWhite}, then please type ${BRed}10.0.0.0/24${Color_Off}\n"
 
 read -r -p "Server subnet: " server_subnet
 
