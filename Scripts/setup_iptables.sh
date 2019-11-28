@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [ "$EUID" -ne 0 ]; then
-  echo "Please run the script as root."
+  printf %s\\n "Please run the script as root."
   exit 1
 fi
 
@@ -174,7 +174,7 @@ if [[ "$cent_os" -gt 0 ]]; then
       sed -i 's/net.ipv4.ip_forward=0//g' /etc/sysctl.conf
       sed -i 's/#net.ipv4.ip_forward=0//g' /etc/sysctl.conf
       sed -i 's/#net.ipv4.ip_forward=1//g' /etc/sysctl.conf
-      echo "net.ipv4.ip_forward=1" >>/etc/sysctl.conf
+      printf %s\\n "net.ipv4.ip_forward=1" >>/etc/sysctl.conf
       sysctl -p
 
       firewall-cmd --zone=public --add-port="$listen_port"/udp
@@ -239,7 +239,7 @@ if [[ "$cent_os" -gt 0 ]]; then
       sed -i 's/net.ipv4.ip_forward=0//g' /etc/sysctl.conf
       sed -i 's/#net.ipv4.ip_forward=0//g' /etc/sysctl.conf
       sed -i 's/#net.ipv4.ip_forward=1//g' /etc/sysctl.conf
-      echo "net.ipv4.ip_forward=1" >>/etc/sysctl.conf
+      printf %s\\n "net.ipv4.ip_forward=1" >>/etc/sysctl.conf
       sysctl -p
 
       iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT

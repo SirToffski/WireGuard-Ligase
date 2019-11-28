@@ -5,7 +5,7 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
-echo "+--------------------------------------------+"
+printf %s\\n "+--------------------------------------------+"
 # Default working directory of the script.
 ## Requirements: Cloning the entire repository.
 my_wgl_folder="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. >/dev/null 2>&1 && pwd)"
@@ -81,14 +81,14 @@ Is this the address you would like to use? ${Color_Off}
 \n${BWhite}1 = yes, 2 = no${Color_Off}"
 read -r -p "Choice: " public_address
 
-echo "+--------------------------------------------+"
+printf %s\\n "+--------------------------------------------+"
 
 if [[ "$public_address" == 1 ]]; then
   server_public_address="$check_pub_ip"
 elif [[ "$public_address" == 2 ]]; then
   printf %b\\n "\n${IWhite}Please specify the public address of the server.${Color_Off}"
   read -r -p "Public IP: " server_public_address
-  echo "+--------------------------------------------+"
+  printf %s\\n "+--------------------------------------------+"
 fi
 
 printf '\e[2J\e[H'
@@ -152,7 +152,7 @@ printf %b\\n "\n${IWhite}Do you need to generate server keys?${Color_Off}
 ${BWhite}1 = yes, 2 = no${Color_Off}\n"
 
 read -r -p "Choice: " generate_server_key
-echo "+--------------------------------------------+"
+printf %s\\n "+--------------------------------------------+"
 
 if [[ "$generate_server_key" == 1 ]]; then
   wg genkey | tee "$my_wgl_folder"/keys/ServerPrivatekey | wg pubkey >"$my_wgl_folder"/keys/ServerPublickey
@@ -167,12 +167,12 @@ else
   printf %b\\n "\n${IWhite}Specify server private key.${Color_Off}\n"
   read -r -p "Server private key: " server_private_key
   printf %b\\n "$server_private_key" >"$my_wgl_folder"/keys/ServerPrivatekey
-  echo "+--------------------------------------------+"
+  printf %s\\n "+--------------------------------------------+"
   printf %b\\n "\n${IWhite}Specify server public key.${Color_Off}\n"
   read -r -p "Server public key: " server_public_key
   printf %b\\n "$server_public_key" >"$my_wgl_folder"/keys/ServerPublickey
   chmod 600 "$my_wgl_folder"/keys/ServerPrivatekey && chmod 600 "$my_wgl_folder"/keys/ServerPrivatekey
-  echo "+--------------------------------------------+"
+  printf %s\\n "+--------------------------------------------+"
 
 fi
 
@@ -212,7 +212,7 @@ printf %b\\n "$new_server_config" >"$my_wgl_folder"/"$wg_serv_iface".conf
 chmod 600 "$my_wgl_folder"/"$wg_serv_iface".conf
 
 printf %b\\n "Server config has been written to a file $my_wgl_folder/$wg_serv_iface.conf"
-echo "+--------------------------------------------+"
+printf %s\\n "+--------------------------------------------+"
 
 sleep 2
 
@@ -256,20 +256,20 @@ printf %b\\n "
   ${IYellow}$new_server_config${Color_Off}
 
 "
-echo "+--------------------------------------------+"
+printf %s\\n "+--------------------------------------------+"
 
 printf %b\\n "\n${IWhite}Configure clients?${Color_Off}
 ${BWhite}1=yes, 2=no${Color_Off}"
 
 read -r -p "Choice: " client_config_answer
-echo "+--------------------------------------------+"
+printf %s\\n "+--------------------------------------------+"
 
 if [[ "$client_config_answer" == 1 ]]; then
   printf '\e[2J\e[H'
   printf %b\\n "\n${IWhite}How many clients would you like to configure?${Color_Off}\n"
   read -r -p "Number of clients: " number_of_clients
 
-  echo "+--------------------------------------------+"
+  printf %s\\n "+--------------------------------------------+"
 
   printf %b\\n "\n${IWhite}Specify the DNS server your clients will use.${Color_Off}\n"
   # This would usually be a public DNS server, for example 1.1.1.1,
@@ -277,7 +277,7 @@ if [[ "$client_config_answer" == 1 ]]; then
   read -r -p "DNS server: " client_dns
   printf '\e[2J\e[H'
   printf %b\\n "\nNext steps will ask to provide \nprivate address and a name for each client, one at a time.\n"
-  echo "+--------------------------------------------+"
+  printf %s\\n "+--------------------------------------------+"
 
   # Private address would be within the RFC 1918 range of the server.
   # For example if the server IP is 10.10.10.1/24, the first client
@@ -292,12 +292,12 @@ if [[ "$client_config_answer" == 1 ]]; then
     # Tom_iPhone
     # Wendy_laptop
 
-    echo "+--------------------------------------------+"
+    printf %s\\n "+--------------------------------------------+"
 
     printf %b\\n "\n${IWhite}Provide the name of the client # $i ${Color_Off}\n"
     read -r -p "Client $i name: " client_name_[$i]
 
-    echo "+--------------------------------------------+"
+    printf %s\\n "+--------------------------------------------+"
 
     wg genkey | tee "$my_wgl_folder"/keys/"${client_name_["$i"]}"Privatekey | wg pubkey >"$my_wgl_folder"/keys/"${client_name_["$i"]}"Publickey
 
@@ -320,7 +320,7 @@ PersistentKeepalive = 21" >"$my_wgl_folder"/client_configs/"${client_name_["$i"]
   done
   printf %b\\n "\nAwesome!\nClient config files were saved to ${IWhite}$my_wgl_folder/client_configs/${Color_Off}"
 else
-  echo "+--------------------------------------------+"
+  printf %s\\n "+--------------------------------------------+"
   printf %b\\n "${IWhite}Before ending this script,\nwould you like to setup firewall rules for the new server? (recommended)${Color_Off}\n
   ${BWhite}1 = yes, 2 = no${Color_Off}\n"
   read -r -p "Choice: " iptables_setup
@@ -341,7 +341,7 @@ if [[ "$generate_qr_code" == 1 ]]; then
   for ((q = 1; q <= "$number_of_clients"; q++)); do
     printf %b\\n "${BRed}${client_name_[$q]}${Color_Off}\n"
     qrencode -t ansiutf8 <"$my_wgl_folder"/client_configs/"${client_name_["$q"]}".conf
-    echo "+--------------------------------------------+"
+    printf %s\\n "+--------------------------------------------+"
   done
 elif [[ "$generate_qr_code" == 2 ]]; then
   printf %b\\n "\nAlright.. Moving on!\n+--------------------------------------------+"

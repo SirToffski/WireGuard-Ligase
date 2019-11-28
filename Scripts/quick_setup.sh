@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [ "$EUID" -ne 0 ]; then
-  echo "Please run the script as root."
+  printf %s\\n "Please run the script as root."
   exit 1
 fi
 
@@ -197,7 +197,7 @@ case "$proceed_quick_setup" in
 
   sleep 1
   printf %b\\n "\n${BGreen}Saving server config${Color_Off}"
-  echo "$new_server_config" >"$config_file_name".txt && echo "$new_server_config" >/etc/wireguard/"$config_file_name".conf
+  printf %s\\n "$new_server_config" >"$config_file_name".txt && printf %s\\n "$new_server_config" >/etc/wireguard/"$config_file_name".conf
 
   # Generating client keys
 
@@ -249,7 +249,7 @@ AllowedIPs = $private_range.$((i + 9))/32\n" >>/etc/wireguard/"$config_file_name
     sed -i 's/net.ipv4.ip_forward=0//g' /etc/sysctl.conf
     sed -i 's/#net.ipv4.ip_forward=0//g' /etc/sysctl.conf
     sed -i 's/#net.ipv4.ip_forward=1//g' /etc/sysctl.conf
-    echo "net.ipv4.ip_forward=1" >>/etc/sysctl.conf
+    printf %s\\n "net.ipv4.ip_forward=1" >>/etc/sysctl.conf
     sysctl -p
     if [[ "$check_if_firewalld_installed" == 0 ]]; then
       iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
@@ -413,7 +413,7 @@ Review the above commands.
     for ((q = 1; q <= "$number_of_clients"; q++)); do
       printf %b\\n "${BRed}client_[$q]${Color_Off}\n"
       qrencode -t ansiutf8 <"$my_wgl_folder"/client_configs/client_["$q"].conf
-      echo "+--------------------------------------------+"
+      printf %s\\n "+--------------------------------------------+"
     done
   elif [[ "$generate_qr_code" == 2 ]]; then
     printf %b\\n "\nAlright.. Moving on!\n+--------------------------------------------+"

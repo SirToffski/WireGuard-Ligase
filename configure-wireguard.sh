@@ -18,7 +18,7 @@
 # - https://en.wikipedia.org/wiki/Ligase (May 19th, 2019)
 
 if [ "$EUID" -ne 0 ]; then
-  echo "Please run the script as root."
+  printf %s\\n "Please run the script as root."
   exit 1
 fi
 
