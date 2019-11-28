@@ -2,12 +2,12 @@
 
 function determine_os() {
   {
-    ubuntu_os=$(lsb_release -a | grep -c Ubuntu)
-    arch_os=$(hostnamectl | grep -c "Arch Linux")
-    cent_os=$(hostnamectl | grep -c CentOS)
-    debian_os=$(lsb_release -a | grep -c Debian)
-    fedora_os=$(lsb_release -a | grep -c Fedora)
-    manjaro_os=$(hostnamectl | grep -c Manjaro)
+    ubuntu_os=$(lsb_release -a | grep -i -c Ubuntu)
+    arch_os=$(hostnamectl | grep -i -c "Arch Linux")
+    cent_os=$(hostnamectl | grep -i -c CentOS)
+    debian_os=$(lsb_release -a | grep -i -c Debian)
+    fedora_os=$(lsb_release -a | grep -i -c Fedora)
+    manjaro_os=$(hostnamectl | grep -i -c Manjaro)
   } &>/dev/null
   if [[ "$ubuntu_os" -gt 0 ]]; then
     distro=ubuntu
@@ -22,7 +22,7 @@ function determine_os() {
   elif [[ "$manjaro_os" -gt 0 ]]; then
     distro=manjaro
   else
-    echo -e "The operating system is not supported by this script.
+    printf %b\\n "The operating system is not supported by this script.
     The script will continue but will be unable to install Wireguard packages. 
     Hence script's functionality will be limited to generating server and client configurations."
   fi
@@ -33,7 +33,7 @@ function determine_os() {
     check_if_wg_installed=$(dpkg-query -l | grep -i -c wireguard-tools)
     # If WireGuard is NOT installed, offer to install
     if [[ "$check_if_wg_installed" == 0 ]]; then
-      echo -e "
+      printf %b\\n "
   +---------------------------------------------+
       ${BWhite}OS Type: Ubuntu
       Wireguard-Tools: NOT installed${Color_Off}
@@ -49,11 +49,11 @@ function determine_os() {
         apt-get install wireguard
       elif [[ "$install_wireguard" == 2 ]]; then
         # If chosen NOT to install, move along
-        echo -e "
+        printf %b\\n "
         Understood, moving on with the script."
       fi
     else
-      echo -e "
+      printf %b\\n "
   +---------------------------------------------+
       ${BWhite}OS Type: Ubuntu
       Wireguard-Tools: Installed${Color_Off}
@@ -69,7 +69,7 @@ function determine_os() {
     check_if_wg_installed=$(pacman -Qe | grep -i -c wireguard-tools)
     # If WireGuard is NOT installed, offer to instal
     if [[ "$check_if_wg_installed" == 0 ]]; then
-      echo -e "
+      printf %b\\n "
   +---------------------------------------------+
       ${BWhite}OS Type: $distro
       Wireguard-Tools: NOT installed${Color_Off}
@@ -84,11 +84,11 @@ function determine_os() {
         pacman -S wireguard-dkms wireguard-tools --noconfirm
       elif [[ "$install_wireguard" == 2 ]]; then
         # If chosen NOT to install, move along
-        echo -e "
+        printf %b\\n "
         Understood, moving on with the script."
       fi
     else
-      echo -e "
+      printf %b\\n "
   +---------------------------------------------+
       ${BWhite}OS Type: $distro
       Wireguard-Tools: Installed${Color_Off}
@@ -105,7 +105,7 @@ function determine_os() {
     mkdir /etc/wireguard/
     # If WireGuard is NOT installed, offer to instal
     if [[ "$check_if_wg_installed" == 0 ]]; then
-      echo -e "
+      printf %b\\n "
   +---------------------------------------------+
         ${BWhite}OS Type: CentOS
       Wireguard-Tools: NOT installed${Color_Off}
@@ -121,11 +121,11 @@ function determine_os() {
         yum install wireguard-dkms wireguard-tools
       elif [[ "$install_wireguard" == 2 ]]; then
         # If chosen NOT to install, move along
-        echo -e "
+        printf %b\\n "
         Understood, moving on with the script."
       fi
     else
-      echo -e "
+      printf %b\\n "
   +---------------------------------------------+
       ${BWhite}OS Type: CentOS
       Wireguard-Tools: Installed${Color_Off}
@@ -141,7 +141,7 @@ function determine_os() {
     check_if_wg_installed=$(dnf list installed | grep -i -c wireguard-tools)
     # If WireGuard is NOT installed, offer to instal
     if [[ "$check_if_wg_installed" == 0 ]]; then
-      echo -e "
+      printf %b\\n "
   +---------------------------------------------+
         ${BWhite}OS Type: Fedora
       Wireguard-Tools: NOT installed${Color_Off}
@@ -156,11 +156,11 @@ function determine_os() {
         dnf install wireguard-dkms wireguard-tools
       elif [[ "$install_wireguard" == 2 ]]; then
         # If chosen NOT to install, move along
-        echo -e "
+        printf %b\\n "
         Understood, moving on with the script."
       fi
     else
-      echo -e "
+      printf %b\\n "
   +---------------------------------------------+
       ${BWhite}OS Type: Fedora
       Wireguard-Tools: Installed${Color_Off}
@@ -176,7 +176,7 @@ function determine_os() {
     check_if_wg_installed=$(dpkg-query -l | grep -i -c wireguard-tools)
     # If WireGuard is NOT installed, offer to instal
     if [[ "$check_if_wg_installed" == 0 ]]; then
-      echo -e "
+      printf %b\\n "
   +---------------------------------------------+
       ${BWhite}OS Type: Debian
       Wireguard-Tools: NOT installed${Color_Off}
@@ -193,11 +193,11 @@ function determine_os() {
         apt install wireguard
       elif [[ "$install_wireguard" == 2 ]]; then
         # If chosen NOT to install, move along
-        echo -e "
+        printf %b\\n "
         Understood, moving on with the script."
       fi
     else
-      echo -e "
+      printf %b\\n "
   +---------------------------------------------+
       ${BWhite}OS Type: Debian
       Wireguard-Tools: Installed${Color_Off}

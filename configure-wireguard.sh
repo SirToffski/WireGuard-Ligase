@@ -30,9 +30,9 @@ colours
 
 logo=$(cat "$my_wgl_folder"/doc/ascii-logo)
 printf '\e[2J\e[H'
-echo -e "${BPurple}$logo${Color_Off}"
+printf %b\\n "${BPurple}$logo${Color_Off}"
 
-echo -e "${BWhite}Welcome to WG Ligase${Color_Off}.
+printf %b\\n "${BWhite}Welcome to WG Ligase${Color_Off}.
 
 The script will guide you through the installaton process, allowing to
 choose a starting point. The idea is for this script to be equally
@@ -40,7 +40,7 @@ suitable for new deployments, as well as for configuring a live
 deployment.
 "
 
-echo -e "
+printf %b\\n "
 Let's begin. Please select from one of the following options:
 -----------------------------------
 
@@ -76,6 +76,6 @@ case "$scope_of_script" in
   sudo bash "$my_wgl_folder"/Scripts/setup_iptables.sh
   ;;
 *)
-  echo -e "${BRed}Sorry, wrong choise. Rerun the script and try again${Color_Off}"
+  printf %b\\n "${BRed}Sorry, wrong choise. Rerun the script and try again${Color_Off}"
   ;;
 esac

@@ -46,7 +46,7 @@ check_pub_ip=$(curl -s https://checkip.amazonaws.com)
 
 printf '\e[2J\e[H'
 
-echo -e "\n${IWhite}We are going to setup some basic firewwall rules so the server can
+printf %b\\n "\n${IWhite}We are going to setup some basic firewwall rules so the server can
 function correctly.
 
 Step 1) Please provide the server subnet information to be used.${Color_Off}
@@ -57,7 +57,7 @@ read -r -p "Server subnet: " server_subnet
 
 printf '\e[2J\e[H'
 
-echo -e "
+printf %b\\n "
 +--------------------------------------------+
 ${BWhite}Server subnet = ${BRed}$server_subnet${Color_Off}
 +--------------------------------------------+
@@ -71,7 +71,7 @@ read -r -p "Server listen port: " listen_port
 printf '\e[2J\e[H'
 
 # Public IP address of the server hosting the WireGuard server
-echo -e "
+printf %b\\n "
 +--------------------------------------------+
 ${BWhite}Server subnet = ${BRed}$server_subnet${Color_Off}
 ${BWhite}Server port = ${BRed}$listen_port${Color_Off}
@@ -83,12 +83,12 @@ Is this the address you would like to use? ${Color_Off}
 ${BWhite}1 = yes, 2 = no${Color_Off}"
 read -r -p "Choice: " public_address
 
-echo -e "$my_separator"
+printf %b\\n "$my_separator"
 
 if [[ "$public_address" == 1 ]]; then
   server_public_address="$check_pub_ip"
 elif [[ "$public_address" == 2 ]]; then
-  echo -e "
+  printf %b\\n "
 ${IWhite}Please specify the public address of the server.${Color_Off}
 "
   read -r -p "Public IP: " server_public_address
@@ -96,7 +96,7 @@ fi
 
 printf '\e[2J\e[H'
 
-echo -e "
+printf %b\\n "
 +--------------------------------------------+
 ${BWhite}Server subnet = ${BRed}$server_subnet${Color_Off}
 ${BWhite}Server port = ${BRed}$listen_port${Color_Off}
@@ -115,7 +115,7 @@ $(ip -br a | awk '{print $1}')
 read -r -p "Interface: " local_interface
 printf '\e[2J\e[H'
 
-echo -e "
+printf %b\\n "
 +--------------------------------------------+
 ${BWhite}Server subnet = ${BRed}$server_subnet${Color_Off}
 ${BWhite}Server port = ${BRed}$listen_port${Color_Off}
@@ -134,7 +134,7 @@ printf '\e[2J\e[H'
 if [[ "$cent_os" -gt 0 ]]; then
   check_if_firewalld_installed=$(yum list installed | grep -i -c firewalld)
   if [[ "$check_if_firewalld_installed" == 1 ]]; then
-    echo -e "
+    printf %b\\n "
     ${IWhite}
     OS Type: CentOS
     Firewalld: installed
@@ -184,17 +184,17 @@ if [[ "$cent_os" -gt 0 ]]; then
       firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -s "$server_subnet" ! -d "$server_subnet" -j SNAT --to "$server_public_address"
       firewall-cmd --permanent --direct --add-rule ipv4 nat POSTROUTING 0 -s "$server_subnet" ! -d "$server_subnet" -j SNAT --to "$server_public_address"
       printf '\e[2J\e[H'
-      echo -e "${BWhite}Done!${Color_Off}"
+      printf %b\\n "${BWhite}Done!${Color_Off}"
       ;;
     esac
 
   elif [[ "$check_if_firewalld_installed" == 0 ]]; then
-    echo -e "
+    printf %b\\n "
     OS Type: CentOS
     Firewalld: NOT installed - using iptables
     The following firewall rules will be configured:${Color_Off}"
 
-    echo -e "
+    printf %b\\n "
     ${IWhite}The following iptables will be configured:${Color_Off}
 
     # Track VPN connection
@@ -248,13 +248,13 @@ if [[ "$cent_os" -gt 0 ]]; then
       iptables -A FORWARD -i "$wg_serv_iface" -o "$wg_serv_iface" -m conntrack --ctstate NEW -j ACCEPT
       iptables -t nat -A POSTROUTING -s "$server_subnet" -o "$local_interface" -j MASQUERADE
       printf '\e[2J\e[H'
-      echo -e "${BWhite}Done!${Color_Off}"
+      printf %b\\n "${BWhite}Done!${Color_Off}"
       ;;
     esac
   fi
 else
 
-  echo -e "
+  printf %b\\n "
   ${IWhite}The following iptables will be configured:${Color_Off}
 
   # Track VPN connection
@@ -308,14 +308,14 @@ else
     iptables -A FORWARD -i "$wg_serv_iface" -o "$wg_serv_iface" -m conntrack --ctstate NEW -j ACCEPT
     iptables -t nat -A POSTROUTING -s "$server_subnet" -o "$local_interface" -j MASQUERADE
     printf '\e[2J\e[H'
-    echo -e "${BWhite}Done!${Color_Off}"
+    printf %b\\n "${BWhite}Done!${Color_Off}"
     ;;
   esac
 
 fi
 
 if [[ "$distro" == "ubuntu" ]] || [[ "$distro" == "debian" ]]; then
-  echo -e "
+  printf %b\\n "
   ${IWhite}In order to make the above iptables rules persistent after system reboot,
   ${BRed}iptables-persistent ${IWhite} package needs to be installed.
 
@@ -337,7 +337,7 @@ if [[ "$distro" == "ubuntu" ]] || [[ "$distro" == "debian" ]]; then
   systemctl enable netfilter-persistent
   netfilter-persistent save
 elif [[ "$distro" == "fedora" ]]; then
-  echo -e "
+  printf %b\\n "
   ${IWhite}In order to make the above iptables rules persistent after system reboot,
   netfilter rules will need to be saved.
 
@@ -355,7 +355,7 @@ elif [[ "$distro" == "fedora" ]]; then
   /sbin/service iptables save
 
 elif [[ "$distro" == "arch" ]] || [[ "$distro" == "manjaro" ]]; then
-  echo -e "
+  printf %b\\n "
   ${IWhite}In order to make the above iptables rules persistent after system reboot,
   netfilter rules will need to be saved.
 
@@ -390,7 +390,7 @@ elif [[ "$distro" == "arch" ]] || [[ "$distro" == "manjaro" ]]; then
   systemctl restart iptables.service
 elif [[ "$distro" == "centos" ]]; then
   if [[ "$check_if_firewalld_installed" == 0 ]]; then
-    echo -e "
+    printf %b\\n "
   ${IWhite}In order to make the above iptables rules persistent after system reboot,
   netfilter rules will need to be saved.
 
@@ -417,7 +417,7 @@ First, iptables-service needs to be intalled.
 fi
 
 printf '\e[2J\e[H'
-echo -e "
+printf %b\\n "
 Congrats, everything should be up and running now!
 
 Ending the script...."

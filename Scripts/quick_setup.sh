@@ -36,7 +36,7 @@ server_subnet="$private_range.0/25"
 number_of_clients="4"
 function create_client_ip_range() {
   for ((i = 1; i <= "$number_of_clients"; i++)); do
-    echo -e "\n${BRed}$private_range.$((i + 9))"
+    printf %b\\n "\n${BRed}$private_range.$((i + 9))"
   done
 }
 local_interface="eth0"
@@ -63,7 +63,7 @@ fi
 
 printf '\e[2J\e[H'
 
-echo -e "This script will take you through the steps needed to deploy a new server and configure some clients.
+printf %b\\n "This script will take you through the steps needed to deploy a new server and configure some clients.
 \nFirst, let's check if wireguard is installed..."
 
 ############## Determine OS Type ##############
@@ -72,7 +72,7 @@ echo -e "This script will take you through the steps needed to deploy a new serv
 determine_os
 ############### FINISHED CHECKING OS AND OFFER TO INSTALL WIREGUARD ###############
 
-echo -e "\n${IWhite} This script will perform a quick server setup with minimal user input.\n
+printf %b\\n "\n${IWhite} This script will perform a quick server setup with minimal user input.\n
 The following will be auto-configured:
 1) Listen port: UDP ${BRed}$server_listen_port ${IWhite}
 2) Server public / private keys
@@ -81,7 +81,7 @@ The following will be auto-configured:
 # {
 create_client_ip_range
 # }
-echo -e "\n5) Server PostUp: iptables -A FORWARD -i ${BRed}$config_file_name${IWhite} -j ACCEPT; iptables -t nat -A POSTROUTING -o $local_interface -j MASQUERADE; ip6tables -A FORWARD -i ${BRed}$config_file_name${IWhite} -j ACCEPT; ip6tables -t nat -A POSTROUTING -o $local_interface -j MASQUERADE
+printf %b\\n "\n5) Server PostUp: iptables -A FORWARD -i ${BRed}$config_file_name${IWhite} -j ACCEPT; iptables -t nat -A POSTROUTING -o $local_interface -j MASQUERADE; ip6tables -A FORWARD -i ${BRed}$config_file_name${IWhite} -j ACCEPT; ip6tables -t nat -A POSTROUTING -o $local_interface -j MASQUERADE
 6) Server PostDown: iptables -D FORWARD -i ${BRed}$config_file_name${IWhite} -j ACCEPT; iptables -t nat -D POSTROUTING -o $local_interface -j MASQUERADE; ip6tables -D FORWARD -i ${BRed}$config_file_name${IWhite} -j ACCEPT; ip6tables -t nat -D POSTROUTING -o $local_interface -j MASQUERADE
 7) Clients will use Cloudflare public DNS of ${BRed}$client_dns${IWhite}
 8) Server config ${BRed}/etc/wireguard/$config_file_name.conf${IWhite}
@@ -141,14 +141,14 @@ ${IYellow}net.ipv4.ip_forward=1${Color_Off}
 #To avoid the need to reboot the server
 ${IYellow}sysctl -p${Color_Off}\n"
 
-echo -e "$my_separator"
+printf %b\\n "$my_separator"
 
 read -n 1 -s -r -p "
 Review the above commands.
 
 Press any key to continue or CTRL+C to stop."
-echo -e "$my_separator"
-echo -e "
+printf %b\\n "$my_separator"
+printf %b\\n "
 ${IWhite}The public IP address of this machine is $check_pub_ip. Is this the address you would like to use? ${Color_Off}
 
 ${BWhite}1 = yes, 2 = no${Color_Off}"
@@ -156,13 +156,13 @@ read -r public_address
 if [[ "$public_address" == 1 ]]; then
   server_public_address="$check_pub_ip"
 elif [[ "$public_address" == 2 ]]; then
-  echo -e "\n${IWhite}Please specify the public address of the server.${Color_Off}"
+  printf %b\\n "\n${IWhite}Please specify the public address of the server.${Color_Off}"
   read -r server_public_address
 fi
 
-echo -e "$my_separator"
+printf %b\\n "$my_separator"
 
-echo -e "\n${BWhite}Review the above. Do you wish to proceed? (y/n)${Color_Off}"
+printf %b\\n "\n${BWhite}Review the above. Do you wish to proceed? (y/n)${Color_Off}"
 
 read -r proceed_quick_setup
 
@@ -174,7 +174,7 @@ case "$proceed_quick_setup" in
   
   # Generating server keys
   
-  echo -e "\n${BGreen}Generating server keys${Color_Off}"
+  printf %b\\n "\n${BGreen}Generating server keys${Color_Off}"
   sleep 1
   wg genkey | tee "$my_wgl_folder"/keys/ServerPrivatekey | wg pubkey >"$my_wgl_folder"/keys/ServerPublickey
   chmod 600 "$my_wgl_folder"/keys/ServerPrivatekey && chmod 600 "$my_wgl_folder"/keys/ServerPublickey
@@ -184,8 +184,8 @@ case "$proceed_quick_setup" in
   # Generating server config
 
   sleep 1
-  echo -e "\n${BGreen}Generating server config${Color_Off}"
-  new_server_config=$(echo -e "\n[Interface]
+  printf %b\\n "\n${BGreen}Generating server config${Color_Off}"
+  new_server_config=$(printf %b\\n "\n[Interface]
   Address = $server_private_address
   SaveConfig = true
   PostUp = iptables -A FORWARD -i $config_file_name -j ACCEPT; iptables -t nat -A POSTROUTING -o $local_interface -j MASQUERADE; ip6tables -A FORWARD -i $config_file_name -j ACCEPT; ip6tables -t nat -A POSTROUTING -o $local_interface -j MASQUERADE
@@ -196,7 +196,7 @@ case "$proceed_quick_setup" in
   # Saving server config
 
   sleep 1
-  echo -e "\n${BGreen}Saving server config${Color_Off}"
+  printf %b\\n "\n${BGreen}Saving server config${Color_Off}"
   echo "$new_server_config" >"$config_file_name".txt && echo "$new_server_config" >/etc/wireguard/"$config_file_name".conf
 
   # Generating client keys
@@ -213,8 +213,8 @@ case "$proceed_quick_setup" in
     # Generating client config
 
     sleep 1
-    echo -e "\n${BGreen}Generating client $i config${Color_Off}"
-    echo -e "\n[Interface]
+    printf %b\\n "\n${BGreen}Generating client $i config${Color_Off}"
+    printf %b\\n "\n[Interface]
 Address = $private_range.$((i + 9))
 PrivateKey = ${client_private_key_["$i"]}
 DNS = $client_dns
@@ -226,8 +226,8 @@ PersistentKeepalive = 21" >"$my_wgl_folder"/client_configs/client_["$i"].conf
 
     # Adding client info to the server config
     sleep 1
-    echo -e "\n${BGreen}Adding client info to the server config${Color_Off}"
-    echo -e "\n[Peer]
+    printf %b\\n "\n${BGreen}Adding client info to the server config${Color_Off}"
+    printf %b\\n "\n[Peer]
 PublicKey = ${client_public_key_["$i"]}
 AllowedIPs = $private_range.$((i + 9))/32\n" >>/etc/wireguard/"$config_file_name".conf
 
@@ -235,7 +235,7 @@ AllowedIPs = $private_range.$((i + 9))/32\n" >>/etc/wireguard/"$config_file_name
 
   ####### ENABLE WireGuard INTERFACE AND SERVICE  BEGINS #######
   sleep 1
-  echo -e "\n${BGreen}ENABLE $config_file_name INTERFACE AND SERVICE${Color_Off}"
+  printf %b\\n "\n${BGreen}ENABLE $config_file_name INTERFACE AND SERVICE${Color_Off}"
   chown -v root:root /etc/wireguard/"$config_file_name".conf
   chmod -v 600 /etc/wireguard/"$config_file_name".conf
   wg-quick up "$config_file_name"
@@ -267,7 +267,7 @@ AllowedIPs = $private_range.$((i + 9))/32\n" >>/etc/wireguard/"$config_file_name
     fi
   else
     sleep 1
-    echo -e "\n ${BGreen}Configuring iptables and IP forwarding${Color_Off}"
+    printf %b\\n "\n ${BGreen}Configuring iptables and IP forwarding${Color_Off}"
     sed -i 's/net.ipv4.ip_forward=0/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
     sed -i 's/#net.ipv4.ip_forward=0/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
     sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
@@ -282,7 +282,7 @@ AllowedIPs = $private_range.$((i + 9))/32\n" >>/etc/wireguard/"$config_file_name
   ####### IPTABLES END #######
 
   sleep 2
-  echo -e "${BPurple}
+  printf %b\\n "${BPurple}
   :: Server config was generated: /etc/wireguard/wg_0.conf
   :: Client configs are available in $my_wgl_folder/client_configs/
   :: Client info has been added to the server config
@@ -291,12 +291,12 @@ AllowedIPs = $private_range.$((i + 9))/32\n" >>/etc/wireguard/"$config_file_name
   :: iptables were configured and IP forwarding was enables ${Color_Off}\n"
 
   if [[ "$distro" != "centos" ]]; then
-    echo -e "\n${IWhite} Netfilter iptables rules will need to be saved to persist after reboot.
+    printf %b\\n "\n${IWhite} Netfilter iptables rules will need to be saved to persist after reboot.
   \n${BWhite} Save rules now? \n1 = yes, 2 = no${Color_Off}\n"
     read -r save_netfilter
     if [[ "$save_netfilter" == 1 ]]; then
       if [[ "$distro" == "ubuntu" ]] || [[ "$distro" == "debian" ]]; then
-        echo -e "\n${IWhite}In order to make the above iptables rules persistent after system reboot,
+        printf %b\\n "\n${IWhite}In order to make the above iptables rules persistent after system reboot,
       ${BRed}iptables-persistent ${IWhite} package needs to be installed.
 
       Would you like the script to install iptables-persistent and to enable the service?
@@ -317,7 +317,7 @@ AllowedIPs = $private_range.$((i + 9))/32\n" >>/etc/wireguard/"$config_file_name
         systemctl enable netfilter-persistent
         netfilter-persistent save
       elif [[ "$distro" == "fedora" ]]; then
-        echo -e "\n${IWhite}In order to make the above iptables rules persistent after system reboot,
+        printf %b\\n "\n${IWhite}In order to make the above iptables rules persistent after system reboot,
       netfilter rules will need to be saved.
 
       Would you like the script to save the netfilter rules?
@@ -334,7 +334,7 @@ AllowedIPs = $private_range.$((i + 9))/32\n" >>/etc/wireguard/"$config_file_name
         /sbin/service iptables save
 
       elif [[ "$distro" == "arch" ]] || [[ "$distro" == "manjaro" ]]; then
-        echo -e "\n${IWhite}In order to make the above iptables rules persistent after system reboot,
+        printf %b\\n "\n${IWhite}In order to make the above iptables rules persistent after system reboot,
       netfilter rules will need to be saved.
 
       Would you like the script to save the netfilter rules?
@@ -367,13 +367,13 @@ AllowedIPs = $private_range.$((i + 9))/32\n" >>/etc/wireguard/"$config_file_name
         systemctl restart iptables.service
       fi
     elif [[ "$save_netfilter" == 2 ]]; then
-      echo -e "\n${BRed}TODO:
+      printf %b\\n "\n${BRed}TODO:
     * Add configurations to the client devices.
       * For mobile devices, 'qrencode' can be used${Color_Off}"
     fi
   elif [[ "$distro" == "centos" ]]; then
     if [[ "$check_if_firewalld_installed" == 0 ]]; then
-      echo -e "\n${IWhite}In order to make the above iptables rules persistent after system reboot,
+      printf %b\\n "\n${IWhite}In order to make the above iptables rules persistent after system reboot,
   netfilter rules will need to be saved.
 
   First, iptables-service needs to be intalled.
@@ -396,12 +396,12 @@ Review the above commands.
       sudo service iptables save
     fi
   else
-    echo -e "${BRed}\nTODO:
+    printf %b\\n "${BRed}\nTODO:
   * Add configurations to the client devices.
     * For mobile devices, qrencode can be used${Color_Off}"
   fi
 
-  echo -e "\n${IWhite}If you've got qrencode installed, the script can generate QR codes for the client configs.
+  printf %b\\n "\n${IWhite}If you've got qrencode installed, the script can generate QR codes for the client configs.
 
   Would you like to have QR codes generated?
 
@@ -411,14 +411,14 @@ Review the above commands.
 
   if [[ "$generate_qr_code" == 1 ]]; then
     for ((q = 1; q <= "$number_of_clients"; q++)); do
-      echo -e "${BRed}client_[$q]${Color_Off}\n"
+      printf %b\\n "${BRed}client_[$q]${Color_Off}\n"
       qrencode -t ansiutf8 <"$my_wgl_folder"/client_configs/client_["$q"].conf
       echo "+--------------------------------------------+"
     done
   elif [[ "$generate_qr_code" == 2 ]]; then
-    echo -e "\nAlright.. Moving on!\n+--------------------------------------------+"
+    printf %b\\n "\nAlright.. Moving on!\n+--------------------------------------------+"
   else
-    echo -e "Sorry, wrong choice! Moving on with the script."
+    printf %b\\n "Sorry, wrong choice! Moving on with the script."
   fi
 
   #########################################################################
@@ -426,12 +426,12 @@ Review the above commands.
   #########################################################################
   ;;
 "n" | "N")
-  echo -e "
+  printf %b\\n "
   Ending the script...."
   exit
   ;;
 *)
-  echo -e "${BRed}Sorry, wrong choise. Rerun the script and try again${Color_Off}"
+  printf %b\\n "${BRed}Sorry, wrong choise. Rerun the script and try again${Color_Off}"
   exit
   ;;
 esac
