@@ -51,7 +51,6 @@ if [[ -f "$check_for_full_clone" ]]; then
   ###############################################
   determine_os
   ############### FINISHED CHECKING OS AND OFFER TO INSTALL WIREGUARD ###############
-  printf '\e[2J\e[H'
 fi
 
 # Private address could be any address within RFC 1918,
@@ -248,14 +247,11 @@ elif [[ "$save_server_config" == 1 ]] && [[ ! -f "$check_for_existing_config" ]]
   printf %b\\n "\nCongrats! Server config is ready and saved to \n/etc/wireguard/$wg_serv_iface.conf... The config is shown below."
 elif [[ "$save_server_config" == 2 ]]; then
   printf '\e[2J\e[H'
-  printf %b\\n "\nUnderstood! Server config copy \nis located in $my_wgl_folder/server_config.txt.\nThe config is shown below."
+  printf %b\\n "\nUnderstood! Server config copy \nis located in $my_wgl_folder/$wg_serv_iface.conf.\nThe config is shown below."
 fi
 
-printf %b\\n "
+printf %b\\n "\n\n${IYellow}$new_server_config${Color_Off}\n" | sed -E 's/PrivateKey = .*/PrivateKey = Hidden/g'
 
-  ${IYellow}$new_server_config${Color_Off}
-
-"
 printf %s\\n "+--------------------------------------------+"
 
 printf %b\\n "\n${IWhite}Configure clients?${Color_Off}
