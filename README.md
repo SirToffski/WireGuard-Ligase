@@ -73,6 +73,9 @@ The script has an ability to detect and install Wireguard of the following distr
 * Fedora
 * Manjaro
 * Ubuntu
+* FreeBSD 12
+ * Only normal mode has been implemented (including firewall rules). Quick-setup will be implemented at a later date.
+
 
 For installation on other Operating Systems, please check the [**Wiki**](https://github.com/SirToffski/WireGuard-Ligase/wiki/Getting-Started).
 
@@ -111,12 +114,14 @@ For installation on other Operating Systems, please check the [**Wiki**](https:/
     * The look of the script has changed somewhat. The terminal screen is now cleared when needed and important parts summarized - easier to see than to explain.. but it's a lot better now.
     * Finally a good solution has been found to check for the directory where the script is running. See commit [7d2d61c](https://github.com/SirToffski/WireGuard-Ligase/commit/7d2d61c61949089a6b4aa363e422a5d53ac0423f). Find worked well on a brand new OS installation. However on a system with plenty of files and directories - it was a mess.
     * For the time being, work will continue concentrating on improvements to user interface, experience, and overall stability. New features will be implemented at a slower pace until the author is satisfied with UX.
+* Jan 8th, 2020
+ * Added initial support for FreeBSD.
 
 ## TODO
 
   - [x] Add an option for a quick hands-free server deployment / host configuration. Especially useful for people who dont want to answer a lot of questions and are not too fussy about naming clients, etc.
   - [x] Customize server config depending on the distro in use (Arch vs Ubuntu, vs RHEL, etc)
-  - [ ] Add option to configure other UNIX OS types (such as OpenBSD)
+  - [ ] Add option to configure other UNIX OS types (such as OpenBSD) - work in progress. Initial FreeBSD support has been added.
 
 ## Disclaimer
 
