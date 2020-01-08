@@ -242,6 +242,10 @@ if [[ "$save_server_config" == 1 ]] && [[ -f "$check_for_existing_config" ]]; th
   printf '\e[2J\e[H'
   printf %b\\n "\nCongrats! Server config is ready and saved to \n/etc/wireguard/$wg_serv_iface.conf... The config is shown below."
 elif [[ "$save_server_config" == 1 ]] && [[ ! -f "$check_for_existing_config" ]]; then
+  # Make /etc/wireguard if it does not exist yet
+  # Example is FreeBSD - /etc/wireguard is not automatically created
+  # after installing WG.
+  mkdir -p /etc/wireguard
   printf %b\\n "$new_server_config" >/etc/wireguard/"$wg_serv_iface".conf
   printf '\e[2J\e[H'
   printf %b\\n "\nCongrats! Server config is ready and saved to \n/etc/wireguard/$wg_serv_iface.conf... The config is shown below."
@@ -379,32 +383,66 @@ printf %b\\n "${IWhite}Almost done! Would you like to bring WireGuard interface 
 read -r -p "Choice: " enable_on_boot
 printf '\e[2J\e[H'
 if [[ "$enable_on_boot" == 1 ]]; then
-  printf %b\\n "\n${IYellow}chown -v root:root /etc/wireguard/$wg_serv_iface.conf
-  chmod -v 600 /etc/wireguard/$wg_serv_iface.conf
-  wg-quick up $wg_serv_iface
-  systemctl enable wg-quick@$wg_serv_iface.service${Color_Off}\n"
+# If current OS is FreeBSD - we wont use systemd as we would've for supported linux distros.
+  freebsd_os=$(uname -a | awk '{print $1}' | grep -i -c FreeBSD)
+  if [[ "$freebsd_os" -gt 0 ]]; then
+    printf %b\\n "\n${IYellow}chown -v root:root /etc/wireguard/$wg_serv_iface.conf
+chmod -v 600 /etc/wireguard/$wg_serv_iface.conf
+sysrc wireguard_enable=\"YES\"
+sysrc wireguard_interfaces=\"$wg_serv_iface\"
+service wireguard start${Color_Off}\n"
 
-  read -n 1 -s -r -p "
+    read -n 1 -s -r -p "
   Review the above. 
   Press any key to continue 
   Press r/R to restart the script
   Press e/E to exit
   " your_choice
 
-  case "$your_choice" in
-  [Rr]*)
-    sudo bash "$my_wgl_folder"/Scripts/deploy_new_server.sh
-    ;;
-  [Ee]*)
-    exit
-    ;;
-  *)
-    chown -v root:root /etc/wireguard/"$wg_serv_iface".conf
-    chmod -v 600 /etc/wireguard/"$wg_serv_iface".conf
-    wg-quick up "$wg_serv_iface"
-    systemctl enable wg-quick@"$wg_serv_iface".service
-    ;;
-  esac
+    case "$your_choice" in
+    [Rr]*)
+      sudo bash "$my_wgl_folder"/Scripts/deploy_new_server.sh
+      ;;
+    [Ee]*)
+      exit
+      ;;
+    *)
+      chown -v root:root /etc/wireguard/"$wg_serv_iface".conf
+      chmod -v 600 /etc/wireguard/"$wg_serv_iface".conf
+      sysrc wireguard_enable=\"YES\"
+      sysrc wireguard_interfaces=\""$wg_serv_iface"\"
+      service wireguard start
+      ;;
+    esac
+
+  else
+    printf %b\\n "\n${IYellow}chown -v root:root /etc/wireguard/$wg_serv_iface.conf
+  chmod -v 600 /etc/wireguard/$wg_serv_iface.conf
+  wg-quick up $wg_serv_iface
+  systemctl enable wg-quick@$wg_serv_iface.service${Color_Off}\n"
+
+    read -n 1 -s -r -p "
+  Review the above. 
+  Press any key to continue 
+  Press r/R to restart the script
+  Press e/E to exit
+  " your_choice
+
+    case "$your_choice" in
+    [Rr]*)
+      sudo bash "$my_wgl_folder"/Scripts/deploy_new_server.sh
+      ;;
+    [Ee]*)
+      exit
+      ;;
+    *)
+      chown -v root:root /etc/wireguard/"$wg_serv_iface".conf
+      chmod -v 600 /etc/wireguard/"$wg_serv_iface".conf
+      wg-quick up "$wg_serv_iface"
+      systemctl enable wg-quick@"$wg_serv_iface".service
+      ;;
+    esac
+  fi
 elif [[ "$enable_on_boot" == 2 ]]; then
   printf %b\\n "\n${IWhite} To manually enable the service and bring tunnel interface up, the following commands can be used:${Color_Off}"
   printf %b\\n "\n${IYellow}chown -v root:root /etc/wireguard/$wg_serv_iface.conf
