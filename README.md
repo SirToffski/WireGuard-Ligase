@@ -15,12 +15,6 @@ Table of Contents
      * [Pre-requisites](#pre-requisites)
      * [Usage](#usage)
   * [Why would I use this script?](#why-use-wireguard-ligase)
-  * [Installing Wireguard](#installing-wireguard)
-     * [Arch](#arch)
-     * [Ubuntu](#ubuntu)
-     * [RHEL / CentOS](#rhel--centos)
-     * [Fedora](#fedora)
-     * [Others](#others)
   * [Changelog](#changelog)
   * [TODO](#todo)
   * [Disclaimer](#disclaimer)
@@ -74,7 +68,7 @@ The script has an ability to detect and install Wireguard of the following distr
 * Manjaro
 * Ubuntu
 * FreeBSD 12
- * Only normal mode has been implemented (including firewall rules). Quick-setup will be implemented at a later date.
+  * Only normal mode has been implemented (including firewall rules). Quick-setup will be implemented at a later date.
 
 
 For installation on other Operating Systems, please check the [**Wiki**](https://github.com/SirToffski/WireGuard-Ligase/wiki/Getting-Started).
@@ -115,7 +109,7 @@ For installation on other Operating Systems, please check the [**Wiki**](https:/
     * Finally a good solution has been found to check for the directory where the script is running. See commit [7d2d61c](https://github.com/SirToffski/WireGuard-Ligase/commit/7d2d61c61949089a6b4aa363e422a5d53ac0423f). Find worked well on a brand new OS installation. However on a system with plenty of files and directories - it was a mess.
     * For the time being, work will continue concentrating on improvements to user interface, experience, and overall stability. New features will be implemented at a slower pace until the author is satisfied with UX.
 * Jan 8th, 2020
- * Added initial support for FreeBSD.
+  * Added initial support for FreeBSD.
 
 ## TODO
 
