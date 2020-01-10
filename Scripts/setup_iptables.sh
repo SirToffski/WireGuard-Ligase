@@ -47,20 +47,45 @@ fi
 my_separator="--------------------------------------"
 check_pub_ip=$(curl -s https://checkip.amazonaws.com)
 
-printf '\e[2J\e[H'
+###############################################
+# If deploy_new_server.sh script has already been run,
+# attempt to source variables used in it to avoid repitition
+###############################################
+check_for_shared_vars="$my_wgl_folder/shared_vars.sh"
+if [[ -f "$check_for_shared_vars" ]]; then
+  source "$my_wgl_folder/shared_vars.sh"
 
-printf %b\\n "\n${IWhite}We are going to setup some basic firewwall rules so the server can
+  printf '\e[2J\e[H'
+
+  printf %b\\n "\n+--------------------------------------------+
+${BWhite}Server private address = ${BRed}$server_private_range${Color_Off}
+${BWhite}Server listen port = ${BRed}$server_listen_port${Color_Off}
+${BWhite}Server public address = ${BRed}$server_public_address${Color_Off}
+${BWhite}WAN interface = ${BRed}$local_interface${Color_Off}
+${BWhite}WireGuard interface = ${BRed}$wg_serv_iface${Color_Off}
++--------------------------------------------+\n"
+
+  read -n 1 -s -r -p "
+Review the above. 
+Press any key to continue (everything looks correct)
+Press r/R if some variables need to be changed
+Press e/E to exit
+" your_choice
+
+  case "$your_choice" in
+  [Rr]*)
+    printf %b\\n "\n${IWhite}We are going to setup some basic firewall rules so the server can
 function correctly.
 
 Step 1) Please provide the server subnet information to be used.${Color_Off}
 
 ${BWhite}Example:${IWhite} If you server IP is ${BRed}10.0.0.1/24${IWhite}, then please type ${BRed}10.0.0.0/24${Color_Off}\n"
 
-read -r -p "Server subnet: " server_subnet
+    read -r -p "Server subnet: " server_subnet
 
-printf '\e[2J\e[H'
+    printf '\e[2J\e[H'
 
-printf %b\\n "
+    printf %b\\n "
 +--------------------------------------------+
 ${BWhite}Server subnet = ${BRed}$server_subnet${Color_Off}
 +--------------------------------------------+
@@ -69,12 +94,12 @@ ${IWhite}Step 2) Please also provide the listen port of your server.${Color_Off}
 
 ${BWhite}Example: ${BRed}51820${Color_Off}"
 
-read -r -p "Server listen port: " listen_port
+    read -r -p "Server listen port: " listen_port
 
-printf '\e[2J\e[H'
+    printf '\e[2J\e[H'
 
-# Public IP address of the server hosting the WireGuard server
-printf %b\\n "
+    # Public IP address of the server hosting the WireGuard server
+    printf %b\\n "
 +--------------------------------------------+
 ${BWhite}Server subnet = ${BRed}$server_subnet${Color_Off}
 ${BWhite}Server port = ${BRed}$listen_port${Color_Off}
@@ -84,22 +109,22 @@ ${BWhite}Step 3)${Color_Off} ${IWhite}The public IP address of this machine is $
 Is this the address you would like to use? ${Color_Off}
 
 ${BWhite}1 = yes, 2 = no${Color_Off}"
-read -r -p "Choice: " public_address
+    read -r -p "Choice: " public_address
 
-printf %b\\n "$my_separator"
+    printf %b\\n "$my_separator"
 
-if [[ "$public_address" == 1 ]]; then
-  server_public_address="$check_pub_ip"
-elif [[ "$public_address" == 2 ]]; then
-  printf %b\\n "
+    if [[ "$public_address" == 1 ]]; then
+      server_public_address="$check_pub_ip"
+    elif [[ "$public_address" == 2 ]]; then
+      printf %b\\n "
 ${IWhite}Please specify the public address of the server.${Color_Off}
 "
-  read -r -p "Public IP: " server_public_address
-fi
+      read -r -p "Public IP: " server_public_address
+    fi
 
-printf '\e[2J\e[H'
+    printf '\e[2J\e[H'
 
-printf %b\\n "
+    printf %b\\n "
 +--------------------------------------------+
 ${BWhite}Server subnet = ${BRed}$server_subnet${Color_Off}
 ${BWhite}Server port = ${BRed}$listen_port${Color_Off}
@@ -115,10 +140,10 @@ $(ip -br a | awk '{print $1}')
 +--------------------+
 "
 
-read -r -p "Interface: " local_interface
-printf '\e[2J\e[H'
+    read -r -p "Interface: " local_interface
+    printf '\e[2J\e[H'
 
-printf %b\\n "
+    printf %b\\n "
 +--------------------------------------------+
 ${BWhite}Server subnet = ${BRed}$server_subnet${Color_Off}
 ${BWhite}Server port = ${BRed}$listen_port${Color_Off}
@@ -130,9 +155,119 @@ ${IWhite}Step 5) Specify wireguard server interface name
 (will be the same as config name, without .conf)${Color_Off}
 "
 
-read -r -p "WireGuard Interface: " wg_serv_iface
+    read -r -p "WireGuard Interface: " wg_serv_iface
 
-printf '\e[2J\e[H'
+    printf '\e[2J\e[H'
+    ;;
+  [Ee]*)
+    exit
+    ;;
+  *)
+    printf %b\\n "\n${IWhite}We are going to setup some basic firewall rules so the server can
+function correctly.
+
+Step 1) Please provide the server subnet information to be used.${Color_Off}
+
+${BWhite}Example:${IWhite} If you server IP is ${BRed}10.0.0.1/24${IWhite}, then please type ${BRed}10.0.0.0/24${Color_Off}\n"
+
+    read -r -p "Server subnet: " server_subnet
+
+    printf '\e[2J\e[H'
+    ;;
+  esac
+
+###############################################
+# Else, start from the beginning and gather
+# needed info.
+###############################################
+else
+
+  printf %b\\n "\n${IWhite}We are going to setup some basic firewall rules so the server can
+function correctly.
+
+Step 1) Please provide the server subnet information to be used.${Color_Off}
+
+${BWhite}Example:${IWhite} If you server IP is ${BRed}10.0.0.1/24${IWhite}, then please type ${BRed}10.0.0.0/24${Color_Off}\n"
+
+  read -r -p "Server subnet: " server_subnet
+
+  printf '\e[2J\e[H'
+
+  printf %b\\n "
++--------------------------------------------+
+${BWhite}Server subnet = ${BRed}$server_subnet${Color_Off}
++--------------------------------------------+
+
+${IWhite}Step 2) Please also provide the listen port of your server.${Color_Off}
+
+${BWhite}Example: ${BRed}51820${Color_Off}"
+
+  read -r -p "Server listen port: " listen_port
+
+  printf '\e[2J\e[H'
+
+  # Public IP address of the server hosting the WireGuard server
+  printf %b\\n "
++--------------------------------------------+
+${BWhite}Server subnet = ${BRed}$server_subnet${Color_Off}
+${BWhite}Server port = ${BRed}$listen_port${Color_Off}
++--------------------------------------------+
+
+${BWhite}Step 3)${Color_Off} ${IWhite}The public IP address of this machine is $check_pub_ip. 
+Is this the address you would like to use? ${Color_Off}
+
+${BWhite}1 = yes, 2 = no${Color_Off}"
+  read -r -p "Choice: " public_address
+
+  printf %b\\n "$my_separator"
+
+  if [[ "$public_address" == 1 ]]; then
+    server_public_address="$check_pub_ip"
+  elif [[ "$public_address" == 2 ]]; then
+    printf %b\\n "
+${IWhite}Please specify the public address of the server.${Color_Off}
+"
+    read -r -p "Public IP: " server_public_address
+  fi
+
+  printf '\e[2J\e[H'
+
+  printf %b\\n "
++--------------------------------------------+
+${BWhite}Server subnet = ${BRed}$server_subnet${Color_Off}
+${BWhite}Server port = ${BRed}$listen_port${Color_Off}
+${BWhite}Server public address = ${BRed}$server_public_address${Color_Off}
++--------------------------------------------+
+
+${BWhite}Step 4)${IWhite} Please also provide the internet facing interface of the server. 
+${BWhite}Example: ${BRed}eth0${Color_Off}
+
+Available interfaces are:
++--------------------+
+$(ip -br a | awk '{print $1}')
++--------------------+
+"
+
+  read -r -p "Interface: " local_interface
+  printf '\e[2J\e[H'
+
+  printf %b\\n "
++--------------------------------------------+
+${BWhite}Server subnet = ${BRed}$server_subnet${Color_Off}
+${BWhite}Server port = ${BRed}$listen_port${Color_Off}
+${BWhite}Server public address = ${BRed}$server_public_address${Color_Off}
+${BWhite}WAN Interface = ${BRed}$local_interface${Color_Off}
++--------------------------------------------+
+
+${IWhite}Step 5) Specify wireguard server interface name 
+(will be the same as config name, without .conf)${Color_Off}
+"
+
+  read -r -p "WireGuard Interface: " wg_serv_iface
+
+  printf '\e[2J\e[H'
+
+fi
 
 if [[ "$cent_os" -gt 0 ]]; then
   check_if_firewalld_installed=$(yum list installed | grep -i -c firewalld)
@@ -425,11 +560,22 @@ ipfw -q nat 1 config if ${BRed}$local_interface${IYellow}same_ports unreg_only r
     sed -i -E 's/firewall_nat_enable=.*//g' /etc/rc.conf
     sed -i -E 's/firewall_script=.*//g' /etc/rc.conf
     sed -i -E 's/firewall_logging=.*//g' /etc/rc.conf
+    sed -i -E 's/gateway_enable=.*//g' /etc/rc.conf
 
-    printf %b \\n "firewall_enable=\"YES\"
+    sed -i -E 's/net.inet.tcp.tso=.*//g' /etc/sysctl.conf
+    
+
+    printf %b \\n "gateway_enable=\"YES\"
+firewall_enable=\"YES\"
 firewall_nat_enable=\"YES\"
 firewall_script=\"/usr/local/etc/IPFW.rules\"
 firewall_logging=\"YES\"" | tee -a /etc/rc.conf >/dev/null
+
+
+# Disable TCP segmentation offloading
+# See https://www.freebsd.org/doc/handbook/firewalls-ipfw.html
+# 30.4.4 In-kernet NAT
+printf %b \\n "net.inet.tcp.tso=0" | tee -a /etc/sysctl.conf >/dev/null
 
     sudo sysctl net.inet.tcp.tso="0"
     sudo sysctl net.inet.ip.forwarding="1"
@@ -439,6 +585,11 @@ firewall_logging=\"YES\"" | tee -a /etc/rc.conf >/dev/null
 # from FBSD Handbook, rc.firewall, et. al.
 # Flush all rules before we begin.
 ipfw -q -f flush
+
+# Make sure forwarding and tcp offset fragmentation are configured.
+sysctl net.inet.tcp.tso=0
+sudo sysctl net.inet.ip.forwarding=1
+
 # Set rules command prefix
 cmd=\"ipfw -q add \"
 # Used for outboud NAT rules
@@ -449,7 +600,8 @@ local_interface=$local_interface
 pub_dns=$pub_dns
 local_dns=$local_dns
 ssh_port=$ssh_port
-server_subner=$server_subnet
+server_subnet=$server_subnet
+listen_port=$listen_port
 
 # Allow NAT
 ipfw disable one_pass
@@ -706,7 +858,6 @@ First, iptables-service needs to be intalled.
   fi
 fi
 
-printf '\e[2J\e[H'
 printf %b\\n "
 Congrats, everything should be up and running now!
 
