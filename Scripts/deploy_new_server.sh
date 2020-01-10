@@ -20,6 +20,9 @@ else
   colours
 fi
 
+# Create a file with shared variables between the scripts
+printf %b\\n "#!/usr/bin/env bash" >"$my_wgl_folder"/shared_vars.sh
+
 # Determine the public IP of the host.
 check_pub_ip=$(curl -s https://checkip.amazonaws.com)
 
@@ -192,6 +195,14 @@ ${BWhite}Server public address = ${BRed}$server_public_address${Color_Off}
 ${BWhite}WAN interface = ${BRed}$local_interface${Color_Off}
 ${BWhite}WireGuard interface = ${BRed}$wg_serv_iface${Color_Off}
 +--------------------------------------------+\n"
+
+{
+  printf %b\\n "server_private_range=$server_private_range"
+  printf %b\\n "server_listen_port=$server_listen_port"
+  printf %b\\n "server_public_address=$server_public_address"
+  printf %b\\n "local_interface=$local_interface"
+  printf %b\\n "wg_serv_iface=$wg_serv_iface"
+} >>"$my_wgl_folder"/shared_vars.sh
 
 printf %b\\n "\n Generating server config file...."
 
@@ -383,7 +394,7 @@ printf %b\\n "${IWhite}Almost done! Would you like to bring WireGuard interface 
 read -r -p "Choice: " enable_on_boot
 printf '\e[2J\e[H'
 if [[ "$enable_on_boot" == 1 ]]; then
-# If current OS is FreeBSD - we wont use systemd as we would've for supported linux distros.
+  # If current OS is FreeBSD - we wont use systemd as we would've for supported linux distros.
   freebsd_os=$(uname -a | awk '{print $1}' | grep -i -c FreeBSD)
   if [[ "$freebsd_os" -gt 0 ]]; then
     printf %b\\n "\n${IYellow}chown -v root:root /etc/wireguard/$wg_serv_iface.conf
@@ -409,8 +420,8 @@ service wireguard start${Color_Off}\n"
     *)
       chown -v root:root /etc/wireguard/"$wg_serv_iface".conf
       chmod -v 600 /etc/wireguard/"$wg_serv_iface".conf
-      sysrc wireguard_enable=\"YES\"
-      sysrc wireguard_interfaces=\""$wg_serv_iface"\"
+      sysrc wireguard_enable="YES"
+      sysrc wireguard_interfaces="$wg_serv_iface"
       service wireguard start
       ;;
     esac
