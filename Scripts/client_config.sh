@@ -48,18 +48,18 @@ read -r client_dns
 printf %b\\n "\nNext steps will ask to provide private address and a name for each client, one at a time.\n"
 for ((i = 1; i <= "$number_of_clients"; i++)); do
   printf %b\\n "\nPrivate address of a client (do NOT include /32):\n"
-  read -r client_private_address_[$i]
+  read -r client_private_address_["$i"]
   printf %b\\n "\nProvide the name of the client\n"
 
-  read -r client_name_[$i]
+  read -r client_name_["$i"]
 
   wg genkey | tee "$my_wgl_folder"/keys/"${client_name_["$i"]}"Privatekey | wg pubkey >"$my_wgl_folder"/keys/"${client_name_["$i"]}"Publickey
 
   chmod 600 "$my_wgl_folder"/keys/"${client_name_["$i"]}"Privatekey
   chmod 600 "$my_wgl_folder"/keys/"${client_name_["$i"]}"Publickey
 
-  client_private_key_["$i"]=$(cat "$my_wgl_folder"/keys/"${client_name_["$i"]}"Privatekey)
-  client_public_key_["$i"]=$(cat "$my_wgl_folder"/keys/"${client_name_["$i"]}"Publickey)
+  client_private_key_["$i"]="$(cat "$my_wgl_folder"/keys/"${client_name_["$i"]}"Privatekey)"
+  client_public_key_["$i"]="$(cat "$my_wgl_folder"/keys/"${client_name_["$i"]}"Publickey)"
 
   printf %b\\n "\n[Interface]
 Address = ${client_private_address_["$i"]}

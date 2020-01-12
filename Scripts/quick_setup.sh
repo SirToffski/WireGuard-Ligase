@@ -168,8 +168,8 @@ case "$proceed_quick_setup" in
     chmod 600 "$my_wgl_folder"/keys/client_"$i"_Privatekey
     chmod 600 "$my_wgl_folder"/keys/client_"$i"_Publickey
 
-    client_private_key_["$i"]=$(cat "$my_wgl_folder"/keys/client_"$i"_Privatekey)
-    client_public_key_["$i"]=$(cat "$my_wgl_folder"/keys/client_"$i"_Publickey)
+    client_private_key_["$i"]="$(cat "$my_wgl_folder"/keys/client_"$i"_Privatekey)"
+    client_public_key_["$i"]="$(cat "$my_wgl_folder"/keys/client_"$i"_Publickey)"
 
     # Generating client config
 

@@ -318,7 +318,7 @@ if [[ "$client_config_answer" == 1 ]]; then
 
   for ((i = 1; i <= "$number_of_clients"; i++)); do
     printf %b\\n "\n${IW}Private address of client # $i (do NOT include /32):${Off}\n"
-    read -r -p "Client $i IP: " client_private_address_[$i]
+    read -r -p "Client $i IP: " client_private_address_["$i"]
     # Client name can be anything, mainly to easily identify the device
     # to be used. Some exampmles are:
     # Tom_iPhone
@@ -327,7 +327,7 @@ if [[ "$client_config_answer" == 1 ]]; then
     printf %s\\n "+--------------------------------------------+"
 
     printf %b\\n "\n${IW}Provide the name of the client # $i ${Off}\n"
-    read -r -p "Client $i name: " client_name_[$i]
+    read -r -p "Client $i name: " client_name_["$i"]
 
     printf %s\\n "+--------------------------------------------+"
 
@@ -336,8 +336,8 @@ if [[ "$client_config_answer" == 1 ]]; then
     chmod 600 "$my_wgl_folder"/keys/"${client_name_["$i"]}"Privatekey
     chmod 600 "$my_wgl_folder"/keys/"${client_name_["$i"]}"Publickey
 
-    client_private_key_["$i"]=$(cat "$my_wgl_folder"/keys/"${client_name_["$i"]}"Privatekey)
-    client_public_key_["$i"]=$(cat "$my_wgl_folder"/keys/"${client_name_["$i"]}"Publickey)
+    client_private_key_["$i"]="$(cat "$my_wgl_folder"/keys/"${client_name_["$i"]}"Privatekey)"
+    client_public_key_["$i"]="$(cat "$my_wgl_folder"/keys/"${client_name_["$i"]}"Publickey)"
 
     printf %b\\n "\n[Interface]
 Address = ${client_private_address_["$i"]}
