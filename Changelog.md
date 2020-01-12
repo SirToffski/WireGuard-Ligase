@@ -38,3 +38,6 @@
 * Jan 9th, 2020
   * BSD firewall ruless did not enable gateway mode in `/etc/rc.conf` and TCP segmentaion offloading in `/etc/sysctl.conf` - hence those settings were not preserved with server reboot. Both were fixed.
   * Using normal server setup mode now exports most of the variables to `shared_vars.sh`. This will prevent having to ask repetitive questions when setting up firewall rules.
+* Jan 12th, 2020
+  * FreeBSD support has been added to quick-setup mode.
+  * Various syntax improvements in the shell code.
