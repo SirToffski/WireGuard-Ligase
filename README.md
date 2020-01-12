@@ -87,3 +87,7 @@ See [**changelog**](/Changelog.md).
 The plan is to keep this updated and add features until the project reaches its logical conclusion.
 
 Everyone is welcome to fork / contribute / use any or all parts of the project.
+
+---
+<sub><sub><sub><sub>WireGuard is a registered trademark of Jason A. Donenfeld.</sub></sub></sub></sub>
+
