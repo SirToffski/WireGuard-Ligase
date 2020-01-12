@@ -216,7 +216,7 @@ function determine_os() {
     check_if_wg_installed=$(pkg info | grep -i -c wireguard)
     check_if_sudo_installed=$(pkg info | grep -i -c sudo)
     if [[ "$check_if_sudo_installed" == 0 ]]; then
-      printf %b \\n "\n sudo is not istalled...
+      printf %b\\n "\n sudo is not istalled...
     At this time, the script needs sudo package to work properly on FreeBSD.
     
     Please install sudo, configure used with visudo, then re-run the script."
@@ -261,7 +261,7 @@ function colours() {
   # Borrowed from https://gist.github.com/nbrew/9278728
 
   # Reset
-  Color_Off="\033[0m" # Text Reset
+  Off="\033[0m" # Text Reset
 
   # Regular Colors
   Black="\033[0;30m"  # Black
@@ -274,24 +274,24 @@ function colours() {
   White="\033[0;37m"  # White
 
   # Bold
-  BBlack="\033[1;30m"  # Black
-  BRed="\033[1;31m"    # Red
-  BGreen="\033[1;32m"  # Green
-  BYellow="\033[1;33m" # Yellow
-  BBlue="\033[1;34m"   # Blue
-  BPurple="\033[1;35m" # Purple
-  BCyan="\033[1;36m"   # Cyan
-  BWhite="\033[1;37m"  # White
+  BB="\033[1;30m"  # Black
+  BR="\033[1;31m"  # Red
+  BG="\033[1;32m"  # Green
+  BY="\033[1;33m"  # Yellow
+  BBl="\033[1;34m" # Blue
+  BP="\033[1;35m"  # Purple
+  BC="\033[1;36m"  # Cyan
+  BW="\033[1;37m"  # White
 
   # Underline
-  UBlack="\033[4;30m"  # Black
-  URed="\033[4;31m"    # Red
-  UGreen="\033[4;32m"  # Green
-  UYellow="\033[4;33m" # Yellow
-  UBlue="\033[4;34m"   # Blue
-  UPurple="\033[4;35m" # Purple
-  UCyan="\033[4;36m"   # Cyan
-  UWhite="\033[4;37m"  # White
+  UB="\033[4;30m"  # Black
+  UR="\033[4;31m"  # Red
+  UG="\033[4;32m"  # Green
+  UY="\033[4;33m"  # Yellow
+  UBl="\033[4;34m" # Blue
+  UP="\033[4;35m"  # Purple
+  UC="\033[4;36m"  # Cyan
+  UW="\033[4;37m"  # White
 
   # Background
   On_Black="\033[40m"  # Black
@@ -304,14 +304,14 @@ function colours() {
   On_White="\033[47m"  # White
 
   # High Intensty
-  IBlack="\033[0;90m"  # Black
-  IRed="\033[0;91m"    # Red
-  IGreen="\033[0;92m"  # Green
-  IYellow="\033[0;93m" # Yellow
-  IBlue="\033[0;94m"   # Blue
-  IPurple="\033[0;95m" # Purple
-  ICyan="\033[0;96m"   # Cyan
-  IWhite="\033[0;97m"  # White
+  IB="\033[0;90m"  # Black
+  IR="\033[0;91m"  # Red
+  IG="\033[0;92m"  # Green
+  IY="\033[0;93m"  # Yellow
+  IBl="\033[0;94m" # Blue
+  IP="\033[0;95m"  # Purple
+  IC="\033[0;96m"  # Cyan
+  IW="\033[0;97m"  # White
 
   # Bold High Intensty
   BIBlack="\033[1;90m"  # Black

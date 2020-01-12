@@ -30,9 +30,9 @@ colours
 
 logo=$(cat "$my_wgl_folder"/doc/ascii-logo)
 printf '\e[2J\e[H'
-printf %b\\n "${BPurple}$logo${Color_Off}"
+printf %b\\n "${BP}$logo${Off}"
 
-printf %b\\n "${BWhite}Welcome to WG Ligase${Color_Off}.
+printf %b\\n "${BW}Welcome to WG Ligase${Off}.
 
 The script will guide you through the installaton process, allowing to
 choose a starting point. The idea is for this script to be equally
@@ -44,19 +44,19 @@ printf %b\\n "
 Let's begin. Please select from one of the following options:
 -----------------------------------
 
-${BWhite}1 = Normal Setup:${Color_Off} I would like to configure a new server and clients from scratch.
+${BW}1 = Normal Setup:${Off} I would like to configure a new server and clients from scratch.
 
 -----------------------------------
 
-${BWhite}2 = Quick Setup:${Color_Off} You will only be asked to specify public server IP.${Color_Off}
+${BW}2 = Quick Setup:${Off} You will only be asked to specify public server IP.${Off}
 
 -----------------------------------
 
-${BWhite}3 = Clients only:${Color_Off} I just need to generate some client configs and add those to an existing server.${Color_Off}
+${BW}3 = Clients only:${Off} I just need to generate some client configs and add those to an existing server.${Off}
 
 -----------------------------------
 
-${BWhite}4 = Firewall:${Color_Off} I just need commands to configure IPTABLEs/firewalld.
+${BW}4 = Firewall:${Off} I just need commands to configure IPTABLEs/firewalld.
 
 ----------------------------------"
 
@@ -76,6 +76,6 @@ case "$scope_of_script" in
   sudo bash "$my_wgl_folder"/Scripts/setup_iptables.sh
   ;;
 *)
-  printf %b\\n "${BRed}Sorry, wrong choise. Rerun the script and try again${Color_Off}"
+  printf %b\\n "${BR}Sorry, wrong choise. Rerun the script and try again${Off}"
   ;;
 esac

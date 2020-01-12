@@ -59,28 +59,28 @@ fi
 # Private address could be any address within RFC 1918,
 # usually the first useable address in a /24 range.
 # This however is completely up to you.
-printf %b\\n "\n ${BWhite}Step 1)${Color_Off} ${IWhite}Please specify the private address of the WireGuard server.${Color_Off}"
+printf %b\\n "\n ${BW}Step 1)${Off} ${IW}Please specify the private address of the WireGuard server.${Off}"
 read -r -p "Address: " server_private_range
 
 printf '\e[2J\e[H'
 
 # This would be a UDP port the WireGuard server would listen on.
 printf %b\\n "\n+--------------------------------------------+
-${BWhite}Server private address = ${BRed}$server_private_range${Color_Off}
+${BW}Server private address = ${BR}$server_private_range${Off}
 +--------------------------------------------+
-\n${BWhite}Step 2)${Color_Off} ${IWhite}Please specify listen port of the server.${Color_Off}\n"
+\n${BW}Step 2)${Off} ${IW}Please specify listen port of the server.${Off}\n"
 read -r -p "Listen port: " server_listen_port
 
 printf '\e[2J\e[H'
 
 # Public IP address of the server hosting the WireGuard server
 printf %b\\n "\n+--------------------------------------------+
-${BWhite}Server private address = ${BRed}$server_private_range${Color_Off}
-${BWhite}Server listen port = ${BRed}$server_listen_port${Color_Off}
+${BW}Server private address = ${BR}$server_private_range${Off}
+${BW}Server listen port = ${BR}$server_listen_port${Off}
 +--------------------------------------------+
-\n${BWhite}Step 3)${Color_Off} ${IWhite}The public IP address of this machine is $check_pub_ip. 
-Is this the address you would like to use? ${Color_Off}
-\n${BWhite}1 = yes, 2 = no${Color_Off}"
+\n${BW}Step 3)${Off} ${IW}The public IP address of this machine is $check_pub_ip. 
+Is this the address you would like to use? ${Off}
+\n${BW}1 = yes, 2 = no${Off}"
 read -r -p "Choice: " public_address
 
 printf %s\\n "+--------------------------------------------+"
@@ -88,7 +88,7 @@ printf %s\\n "+--------------------------------------------+"
 if [[ "$public_address" == 1 ]]; then
   server_public_address="$check_pub_ip"
 elif [[ "$public_address" == 2 ]]; then
-  printf %b\\n "\n${IWhite}Please specify the public address of the server.${Color_Off}"
+  printf %b\\n "\n${IW}Please specify the public address of the server.${Off}"
   read -r -p "Public IP: " server_public_address
   printf %s\\n "+--------------------------------------------+"
 fi
@@ -97,26 +97,33 @@ printf '\e[2J\e[H'
 
 # Internet facing iface of the server hosting the WireGuard server
 printf %b\\n "\n+--------------------------------------------+
-${BWhite}Server private address = ${BRed}$server_private_range${Color_Off}
-${BWhite}Server listen port = ${BRed}$server_listen_port${Color_Off}
-${BWhite}Server public address = ${BRed}$server_public_address${Color_Off}
-+--------------------------------------------+
-\n${BWhite}Step 4)${IWhite} Please also provide the internet facing interface of the server. 
-${BWhite}Example: ${BRed}eth0${Color_Off}
-\n Available interfaces are:
+${BW}Server private address = ${BR}$server_private_range${Off}
+${BW}Server listen port = ${BR}$server_listen_port${Off}
+${BW}Server public address = ${BR}$server_public_address${Off}
++--------------------------------------------+"
+printf %b\\n "\n${BW}Step 4)${IW} Please also provide the internet facing interface of the server. 
+${BW}Example: ${BR}eth0${Off}"
+if [[ "$distro" != "freebsd" ]]; then
+  printf %b\\n "\n Available interfaces are:
 +--------------------+
 $(ip -br a | awk '{print $1}')
 +--------------------+"
+else
+  printf %b\\n "\n Available interfaces are:
++--------------------+
+$(ifconfig -l)
++--------------------+"
+fi
 
 read -r -p "Interface: " local_interface
 
 printf '\e[2J\e[H'
 
 printf %b\\n "\n+--------------------------------------------+
-${BWhite}Server private address = ${BRed}$server_private_range${Color_Off}
-${BWhite}Server listen port = ${BRed}$server_listen_port${Color_Off}
-${BWhite}Server public address = ${BRed}$server_public_address${Color_Off}
-${BWhite}WAN interface = ${BRed}$local_interface${Color_Off}
+${BW}Server private address = ${BR}$server_private_range${Off}
+${BW}Server listen port = ${BR}$server_listen_port${Off}
+${BW}Server public address = ${BR}$server_public_address${Off}
+${BW}WAN interface = ${BR}$local_interface${Off}
 +--------------------------------------------+ \n"
 
 read -n 1 -s -r -p "
@@ -139,19 +146,19 @@ case "$your_choice" in
 esac
 
 printf %b\\n "\n+--------------------------------------------+
-${BWhite}Server private address = ${BRed}$server_private_range${Color_Off}
-${BWhite}Server listen port = ${BRed}$server_listen_port${Color_Off}
-${BWhite}Server public address = ${BRed}$server_public_address${Color_Off}
-${BWhite}WAN interface = ${BRed}$local_interface${Color_Off}
+${BW}Server private address = ${BR}$server_private_range${Off}
+${BW}Server listen port = ${BR}$server_listen_port${Off}
+${BW}Server public address = ${BR}$server_public_address${Off}
+${BW}WAN interface = ${BR}$local_interface${Off}
 +--------------------------------------------+"
 
 # This would be the private and public keys of the server.
 # If you are using this script, chances are those have not yet been generated yet.
 
-printf %b\\n "\n${IWhite}Do you need to generate server keys?${Color_Off} 
+printf %b\\n "\n${IW}Do you need to generate server keys?${Off} 
 (If you have not yet configured the server, the probably yes).
 
-${BWhite}1 = yes, 2 = no${Color_Off}\n"
+${BW}1 = yes, 2 = no${Off}\n"
 
 read -r -p "Choice: " generate_server_key
 printf %s\\n "+--------------------------------------------+"
@@ -166,11 +173,11 @@ if [[ "$generate_server_key" == 1 ]]; then
 # to provide public/private key pair for the server.
 
 else
-  printf %b\\n "\n${IWhite}Specify server private key.${Color_Off}\n"
+  printf %b\\n "\n${IW}Specify server private key.${Off}\n"
   read -r -p "Server private key: " server_private_key
   printf %b\\n "$server_private_key" >"$my_wgl_folder"/keys/ServerPrivatekey
   printf %s\\n "+--------------------------------------------+"
-  printf %b\\n "\n${IWhite}Specify server public key.${Color_Off}\n"
+  printf %b\\n "\n${IW}Specify server public key.${Off}\n"
   read -r -p "Server public key: " server_public_key
   printf %b\\n "$server_public_key" >"$my_wgl_folder"/keys/ServerPublickey
   chmod 600 "$my_wgl_folder"/keys/ServerPrivatekey && chmod 600 "$my_wgl_folder"/keys/ServerPrivatekey
@@ -181,19 +188,19 @@ fi
 sever_private_key_output=$(cat "$my_wgl_folder"/keys/ServerPrivatekey)
 sever_public_key_output=$(cat "$my_wgl_folder"/keys/ServerPublickey)
 
-printf %b\\n "\n${IWhite}Specify wireguard server interface name 
-(will be the same as config name, without .conf)${Color_Off}\n"
+printf %b\\n "\n${IW}Specify wireguard server interface name 
+(will be the same as config name, without .conf)${Off}\n"
 
 read -r -p "WireGuard Interface: " wg_serv_iface
 
 printf '\e[2J\e[H'
 
 printf %b\\n "\n+--------------------------------------------+
-${BWhite}Server private address = ${BRed}$server_private_range${Color_Off}
-${BWhite}Server listen port = ${BRed}$server_listen_port${Color_Off}
-${BWhite}Server public address = ${BRed}$server_public_address${Color_Off}
-${BWhite}WAN interface = ${BRed}$local_interface${Color_Off}
-${BWhite}WireGuard interface = ${BRed}$wg_serv_iface${Color_Off}
+${BW}Server private address = ${BR}$server_private_range${Off}
+${BW}Server listen port = ${BR}$server_listen_port${Off}
+${BW}Server public address = ${BR}$server_public_address${Off}
+${BW}WAN interface = ${BR}$local_interface${Off}
+${BW}WireGuard interface = ${BR}$wg_serv_iface${Off}
 +--------------------------------------------+\n"
 
 {
@@ -208,7 +215,9 @@ printf %b\\n "\n Generating server config file...."
 
 sleep 2
 
-new_server_config=$(printf %b\\n "
+if [[ "$distro" != "freebsd" ]]; then
+
+  new_server_config=$(printf %b\\n "
 [Interface]
 Address = $server_private_range
 SaveConfig = true
@@ -218,6 +227,18 @@ ListenPort = $server_listen_port
 PrivateKey = $sever_private_key_output
   ")
 
+else
+  # We wont use iptables in FreeBSD, everythig will be handled by IPFW.
+  new_server_config=$(printf %b\\n "
+[Interface]
+Address = $server_private_range
+SaveConfig = true
+ListenPort = $server_listen_port
+PrivateKey = $sever_private_key_output
+  ")
+
+fi
+
 printf %b\\n "$new_server_config" >"$my_wgl_folder"/"$wg_serv_iface".conf
 chmod 600 "$my_wgl_folder"/"$wg_serv_iface".conf
 
@@ -226,13 +247,13 @@ printf %s\\n "+--------------------------------------------+"
 
 sleep 2
 
-printf %b\\n "\n ${IWhite}Save config to /etc/wireguard/?${Color_Off}\n
-NOTE: ${UWhite}Choosing to save the config under the same file-name as
-an existing config will ${BRed}overrite it.${Color_Off}\n
+printf %b\\n "\n ${IW}Save config to /etc/wireguard/?${Off}\n
+NOTE: ${UW}Choosing to save the config under the same file-name as
+an existing config will ${BR}overrite it.${Off}\n
 This script will check if a config file with the same name already
 exists. It will back the existing config up before overriting it.
 +--------------------------------------------+\n
-Save config: ${BWhite}1 = yes, 2 = no${Color_Off}\n"
+Save config: ${BW}1 = yes, 2 = no${Off}\n"
 
 check_for_existing_config="/etc/wireguard/$wg_serv_iface.conf"
 
@@ -265,24 +286,24 @@ elif [[ "$save_server_config" == 2 ]]; then
   printf %b\\n "\nUnderstood! Server config copy \nis located in $my_wgl_folder/$wg_serv_iface.conf.\nThe config is shown below."
 fi
 
-printf %b\\n "\n\n${IYellow}$new_server_config${Color_Off}\n" | sed -E 's/PrivateKey = .*/PrivateKey = Hidden/g'
+printf %b\\n "\n\n${IY}$new_server_config${Off}\n" | sed -E 's/PrivateKey = .*/PrivateKey = Hidden/g'
 
 printf %s\\n "+--------------------------------------------+"
 
-printf %b\\n "\n${IWhite}Configure clients?${Color_Off}
-${BWhite}1=yes, 2=no${Color_Off}"
+printf %b\\n "\n${IW}Configure clients?${Off}
+${BW}1=yes, 2=no${Off}"
 
 read -r -p "Choice: " client_config_answer
 printf %s\\n "+--------------------------------------------+"
 
 if [[ "$client_config_answer" == 1 ]]; then
   printf '\e[2J\e[H'
-  printf %b\\n "\n${IWhite}How many clients would you like to configure?${Color_Off}\n"
+  printf %b\\n "\n${IW}How many clients would you like to configure?${Off}\n"
   read -r -p "Number of clients: " number_of_clients
 
   printf %s\\n "+--------------------------------------------+"
 
-  printf %b\\n "\n${IWhite}Specify the DNS server your clients will use.${Color_Off}\n"
+  printf %b\\n "\n${IW}Specify the DNS server your clients will use.${Off}\n"
   # This would usually be a public DNS server, for example 1.1.1.1,
   # 8.8.8.8, etc.
   read -r -p "DNS server: " client_dns
@@ -296,7 +317,7 @@ if [[ "$client_config_answer" == 1 ]]; then
   # address as long as it's within the range specified for the server.
 
   for ((i = 1; i <= "$number_of_clients"; i++)); do
-    printf %b\\n "\n${IWhite}Private address of client # $i (do NOT include /32):${Color_Off}\n"
+    printf %b\\n "\n${IW}Private address of client # $i (do NOT include /32):${Off}\n"
     read -r -p "Client $i IP: " client_private_address_[$i]
     # Client name can be anything, mainly to easily identify the device
     # to be used. Some exampmles are:
@@ -305,7 +326,7 @@ if [[ "$client_config_answer" == 1 ]]; then
 
     printf %s\\n "+--------------------------------------------+"
 
-    printf %b\\n "\n${IWhite}Provide the name of the client # $i ${Color_Off}\n"
+    printf %b\\n "\n${IW}Provide the name of the client # $i ${Off}\n"
     read -r -p "Client $i name: " client_name_[$i]
 
     printf %s\\n "+--------------------------------------------+"
@@ -329,11 +350,11 @@ AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 21" >"$my_wgl_folder"/client_configs/"${client_name_["$i"]}".conf
     printf '\e[2J\e[H'
   done
-  printf %b\\n "\nAwesome!\nClient config files were saved to ${IWhite}$my_wgl_folder/client_configs/${Color_Off}"
+  printf %b\\n "\nAwesome!\nClient config files were saved to ${IW}$my_wgl_folder/client_configs/${Off}"
 else
   printf %s\\n "+--------------------------------------------+"
-  printf %b\\n "${IWhite}Before ending this script,\nwould you like to setup firewall rules for the new server? (recommended)${Color_Off}\n
-  ${BWhite}1 = yes, 2 = no${Color_Off}\n"
+  printf %b\\n "${IW}Before ending this script,\nwould you like to setup firewall rules for the new server? (recommended)${Off}\n
+  ${BW}1 = yes, 2 = no${Off}\n"
   read -r -p "Choice: " iptables_setup
   if [[ "$iptables_setup" == 1 ]]; then
     sudo bash "$my_wgl_folder"/Scripts/setup_iptables.sh
@@ -342,15 +363,15 @@ else
     exit
   fi
 fi
-printf %b\\n "\n${IWhite}If you've got qrencode installed, the script can generate QR codes for
+printf %b\\n "\n${IW}If you've got qrencode installed, the script can generate QR codes for
 the client configs.\n\n Would you like to have QR codes generated?
-\n1= yes, 2 = no${Color_Off}"
+\n1= yes, 2 = no${Off}"
 
 read -r -p "Choice: " generate_qr_code
 
 if [[ "$generate_qr_code" == 1 ]]; then
   for ((q = 1; q <= "$number_of_clients"; q++)); do
-    printf %b\\n "${BRed}${client_name_[$q]}${Color_Off}\n"
+    printf %b\\n "${BR}${client_name_[$q]}${Off}\n"
     qrencode -t ansiutf8 <"$my_wgl_folder"/client_configs/"${client_name_["$q"]}".conf
     printf %s\\n "+--------------------------------------------+"
   done
@@ -360,8 +381,8 @@ else
   printf %b\\n "Sorry, wrong choice! Moving on with the script."
 fi
 
-printf %b\\n "\n${IWhite}Would you like to add client info to the server config now?${Color_Off}
-\n${BWhite}1 = yes, 2 = no${Color_Off}"
+printf %b\\n "\n${IW}Would you like to add client info to the server config now?${Off}
+\n${BW}1 = yes, 2 = no${Off}"
 read -r -p "Choice: " configure_server_with_clients
 
 # If you chose to add client info to the server config AND to save the server config
@@ -376,9 +397,9 @@ elif [[ "$configure_server_with_clients" == 2 ]]; then
   printf %b\\n "\nAlright, you may add the following to a server config file to setup clients.
 \n-----------------\n"
   for ((d = 1; d <= "$number_of_clients"; d++)); do
-    printf %b\\n "\n${IYellow}[Peer]
+    printf %b\\n "\n${IY}[Peer]
 PublicKey = ${client_public_key_["$d"]}
-AllowedIPs = ${client_private_address_["$d"]}/32${Color_Off}\n"
+AllowedIPs = ${client_private_address_["$d"]}/32${Off}\n"
   done
 fi
 
@@ -388,8 +409,9 @@ printf %b\\n "-----------------"
 # The script checks is there is config in /etc/wireguard/, if there is one,
 # the value of the grep will be greater than or equal to 1, means it can be used
 # to bring up the WireGuard tunnel interface.
-printf %b\\n "${IWhite}Almost done! Would you like to bring WireGuard interface up and to enable the service on boot?${Color_Off}
-\n${BWhite}1 = yes, 2 = no${Color_Off}\n"
+printf %b\\n "${IW}Almost done!
+Would you like to bring WireGuard interface up and to enable the service on boot?${Off}
+\n${BW}1 = yes, 2 = no${Off}\n"
 
 read -r -p "Choice: " enable_on_boot
 printf '\e[2J\e[H'
@@ -397,11 +419,11 @@ if [[ "$enable_on_boot" == 1 ]]; then
   # If current OS is FreeBSD - we wont use systemd as we would've for supported linux distros.
   freebsd_os=$(uname -a | awk '{print $1}' | grep -i -c FreeBSD)
   if [[ "$freebsd_os" -gt 0 ]]; then
-    printf %b\\n "\n${IYellow}chown -v root:root /etc/wireguard/$wg_serv_iface.conf
+    printf %b\\n "\n${IY}chown -v root:root /etc/wireguard/$wg_serv_iface.conf
 chmod -v 600 /etc/wireguard/$wg_serv_iface.conf
 sysrc wireguard_enable=\"YES\"
 sysrc wireguard_interfaces=\"$wg_serv_iface\"
-service wireguard start${Color_Off}\n"
+service wireguard start${Off}\n"
 
     read -n 1 -s -r -p "
   Review the above. 
@@ -427,10 +449,10 @@ service wireguard start${Color_Off}\n"
     esac
 
   else
-    printf %b\\n "\n${IYellow}chown -v root:root /etc/wireguard/$wg_serv_iface.conf
+    printf %b\\n "\n${IY}chown -v root:root /etc/wireguard/$wg_serv_iface.conf
   chmod -v 600 /etc/wireguard/$wg_serv_iface.conf
   wg-quick up $wg_serv_iface
-  systemctl enable wg-quick@$wg_serv_iface.service${Color_Off}\n"
+  systemctl enable wg-quick@$wg_serv_iface.service${Off}\n"
 
     read -n 1 -s -r -p "
   Review the above. 
@@ -455,15 +477,16 @@ service wireguard start${Color_Off}\n"
     esac
   fi
 elif [[ "$enable_on_boot" == 2 ]]; then
-  printf %b\\n "\n${IWhite} To manually enable the service and bring tunnel interface up, the following commands can be used:${Color_Off}"
-  printf %b\\n "\n${IYellow}chown -v root:root /etc/wireguard/$wg_serv_iface.conf
+  printf %b\\n "\n${IW} To manually enable the service and bring tunnel interface up,
+  the following commands can be used:${Off}"
+  printf %b\\n "\n${IY}chown -v root:root /etc/wireguard/$wg_serv_iface.conf
 chmod -v 600 /etc/wireguard/$wg_serv_iface.conf
 wg-quick up $wg_serv_iface
-systemctl enable wg-quick@$wg_serv_iface.service${Color_Off}"
+systemctl enable wg-quick@$wg_serv_iface.service${Off}"
 fi
 
-printf %b\\n "\n${IWhite}Before ending this script, would you like to setup firewall rules for the new server? (recommended)${Color_Off}
-\n${BWhite}1 = yes, 2 = no${Color_Off}\n"
+printf %b\\n "\n${IW}Before ending this script, would you like to setup firewall rules for the new server? (recommended)${Off}
+\n${BW}1 = yes, 2 = no${Off}\n"
 
 read -r -p "Choice: " iptables_setup
 if [[ "$iptables_setup" == 1 ]]; then
