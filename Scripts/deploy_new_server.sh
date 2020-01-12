@@ -478,10 +478,18 @@ service wireguard start${Off}\n"
 elif [ "$enable_on_boot" = 2 ]; then
   printf %b\\n "\n${IW} To manually enable the service and bring tunnel interface up,
   the following commands can be used:${Off}"
-  printf %b\\n "\n${IY}chown -v root:root /etc/wireguard/$wg_serv_iface.conf
+  if [ "$freebsd_os" = 0 ]; then
+    printf %b\\n "\n${IY}chown -v root:root /etc/wireguard/$wg_serv_iface.conf
 chmod -v 600 /etc/wireguard/$wg_serv_iface.conf
 wg-quick up $wg_serv_iface
 systemctl enable wg-quick@$wg_serv_iface.service${Off}"
+  else
+    printf %b\\n "\n${IY}chown -v root:root /etc/wireguard/$wg_serv_iface.conf
+chmod -v 600 /etc/wireguard/$wg_serv_iface.conf
+sysrc wireguard_enable=\"YES\"
+sysrc wireguard_interfaces=$wg_serv_iface
+service wireguard start${Off}"
+  fi
 fi
 
 printf %b\\n "\n${IW}Before ending this script, would you like to setup firewall rules for the new server? (recommended)${Off}
