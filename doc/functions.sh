@@ -38,12 +38,12 @@ function determine_os() {
     if [[ "$check_if_wg_installed" == 0 ]]; then
       printf %b\\n "
   +---------------------------------------------+
-      ${BWhite}OS Type: Ubuntu
-      Wireguard-Tools: NOT installed${Color_Off}
+      ${BW}OS Type: Ubuntu
+      Wireguard-Tools: NOT installed${Off}
   +---------------------------------------------+
-        ${BWhite}Would you like to have Wireguard installed?${Color_Off}
+        ${BW}Would you like to have Wireguard installed?${Off}
   +---------------------------------------------+
-      ${BWhite}1 = yes, 2 = no${Color_Off}"
+      ${BW}1 = yes, 2 = no${Off}"
       read -r install_wireguard
       if [[ "$install_wireguard" == 1 ]]; then
         # If chosen to install, proceed with installation
@@ -58,8 +58,8 @@ function determine_os() {
     else
       printf %b\\n "
   +---------------------------------------------+
-      ${BWhite}OS Type: Ubuntu
-      Wireguard-Tools: Installed${Color_Off}
+      ${BW}OS Type: Ubuntu
+      Wireguard-Tools: Installed${Off}
   +---------------------------------------------+
   "
     fi
@@ -74,12 +74,12 @@ function determine_os() {
     if [[ "$check_if_wg_installed" == 0 ]]; then
       printf %b\\n "
   +---------------------------------------------+
-      ${BWhite}OS Type: $distro
-      Wireguard-Tools: NOT installed${Color_Off}
+      ${BW}OS Type: $distro
+      Wireguard-Tools: NOT installed${Off}
   +---------------------------------------------+
-      ${BWhite}Would you like to have Wireguard installed?${Color_Off}
+      ${BW}Would you like to have Wireguard installed?${Off}
   +---------------------------------------------+
-      ${BWhite}1 = yes, 2 = no${Color_Off}"
+      ${BW}1 = yes, 2 = no${Off}"
       read -r install_wireguard
       if [[ "$install_wireguard" == 1 ]]; then
         # If chosen to install, proceed with installation
@@ -93,8 +93,8 @@ function determine_os() {
     else
       printf %b\\n "
   +---------------------------------------------+
-      ${BWhite}OS Type: $distro
-      Wireguard-Tools: Installed${Color_Off}
+      ${BW}OS Type: $distro
+      Wireguard-Tools: Installed${Off}
   +---------------------------------------------+
   "
     fi
@@ -110,12 +110,12 @@ function determine_os() {
     if [[ "$check_if_wg_installed" == 0 ]]; then
       printf %b\\n "
   +---------------------------------------------+
-        ${BWhite}OS Type: CentOS
-      Wireguard-Tools: NOT installed${Color_Off}
+        ${BW}OS Type: CentOS
+      Wireguard-Tools: NOT installed${Off}
   +---------------------------------------------+
-        ${BWhite}Would you like to have Wireguard installed?${Color_Off}
+        ${BW}Would you like to have Wireguard installed?${Off}
   +---------------------------------------------+
-      ${BWhite}1 = yes, 2 = no${Color_Off}"
+      ${BW}1 = yes, 2 = no${Off}"
       read -r install_wireguard
       if [[ "$install_wireguard" == 1 ]]; then
         # If chosen to install, proceed with installation
@@ -130,8 +130,8 @@ function determine_os() {
     else
       printf %b\\n "
   +---------------------------------------------+
-      ${BWhite}OS Type: CentOS
-      Wireguard-Tools: Installed${Color_Off}
+      ${BW}OS Type: CentOS
+      Wireguard-Tools: Installed${Off}
   +---------------------------------------------+
   "
     fi
@@ -146,12 +146,12 @@ function determine_os() {
     if [[ "$check_if_wg_installed" == 0 ]]; then
       printf %b\\n "
   +---------------------------------------------+
-        ${BWhite}OS Type: Fedora
-      Wireguard-Tools: NOT installed${Color_Off}
+        ${BW}OS Type: Fedora
+      Wireguard-Tools: NOT installed${Off}
   +---------------------------------------------+
-        ${BWhite}Would you like to have Wireguard installed?${Color_Off}
+        ${BW}Would you like to have Wireguard installed?${Off}
   +---------------------------------------------+
-      ${BWhite}1 = yes, 2 = no${Color_Off}"
+      ${BW}1 = yes, 2 = no${Off}"
       read -r install_wireguard
       if [[ "$install_wireguard" == 1 ]]; then
         # If chosen to install, proceed with installation
@@ -165,8 +165,8 @@ function determine_os() {
     else
       printf %b\\n "
   +---------------------------------------------+
-      ${BWhite}OS Type: Fedora
-      Wireguard-Tools: Installed${Color_Off}
+      ${BW}OS Type: Fedora
+      Wireguard-Tools: Installed${Off}
   +---------------------------------------------+
   "
     fi
@@ -181,12 +181,12 @@ function determine_os() {
     if [[ "$check_if_wg_installed" == 0 ]]; then
       printf %b\\n "
   +---------------------------------------------+
-      ${BWhite}OS Type: Debian
-      Wireguard-Tools: NOT installed${Color_Off}
+      ${BW}OS Type: Debian
+      Wireguard-Tools: NOT installed${Off}
   +---------------------------------------------+
-      ${BWhite}Would you like to have Wireguard installed?${Color_Off}
+      ${BW}Would you like to have Wireguard installed?${Off}
   +---------------------------------------------+
-      ${BWhite}1 = yes, 2 = no${Color_Off}"
+      ${BW}1 = yes, 2 = no${Off}"
       read -r install_wireguard
       if [[ "$install_wireguard" == 1 ]]; then
         # If chosen to install, proceed with installation
@@ -202,8 +202,8 @@ function determine_os() {
     else
       printf %b\\n "
   +---------------------------------------------+
-      ${BWhite}OS Type: Debian
-      Wireguard-Tools: Installed${Color_Off}
+      ${BW}OS Type: Debian
+      Wireguard-Tools: Installed${Off}
   +---------------------------------------------+
   "
     fi
@@ -227,12 +227,12 @@ function determine_os() {
       if [[ "$check_if_wg_installed" == 0 ]]; then
         printf %b\\n "
   +---------------------------------------------+
-      ${BWhite}OS Type: FreeBSD
-      Wireguard-Tools: NOT installed${Color_Off}
+      ${BW}OS Type: FreeBSD
+      Wireguard-Tools: NOT installed${Off}
   +---------------------------------------------+
-      ${BWhite}Would you like to have Wireguard installed?${Color_Off}
+      ${BW}Would you like to have Wireguard installed?${Off}
   +---------------------------------------------+
-      ${BWhite}1 = yes, 2 = no${Color_Off}"
+      ${BW}1 = yes, 2 = no${Off}"
         read -r install_wireguard
         if [[ "$install_wireguard" == 1 ]]; then
           # If chosen to install, proceed with installation
@@ -246,8 +246,8 @@ function determine_os() {
       else
         printf %b\\n "
   +---------------------------------------------+
-      ${BWhite}OS Type: FreeBSD
-      Wireguard-Tools: Installed${Color_Off}
+      ${BW}OS Type: FreeBSD
+      Wireguard-Tools: Installed${Off}
   +---------------------------------------------+
   "
       fi
