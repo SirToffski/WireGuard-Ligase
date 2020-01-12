@@ -8,7 +8,7 @@ fi
 # A simple check if the entire repo was cloned.
 ## If not, working directory is a directory of the currently running script.
 check_for_full_clone="$my_wgl_folder/configure-wireguard.sh"
-if [[ ! -f "$check_for_full_clone" ]]; then
+if [ ! -f "$check_for_full_clone" ]; then
   my_wgl_folder="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 else
   source "$my_wgl_folder"/doc/functions.sh
@@ -18,14 +18,14 @@ fi
 ######################## Pre-checks ##############################
 # Check if a directory /keys/ exists, if not, it will be made
 check_for_keys_directory=$("$my_wgl_folder"/keys)
-if [[ ! -d "$check_for_keys_directory" ]]; then
+if [ ! -d "$check_for_keys_directory" ]; then
   mkdir -p "$my_wgl_folder"/keys
 fi
 
 # Check if a directory /client_configs/ exists, if not, it will be made
 check_for_clients_directory=$("$my_wgl_folder"/client_configs)
 
-if [[ ! -d "$check_for_clients_directory" ]]; then
+if [ ! -d "$check_for_clients_directory" ]; then
   mkdir -p "$my_wgl_folder"/client_configs
 fi
 ##################### Pre-checks finished #########################
@@ -46,7 +46,7 @@ read -r number_of_clients
 printf %b\\n "\nSpecify the DNS server your clients will use.\n"
 read -r client_dns
 printf %b\\n "\nNext steps will ask to provide private address and a name for each client, one at a time.\n"
-for ((i = 1; i <= "$number_of_clients"; i++)); do
+while read -r i; do
   printf %b\\n "\nPrivate address of a client (do NOT include /32):\n"
   read -r client_private_address_["$i"]
   printf %b\\n "\nProvide the name of the client\n"
@@ -70,7 +70,7 @@ PublicKey = $sever_public_key_output
 Endpoint = $server_details
 AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 21" >"$my_wgl_folder"/client_configs/"${client_name_["$i"]}".conf
-done
+done < <(seq 1 "$number_of_clients")
 
 printf %b\\n "\nAwesome!\nClient config files were saved to $my_wgl_folder/client_configs/"
 
@@ -78,7 +78,7 @@ printf %b\\n "\nWould you link to add client info to the server config now?\n
 1 = yes, 2 = no"
 read -r configure_server_with_clients
 
-if [[ $configure_server_with_clients == 1 ]]; then
+if [ "$configure_server_with_clients" = 1 ]; then
   printf %b\\n "\nPlease specify the file name of the server config located in /etc/wireguard/ WITHOUT the  '.conf'.
 
   EXAMPLE:
@@ -86,27 +86,27 @@ if [[ $configure_server_with_clients == 1 ]]; then
   If your server config file is 'wg0.conf', type 'wg0'\n
   
   NOTE: You need to disable server WireGuard interface before changing the config."
-  
+
   read -r server_file_for_clients
-  for c in $(seq 1 "$number_of_clients"); do
+  while read -r c; do
     printf %b\\n "
 [Peer]
 PublicKey = ${client_public_key_["$c"]}
 AllowedIPs = ${client_private_address_["$c"]}/32
-  " >>/etc/wireguard/"$server_file_for_clients".conf
-  done
+  " | tee -a /etc/wireguard/"$server_file_for_clients".conf >/dev/null
+  done < <(seq 1 "$number_of_clients")
 else
   printf %b\\n "
   Alright, you may add the following to a server config file to setup clients.
 
   -----------------
   "
-  for d in $(seq 1 "$number_of_clients"); do
+  while read -r d; do
     printf %b\\n "
 [Peer]
 PublicKey = ${client_public_key_["$d"]}
 AllowedIPs = ${client_private_address_["$d"]}/32
 "
-  done
+  done < <(seq 1 "$number_of_clients")
   printf %b\\n "-----------------"
 fi

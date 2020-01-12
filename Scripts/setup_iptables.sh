@@ -8,7 +8,7 @@ fi
 my_wgl_folder="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. >/dev/null 2>&1 && pwd)"
 
 check_for_full_clone="$my_wgl_folder/configure-wireguard.sh"
-if [[ ! -f "$check_for_full_clone" ]]; then
+if [ ! -f "$check_for_full_clone" ]; then
   my_wgl_folder="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 else
   source "$my_wgl_folder"/doc/functions.sh
@@ -26,19 +26,19 @@ fedora_os=$(lsb_release -a | grep -i -c Fedora)
 manjaro_os=$(hostnamectl | grep -i -c Manjaro)
 freebsd_os=$(uname -a | awk '{print $1}' | grep -i -c FreeBSD)
 
-if [[ "$ubuntu_os" -gt 0 ]]; then
+if [ "$ubuntu_os" -gt 0 ]; then
   distro=ubuntu
-elif [[ "$arch_os" -gt 0 ]]; then
+elif [ "$arch_os" -gt 0 ]; then
   distro=arch
-elif [[ "$cent_os" -gt 0 ]]; then
+elif [ "$cent_os" -gt 0 ]; then
   distro=centos
-elif [[ "$debian_os" -gt 0 ]]; then
+elif [ "$debian_os" -gt 0 ]; then
   distro=debian
-elif [[ "$fedora_os" -gt 0 ]]; then
+elif [ "$fedora_os" -gt 0 ]; then
   distro=fedora
-elif [[ "$manjaro_os" -gt 0 ]]; then
+elif [ "$manjaro_os" -gt 0 ]; then
   distro=manjaro
-elif [[ "$freebsd_os" -gt 0 ]]; then
+elif [ "$freebsd_os" -gt 0 ]; then
   distro=freebsd
 fi
 ###############################################
@@ -52,7 +52,7 @@ check_pub_ip=$(curl -s https://checkip.amazonaws.com)
 # attempt to source variables used in it to avoid repitition
 ###############################################
 check_for_shared_vars="$my_wgl_folder/shared_vars.sh"
-if [[ -f "$check_for_shared_vars" ]]; then
+if [ -f "$check_for_shared_vars" ]; then
   source "$my_wgl_folder/shared_vars.sh"
 
   printf '\e[2J\e[H'
@@ -79,7 +79,7 @@ Press e/E to exit
   ###############################################
   [Rr]*)
     printf %b\\n "\n${IW}We are going to setup some basic firewall rules so the server can
-function correctly.\n
+work correctly.\n
 Step 1) Please provide the server subnet information to be used.${Off}\n
 ${BW}Example:${IW} If you server IP is ${BR}10.0.0.1/24${IW}, then please type ${BR}10.0.0.0/24${Off}\n"
 
@@ -115,9 +115,9 @@ ${BW}1 = yes, 2 = no${Off}"
 
     printf %b\\n "$my_separator"
 
-    if [[ "$public_address" == 1 ]]; then
+    if [ "$public_address" = 1 ]; then
       server_public_address="$check_pub_ip"
-    elif [[ "$public_address" == 2 ]]; then
+    elif [ "$public_address" = 2 ]; then
       printf %b\\n "
 ${IW}Please specify the public address of the server.${Off}
 "
@@ -166,7 +166,7 @@ ${IW}Step 5) Specify wireguard server interface name
     ;;
   *)
     printf %b\\n "\n${IW}We are going to setup some basic firewall rules so the server can
-function correctly.\n
+work correctly.\n
 Step 1) Please provide the server subnet information to be used.${Off}\n
 ${BW}Example:${IW} If you server IP is ${BR}10.0.0.1/24${IW}, then please type ${BR}10.0.0.0/24${Off}\n"
 
@@ -183,7 +183,7 @@ ${BW}Example:${IW} If you server IP is ${BR}10.0.0.1/24${IW}, then please type $
 else
 
   printf %b\\n "\n${IW}We are going to setup some basic firewall rules so the server can
-function correctly.\n
+work correctly.\n
 Step 1) Please provide the server subnet information to be used.${Off}\n
 ${BW}Example:${IW} If you server IP is ${BR}10.0.0.1/24${IW}, then please type ${BR}10.0.0.0/24${Off}\n"
 
@@ -216,9 +216,9 @@ ${BW}1 = yes, 2 = no${Off}"
 
   printf %b\\n "$my_separator"
 
-  if [[ "$public_address" == 1 ]]; then
+  if [ "$public_address" = 1 ]; then
     server_public_address="$check_pub_ip"
-  elif [[ "$public_address" == 2 ]]; then
+  elif [ "$public_address" = 2 ]; then
     printf %b\\n "\n${IW}Please specify the public address of the server.${Off}\n"
     read -r -p "Public IP: " server_public_address
   fi
@@ -258,9 +258,9 @@ ${IW}Step 5) Specify wireguard server interface name
 
 fi
 
-if [[ "$cent_os" -gt 0 ]]; then
+if [ "$cent_os" -gt 0 ]; then
   check_if_firewalld_installed=$(yum list installed | grep -i -c firewalld)
-  if [[ "$check_if_firewalld_installed" == 1 ]]; then
+  if [ "$check_if_firewalld_installed" = 1 ]; then
     printf %b\\n "
     ${IW}
     OS Type: CentOS
@@ -313,7 +313,7 @@ if [[ "$cent_os" -gt 0 ]]; then
       ;;
     esac
 
-  elif [[ "$check_if_firewalld_installed" == 0 ]]; then
+  elif [ "$check_if_firewalld_installed" = 0 ]; then
     printf %b\\n "
     ${IW}
     OS Type: CentOS
@@ -376,7 +376,7 @@ if [[ "$cent_os" -gt 0 ]]; then
       ;;
     esac
   fi
-elif [[ "$distro" == "freebsd" ]]; then
+elif [ "$distro" = "freebsd" ]; then
   local_dns=$(grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' /etc/resolv.conf | awk '{print $1}')
   printf %b\\n "
     ${IW}
@@ -734,7 +734,7 @@ else
 
 fi
 
-if [[ "$distro" == "ubuntu" ]] || [[ "$distro" == "debian" ]]; then
+if [ "$distro" = "ubuntu" ] || [ "$distro" = "debian" ]; then
   printf %b\\n "\n${IW}In order to make the above iptables rules persistent after system reboot,
   ${BR}iptables-persistent${IW} package needs to be installed.\n
   Would you like the script to install iptables-persistent and to enable the service?\n
@@ -752,7 +752,7 @@ if [[ "$distro" == "ubuntu" ]] || [[ "$distro" == "debian" ]]; then
   apt-get install iptables-persistent
   systemctl enable netfilter-persistent
   netfilter-persistent save
-elif [[ "$distro" == "fedora" ]]; then
+elif [ "$distro" = "fedora" ]; then
   printf %b\\n "\n${IW}In order to make the above iptables rules persistent after system reboot,
   netfilter rules will need to be saved.\n
   Would you like the script to save the netfilter rules?\n
@@ -766,7 +766,7 @@ elif [[ "$distro" == "fedora" ]]; then
 
   /sbin/service iptables save
 
-elif [[ "$distro" == "arch" ]] || [[ "$distro" == "manjaro" ]]; then
+elif [ "$distro" = "arch" ] || [ "$distro" = "manjaro" ]; then
   printf %b\\n "\n${IW}In order to make the above iptables rules persistent after system reboot,
   netfilter rules will need to be saved.\n
   Would you like the script to save the netfilter rules?\n
@@ -774,7 +774,7 @@ elif [[ "$distro" == "arch" ]] || [[ "$distro" == "manjaro" ]]; then
 
   # Check if iptables.rules file exists and create if needed
   ${IY}check_iptables_rules=\$(ls /etc/iptables/ | grep -c iptables.rules)
-  if [[ \$check_iptables_rules == 0 ]]; then
+  if [ \$check_iptables_rules = 0 ]; then
     touch /etc/iptables/iptables.rules
   fi
 
@@ -790,15 +790,15 @@ elif [[ "$distro" == "arch" ]] || [[ "$distro" == "manjaro" ]]; then
   Press any key to continue or CTRL+C to stop."
 
   check_iptables_rules=$(ls /etc/iptables/ | grep -c iptables.rules)
-  if [[ "$check_iptables_rules" == 0 ]]; then
+  if [ "$check_iptables_rules" = 0 ]; then
     touch /etc/iptables/iptables.rules
   fi
   systemctl enable iptables.service
   systemctl start iptables.service
   iptables-save >/etc/iptables/iptables.rules
   systemctl restart iptables.service
-elif [[ "$distro" == "centos" ]]; then
-  if [[ "$check_if_firewalld_installed" == 0 ]]; then
+elif [ "$distro" = "centos" ]; then
+  if [ "$check_if_firewalld_installed" = 0 ]; then
     printf %b\\n "
   ${IW}In order to make the above iptables rules persistent after system reboot,
   netfilter rules will need to be saved.

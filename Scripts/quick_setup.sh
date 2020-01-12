@@ -8,7 +8,7 @@ fi
 my_wgl_folder="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. >/dev/null 2>&1 && pwd)"
 
 check_for_full_clone="$my_wgl_folder/configure-wireguard.sh"
-if [[ ! -f "$check_for_full_clone" ]]; then
+if [ ! -f "$check_for_full_clone" ]; then
   my_wgl_folder="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 else
   source "$my_wgl_folder"/doc/functions.sh
@@ -34,10 +34,10 @@ server_subnet="$private_range.0/25"
 # their fourth octets would be 10,11,12,13,14
 # client_fourth_octet="$((i + 9))" --- this is un-used at the moment and reserved for future
 number_of_clients="4"
-function create_client_ip_range() {
-  for ((i = 1; i <= "$number_of_clients"; i++)); do
+create_client_ip_range() {
+  while read -r i; do
     printf %b\\n "\n${BR}$private_range.$((i + 9))"
-  done
+  done < <(seq 1 "$number_of_clients")
 }
 local_interface="eth0"
 server_listen_port="51820"
@@ -52,14 +52,14 @@ check_pub_ip=$(curl -s https://checkip.amazonaws.com)
 ######################## Pre-checks ######################################################
 # Check if a directory /keys/ exists, if not, it will be made
 check_for_keys_directory=$("$my_wgl_folder"/keys)
-if [[ ! -d "$check_for_keys_directory" ]]; then
+if [ ! -d "$check_for_keys_directory" ]; then
   mkdir -p "$my_wgl_folder"/keys
 fi
 
 # Check if a directory /client_configs/ exists, if not, it will be made
 check_for_clients_directory=$("$my_wgl_folder"/client_configs)
 
-if [[ ! -d "$check_for_clients_directory" ]]; then
+if [ ! -d "$check_for_clients_directory" ]; then
   mkdir -p "$my_wgl_folder"/client_configs
 fi
 
@@ -105,9 +105,9 @@ ${IW}The public IP address of this machine is $check_pub_ip. Is this the address
 
 ${BW}1 = yes, 2 = no${Off}"
 read -r public_address
-if [[ "$public_address" == 1 ]]; then
+if [ "$public_address" = 1 ]; then
   server_public_address="$check_pub_ip"
-elif [[ "$public_address" == 2 ]]; then
+elif [ "$public_address" = 2 ]; then
   printf %b\\n "\n${IW}Please specify the public address of the server.${Off}"
   read -r server_public_address
 fi
@@ -137,7 +137,7 @@ case "$proceed_quick_setup" in
 
   sleep 1
   printf %b\\n "\n${BG}Generating server config${Off}"
-  if [[ "$distro" != "freebsd" ]]; then
+  if [ "$distro" != "freebsd" ]; then
     new_server_config=$(printf %b\\n "\n[Interface]
   Address = $server_private_address
   SaveConfig = true
@@ -161,8 +161,7 @@ case "$proceed_quick_setup" in
   printf %s\\n "$new_server_config" >"$config_file_name".txt && printf %s\\n "$new_server_config" >/etc/wireguard/"$config_file_name".conf
 
   # Generating client keys
-
-  for ((i = 1; i <= "$number_of_clients"; i++)); do
+  while read -r i; do
     wg genkey | tee "$my_wgl_folder"/keys/client_"$i"_Privatekey | wg pubkey >"$my_wgl_folder"/keys/client_"$i"_Publickey
 
     chmod 600 "$my_wgl_folder"/keys/client_"$i"_Privatekey
@@ -192,12 +191,12 @@ PersistentKeepalive = 21" >"$my_wgl_folder"/client_configs/client_["$i"].conf
 PublicKey = ${client_public_key_["$i"]}
 AllowedIPs = $private_range.$((i + 9))/32\n" | tee -a /etc/wireguard/"$config_file_name".conf >/dev/null
 
-  done
+  done < <(seq 1 "$number_of_clients")
 
   ####### ENABLE WireGuard INTERFACE AND SERVICE  BEGINS #######
   sleep 1
   printf %b\\n "\n${BG}ENABLE $config_file_name INTERFACE AND SERVICE${Off}"
-  if [[ "$distro" != "freebsd" ]]; then
+  if [ "$distro" != "freebsd" ]; then
     chown -v root:root /etc/wireguard/"$config_file_name".conf
     chmod -v 600 /etc/wireguard/"$config_file_name".conf
     wg-quick up "$config_file_name"
@@ -210,21 +209,21 @@ AllowedIPs = $private_range.$((i + 9))/32\n" | tee -a /etc/wireguard/"$config_fi
     service wireguard start
   fi
   ####### ENABLE WireGuard INTERFACE AND SERVICE  ENDS #######
-  if [[ "$distro" != "freebsd" ]]; then
+  if [ "$distro" != "freebsd" ]; then
     ####### IPTABLES BEGIN #######
     ## $distro is defined in doc/functions.sh, which is sourced at the beginning of the script
-    if [[ "$distro" == centos ]]; then
+    if [ "$distro" = centos ]; then
       check_if_firewalld_installed=$(yum list installed | grep -i -c firewalld)
       sed -i -E 's/.net.ipv4.ip_forward.*//g' /etc/sysctl.conf
       printf %s\\n "net.ipv4.ip_forward=1" | tee -a /etc/sysctl.conf >/dev/nullf
       sysctl -p
-      if [[ "$check_if_firewalld_installed" == 0 ]]; then
+      if [ "$check_if_firewalld_installed" = 0 ]; then
         iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
         iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
         iptables -A INPUT -p udp -m udp --dport "$server_listen_port" -m conntrack --ctstate NEW -j ACCEPT
         iptables -A FORWARD -i "$config_file_name" -o "$config_file_name" -m conntrack --ctstate NEW -j ACCEPT
         iptables -t nat -A POSTROUTING -s "$server_subnet" -o "$local_interface" -j MASQUERADE
-      elif [[ "$check_if_firewalld_installed" == 1 ]]; then
+      elif [ "$check_if_firewalld_installed" = 1 ]; then
         firewall-cmd --zone=public --add-port="$server_listen_port"/udp
         firewall-cmd --zone=trusted --add-source="$server_subnet"
         firewall-cmd --permanent --zone=public --add-port="$server_listen_port"/udp
@@ -384,12 +383,12 @@ ipfw -q nat 1 config if \$local_interface same_ports unreg_only reset
   :: Interface $config_file_name was enabled and service configured
   :: Firewall has been configured and IP forwarding was enables ${Off}\n"
 
-  if [[ "$distro" != "centos" ]] && [[ "$distro" != "freebsd" ]]; then
+  if [ "$distro" != "centos" ] && [ "$distro" != "freebsd" ]; then
     printf %b\\n "\n${IW} Netfilter iptables rules will need to be saved to persist after reboot.
   \n${BW} Save rules now? \n1 = yes, 2 = no${Off}\n"
     read -r save_netfilter
-    if [[ "$save_netfilter" == 1 ]]; then
-      if [[ "$distro" == "ubuntu" ]] || [[ "$distro" == "debian" ]]; then
+    if [ "$save_netfilter" = 1 ]; then
+      if [ "$distro" = "ubuntu" ] || [ "$distro" = "debian" ]; then
         printf %b\\n "\n${IW}In order to make the above iptables rules persistent after system reboot,
       ${BR}iptables-persistent ${IW} package needs to be installed.
 
@@ -410,7 +409,7 @@ ipfw -q nat 1 config if \$local_interface same_ports unreg_only reset
         apt-get install iptables-persistent
         systemctl enable netfilter-persistent
         netfilter-persistent save
-      elif [[ "$distro" == "fedora" ]]; then
+      elif [ "$distro" = "fedora" ]; then
         printf %b\\n "\n${IW}In order to make the above iptables rules persistent after system reboot,
       netfilter rules will need to be saved.
 
@@ -427,7 +426,7 @@ ipfw -q nat 1 config if \$local_interface same_ports unreg_only reset
 
         /sbin/service iptables save
 
-      elif [[ "$distro" == "arch" ]] || [[ "$distro" == "manjaro" ]]; then
+      elif [ "$distro" = "arch" ] || [ "$distro" = "manjaro" ]; then
         printf %b\\n "\n${IW}In order to make the above iptables rules persistent after system reboot,
       netfilter rules will need to be saved.
 
@@ -437,7 +436,7 @@ ipfw -q nat 1 config if \$local_interface same_ports unreg_only reset
 
       # Check if iptables.rules file exists and create if needed
       ${IY}check_iptables_rules=\$(ls /etc/iptables/ | grep -c iptables.rules)
-      if [[ \$check_iptables_rules == 0 ]]; then
+      if [ \$check_iptables_rules = 0 ]; then
         touch /etc/iptables/iptables.rules
       fi
 
@@ -452,7 +451,7 @@ ipfw -q nat 1 config if \$local_interface same_ports unreg_only reset
       Press any key to continue or CTRL+C to stop."
 
         check_iptables_rules=$(ls /etc/iptables/ | grep -c iptables.rules)
-        if [[ "$check_iptables_rules" == 0 ]]; then
+        if [ "$check_iptables_rules" = 0 ]; then
           touch /etc/iptables/iptables.rules
         fi
         systemctl enable iptables.service
@@ -460,13 +459,13 @@ ipfw -q nat 1 config if \$local_interface same_ports unreg_only reset
         iptables-save >/etc/iptables/iptables.rules
         systemctl restart iptables.service
       fi
-    elif [[ "$save_netfilter" == 2 ]]; then
+    elif [ "$save_netfilter" = 2 ]; then
       printf %b\\n "\n${BR}TODO:
     * Add configurations to the client devices.
       * For mobile devices, 'qrencode' can be used${Off}"
     fi
-  elif [[ "$distro" == "centos" ]]; then
-    if [[ "$check_if_firewalld_installed" == 0 ]]; then
+  elif [ "$distro" = "centos" ]; then
+    if [ "$check_if_firewalld_installed" = 0 ]; then
       printf %b\\n "\n${IW}In order to make the above iptables rules persistent after system reboot,
   netfilter rules will need to be saved.
 
@@ -503,13 +502,13 @@ Review the above commands.
 
   read -r generate_qr_code
 
-  if [[ "$generate_qr_code" == 1 ]]; then
-    for ((q = 1; q <= "$number_of_clients"; q++)); do
+  if [ "$generate_qr_code" = 1 ]; then
+    while read -r q; do
       printf %b\\n "${BR}client_[$q]${Off}\n"
       qrencode -t ansiutf8 <"$my_wgl_folder"/client_configs/client_["$q"].conf
       printf %s\\n "+--------------------------------------------+"
-    done
-  elif [[ "$generate_qr_code" == 2 ]]; then
+    done < <(seq 1 "$number_of_clients")
+  elif [ "$generate_qr_code" = 2 ]; then
     printf %b\\n "\nAlright.. Moving on!\n+--------------------------------------------+"
   else
     printf %b\\n "Sorry, wrong choice! Moving on with the script."

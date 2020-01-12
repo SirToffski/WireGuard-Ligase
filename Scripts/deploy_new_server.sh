@@ -12,7 +12,7 @@ my_wgl_folder="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. >/dev/null 2>&1 &&
 # A simple check if the entire repo was cloned.
 ## If not, working directory is a directory of the currently running script.
 check_for_full_clone="$my_wgl_folder/configure-wireguard.sh"
-if [[ ! -f "$check_for_full_clone" ]]; then
+if [ ! -f "$check_for_full_clone" ]; then
   my_wgl_folder="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 else
   source "$my_wgl_folder"/doc/functions.sh
@@ -29,14 +29,14 @@ check_pub_ip=$(curl -s https://checkip.amazonaws.com)
 ######################## Pre-checks ##############################
 # Check if a directory /keys/ exists, if not, it will be made
 check_for_keys_directory=$("$my_wgl_folder"/keys)
-if [[ ! -d "$check_for_keys_directory" ]]; then
+if [ ! -d "$check_for_keys_directory" ]; then
   mkdir -p "$my_wgl_folder"/keys
 fi
 
 # Check if a directory /client_configs/ exists, if not, it will be made
 check_for_clients_directory=$("$my_wgl_folder"/client_configs)
 
-if [[ ! -d "$check_for_clients_directory" ]]; then
+if [ ! -d "$check_for_clients_directory" ]; then
   mkdir -p "$my_wgl_folder"/client_configs
 fi
 ##################### Pre-checks finished #########################
@@ -46,7 +46,7 @@ printf '\e[2J\e[H'
 printf %b\\n "This script will take you through the steps needed to deploy a new server
 and configure some clients."
 
-if [[ -f "$check_for_full_clone" ]]; then
+if [ -f "$check_for_full_clone" ]; then
   printf %b\\n "\n First, let's check if wireguard is installed..."
 
   ############## Determine OS Type ##############
@@ -85,9 +85,9 @@ read -r -p "Choice: " public_address
 
 printf %s\\n "+--------------------------------------------+"
 
-if [[ "$public_address" == 1 ]]; then
+if [ "$public_address" = 1 ]; then
   server_public_address="$check_pub_ip"
-elif [[ "$public_address" == 2 ]]; then
+elif [ "$public_address" = 2 ]; then
   printf %b\\n "\n${IW}Please specify the public address of the server.${Off}"
   read -r -p "Public IP: " server_public_address
   printf %s\\n "+--------------------------------------------+"
@@ -103,7 +103,7 @@ ${BW}Server public address = ${BR}$server_public_address${Off}
 +--------------------------------------------+"
 printf %b\\n "\n${BW}Step 4)${IW} Please also provide the internet facing interface of the server. 
 ${BW}Example: ${BR}eth0${Off}"
-if [[ "$distro" != "freebsd" ]]; then
+if [ "$distro" != "freebsd" ]; then
   printf %b\\n "\n Available interfaces are:
 +--------------------+
 $(ip -br a | awk '{print $1}')
@@ -163,7 +163,7 @@ ${BW}1 = yes, 2 = no${Off}\n"
 read -r -p "Choice: " generate_server_key
 printf %s\\n "+--------------------------------------------+"
 
-if [[ "$generate_server_key" == 1 ]]; then
+if [ "$generate_server_key" = 1 ]; then
   wg genkey | tee "$my_wgl_folder"/keys/ServerPrivatekey | wg pubkey >"$my_wgl_folder"/keys/ServerPublickey
   chmod 600 "$my_wgl_folder"/keys/ServerPrivatekey && chmod 600 "$my_wgl_folder"/keys/ServerPublickey
 
@@ -215,11 +215,11 @@ printf %b\\n "\n Generating server config file...."
 
 sleep 2
 
-if [[ "$distro" != "freebsd" ]]; then
+if [ "$distro" != "freebsd" ]; then
 
   new_server_config=$(printf %b\\n "
 [Interface]
-Address = $server_private_range
+Address = $server_private_range/32
 SaveConfig = true
 PostUp = iptables -A FORWARD -i $wg_serv_iface -j ACCEPT; iptables -t nat -A POSTROUTING -o $local_interface -j MASQUERADE; ip6tables -A FORWARD -i $wg_serv_iface -j ACCEPT; ip6tables -t nat -A POSTROUTING -o $local_interface -j MASQUERADE
 PostDown = iptables -D FORWARD -i $wg_serv_iface -j ACCEPT; iptables -t nat -D POSTROUTING -o $local_interface -j MASQUERADE; ip6tables -D FORWARD -i $wg_serv_iface -j ACCEPT; ip6tables -t nat -D POSTROUTING -o $local_interface -j MASQUERADE
@@ -231,7 +231,7 @@ else
   # We wont use iptables in FreeBSD, everythig will be handled by IPFW.
   new_server_config=$(printf %b\\n "
 [Interface]
-Address = $server_private_range
+Address = $server_private_range/32
 SaveConfig = true
 ListenPort = $server_listen_port
 PrivateKey = $sever_private_key_output
@@ -261,7 +261,7 @@ read -r -p "Choice: " save_server_config
 
 # The if statement checks whether a config with the same filename already exists.
 # If it does, the falue will always be less than zero, hence it needs to be backed up.
-if [[ "$save_server_config" == 1 ]] && [[ -f "$check_for_existing_config" ]]; then
+if [ "$save_server_config" = 1 ] && [ -f "$check_for_existing_config" ]; then
   printf %b\\n "
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     Found existing config file with the same name. 
@@ -273,7 +273,7 @@ if [[ "$save_server_config" == 1 ]] && [[ -f "$check_for_existing_config" ]]; th
   printf %b\\n "$new_server_config" >/etc/wireguard/"$wg_serv_iface".conf
   printf '\e[2J\e[H'
   printf %b\\n "\nCongrats! Server config is ready and saved to \n/etc/wireguard/$wg_serv_iface.conf... The config is shown below."
-elif [[ "$save_server_config" == 1 ]] && [[ ! -f "$check_for_existing_config" ]]; then
+elif [ "$save_server_config" = 1 ] && [ ! -f "$check_for_existing_config" ]; then
   # Make /etc/wireguard if it does not exist yet
   # Example is FreeBSD - /etc/wireguard is not automatically created
   # after installing WG.
@@ -281,7 +281,7 @@ elif [[ "$save_server_config" == 1 ]] && [[ ! -f "$check_for_existing_config" ]]
   printf %b\\n "$new_server_config" >/etc/wireguard/"$wg_serv_iface".conf
   printf '\e[2J\e[H'
   printf %b\\n "\nCongrats! Server config is ready and saved to \n/etc/wireguard/$wg_serv_iface.conf... The config is shown below."
-elif [[ "$save_server_config" == 2 ]]; then
+elif [ "$save_server_config" = 2 ]; then
   printf '\e[2J\e[H'
   printf %b\\n "\nUnderstood! Server config copy \nis located in $my_wgl_folder/$wg_serv_iface.conf.\nThe config is shown below."
 fi
@@ -296,7 +296,7 @@ ${BW}1=yes, 2=no${Off}"
 read -r -p "Choice: " client_config_answer
 printf %s\\n "+--------------------------------------------+"
 
-if [[ "$client_config_answer" == 1 ]]; then
+if [ "$client_config_answer" = 1 ]; then
   printf '\e[2J\e[H'
   printf %b\\n "\n${IW}How many clients would you like to configure?${Off}\n"
   read -r -p "Number of clients: " number_of_clients
@@ -315,8 +315,7 @@ if [[ "$client_config_answer" == 1 ]]; then
   # For example if the server IP is 10.10.10.1/24, the first client
   # would usually have an IP of 10.10.10.2; though this can be any
   # address as long as it's within the range specified for the server.
-
-  for ((i = 1; i <= "$number_of_clients"; i++)); do
+  while read -r i; do
     printf %b\\n "\n${IW}Private address of client # $i (do NOT include /32):${Off}\n"
     read -r -p "Client $i IP: " client_private_address_["$i"]
     # Client name can be anything, mainly to easily identify the device
@@ -349,14 +348,14 @@ Endpoint = $server_public_address:$server_listen_port
 AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 21" >"$my_wgl_folder"/client_configs/"${client_name_["$i"]}".conf
     printf '\e[2J\e[H'
-  done
+  done < <(seq 1 "$number_of_clients")
   printf %b\\n "\nAwesome!\nClient config files were saved to ${IW}$my_wgl_folder/client_configs/${Off}"
 else
   printf %s\\n "+--------------------------------------------+"
   printf %b\\n "${IW}Before ending this script,\nwould you like to setup firewall rules for the new server? (recommended)${Off}\n
   ${BW}1 = yes, 2 = no${Off}\n"
   read -r -p "Choice: " iptables_setup
-  if [[ "$iptables_setup" == 1 ]]; then
+  if [ "$iptables_setup" = 1 ]; then
     sudo bash "$my_wgl_folder"/Scripts/setup_iptables.sh
   else
     printf %b\\n "Sounds good. Ending the scritp..."
@@ -369,13 +368,13 @@ the client configs.\n\n Would you like to have QR codes generated?
 
 read -r -p "Choice: " generate_qr_code
 
-if [[ "$generate_qr_code" == 1 ]]; then
-  for ((q = 1; q <= "$number_of_clients"; q++)); do
+if [ "$generate_qr_code" = 1 ]; then
+  while read -r q; do
     printf %b\\n "${BR}${client_name_[$q]}${Off}\n"
     qrencode -t ansiutf8 <"$my_wgl_folder"/client_configs/"${client_name_["$q"]}".conf
     printf %s\\n "+--------------------------------------------+"
-  done
-elif [[ "$generate_qr_code" == 2 ]]; then
+  done < <(seq 1 "$number_of_clients")
+elif [ "$generate_qr_code" = 2 ]; then
   printf %b\\n "\nAlright.. Moving on!\n+--------------------------------------------+"
 else
   printf %b\\n "Sorry, wrong choice! Moving on with the script."
@@ -387,20 +386,20 @@ read -r -p "Choice: " configure_server_with_clients
 
 # If you chose to add client info to the server config AND to save the server config
 # to /etc/wireguard/, then the script will add the clients to that config
-if [[ "$configure_server_with_clients" == 1 ]]; then
-  for ((a = 1; a <= "$number_of_clients"; a++)); do
+if [ "$configure_server_with_clients" = 1 ]; then
+  while read -r a; do
     printf %b\\n "\n[Peer]
 PublicKey = ${client_public_key_["$a"]}
 AllowedIPs = ${client_private_address_["$a"]}/32\n" >>/etc/wireguard/"$wg_serv_iface".conf
-  done
-elif [[ "$configure_server_with_clients" == 2 ]]; then
+  done < <(seq 1 "$number_of_clients")
+elif [ "$configure_server_with_clients" = 2 ]; then
   printf %b\\n "\nAlright, you may add the following to a server config file to setup clients.
 \n-----------------\n"
-  for ((d = 1; d <= "$number_of_clients"; d++)); do
+  while read -r d; do
     printf %b\\n "\n${IY}[Peer]
 PublicKey = ${client_public_key_["$d"]}
 AllowedIPs = ${client_private_address_["$d"]}/32${Off}\n"
-  done
+  done < <(seq 1 "$number_of_clients")
 fi
 
 printf %b\\n "-----------------"
@@ -415,10 +414,10 @@ Would you like to bring WireGuard interface up and to enable the service on boot
 
 read -r -p "Choice: " enable_on_boot
 printf '\e[2J\e[H'
-if [[ "$enable_on_boot" == 1 ]]; then
+if [ "$enable_on_boot" = 1 ]; then
   # If current OS is FreeBSD - we wont use systemd as we would've for supported linux distros.
   freebsd_os=$(uname -a | awk '{print $1}' | grep -i -c FreeBSD)
-  if [[ "$freebsd_os" -gt 0 ]]; then
+  if [ "$freebsd_os" -gt 0 ]; then
     printf %b\\n "\n${IY}chown -v root:root /etc/wireguard/$wg_serv_iface.conf
 chmod -v 600 /etc/wireguard/$wg_serv_iface.conf
 sysrc wireguard_enable=\"YES\"
@@ -476,7 +475,7 @@ service wireguard start${Off}\n"
       ;;
     esac
   fi
-elif [[ "$enable_on_boot" == 2 ]]; then
+elif [ "$enable_on_boot" = 2 ]; then
   printf %b\\n "\n${IW} To manually enable the service and bring tunnel interface up,
   the following commands can be used:${Off}"
   printf %b\\n "\n${IY}chown -v root:root /etc/wireguard/$wg_serv_iface.conf
@@ -489,7 +488,7 @@ printf %b\\n "\n${IW}Before ending this script, would you like to setup firewall
 \n${BW}1 = yes, 2 = no${Off}\n"
 
 read -r -p "Choice: " iptables_setup
-if [[ "$iptables_setup" == 1 ]]; then
+if [ "$iptables_setup" = 1 ]; then
   sudo bash "$my_wgl_folder"/Scripts/setup_iptables.sh
 else
   printf %b\\n "Sounds good. Ending the script..."

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-function determine_os() {
+determine_os() {
   {
     ubuntu_os=$(lsb_release -a | grep -i -c Ubuntu)
     arch_os=$(hostnamectl | grep -i -c "Arch Linux")
@@ -10,19 +10,19 @@ function determine_os() {
     manjaro_os=$(hostnamectl | grep -i -c Manjaro)
     freebsd_os=$(uname -a | awk '{print $1}' | grep -i -c FreeBSD)
   } &>/dev/null
-  if [[ "$ubuntu_os" -gt 0 ]]; then
+  if [ "$ubuntu_os" -gt 0 ]; then
     distro=ubuntu
-  elif [[ "$arch_os" -gt 0 ]]; then
+  elif [ "$arch_os" -gt 0 ]; then
     distro=arch
-  elif [[ "$cent_os" -gt 0 ]]; then
+  elif [ "$cent_os" -gt 0 ]; then
     distro=centos
-  elif [[ "$debian_os" -gt 0 ]]; then
+  elif [ "$debian_os" -gt 0 ]; then
     distro=debian
-  elif [[ "$fedora_os" -gt 0 ]]; then
+  elif [ "$fedora_os" -gt 0 ]; then
     distro=fedora
-  elif [[ "$manjaro_os" -gt 0 ]]; then
+  elif [ "$manjaro_os" -gt 0 ]; then
     distro=manjaro
-  elif [[ "$freebsd_os" -gt 0 ]]; then
+  elif [ "$freebsd_os" -gt 0 ]; then
     distro=freebsd
   else
     printf %b\\n "The operating system is not supported by this script.
@@ -32,10 +32,10 @@ function determine_os() {
 
   ########### UBUNTU ###########
   ##############################
-  if [[ "$distro" == "ubuntu" ]]; then
+  if [ "$distro" = "ubuntu" ]; then
     check_if_wg_installed=$(dpkg-query -l | grep -i -c wireguard-tools)
     # If WireGuard is NOT installed, offer to install
-    if [[ "$check_if_wg_installed" == 0 ]]; then
+    if [ "$check_if_wg_installed" = 0 ]; then
       printf %b\\n "
   +---------------------------------------------+
       ${BW}OS Type: Ubuntu
@@ -45,12 +45,12 @@ function determine_os() {
   +---------------------------------------------+
       ${BW}1 = yes, 2 = no${Off}"
       read -r install_wireguard
-      if [[ "$install_wireguard" == 1 ]]; then
+      if [ "$install_wireguard" = 1 ]; then
         # If chosen to install, proceed with installation
         add-apt-repository ppa:wireguard/wireguard
         apt-get update
         apt-get install wireguard
-      elif [[ "$install_wireguard" == 2 ]]; then
+      elif [ "$install_wireguard" = 2 ]; then
         # If chosen NOT to install, move along
         printf %b\\n "
         Understood, moving on with the script."
@@ -68,10 +68,10 @@ function determine_os() {
 
   ########### ARCH OR MANJARO ###########
   #######################################
-  elif [[ "$distro" == "arch" ]] || [[ "$distro" == "manjaro" ]]; then
+  elif [ "$distro" = "arch" ] || [ "$distro" = "manjaro" ]; then
     check_if_wg_installed=$(pacman -Qe | grep -i -c wireguard-tools)
     # If WireGuard is NOT installed, offer to instal
-    if [[ "$check_if_wg_installed" == 0 ]]; then
+    if [ "$check_if_wg_installed" = 0 ]; then
       printf %b\\n "
   +---------------------------------------------+
       ${BW}OS Type: $distro
@@ -81,11 +81,11 @@ function determine_os() {
   +---------------------------------------------+
       ${BW}1 = yes, 2 = no${Off}"
       read -r install_wireguard
-      if [[ "$install_wireguard" == 1 ]]; then
+      if [ "$install_wireguard" = 1 ]; then
         # If chosen to install, proceed with installation
         pacman -Syyy
         pacman -S wireguard-dkms wireguard-tools --noconfirm
-      elif [[ "$install_wireguard" == 2 ]]; then
+      elif [ "$install_wireguard" = 2 ]; then
         # If chosen NOT to install, move along
         printf %b\\n "
         Understood, moving on with the script."
@@ -103,11 +103,11 @@ function determine_os() {
 
   ########### CENTOS ###########
   ##############################
-  elif [[ "$distro" == "centos" ]]; then
+  elif [ "$distro" = "centos" ]; then
     check_if_wg_installed=$(yum list installed | grep -i -c wireguard-tools)
     mkdir /etc/wireguard/
     # If WireGuard is NOT installed, offer to instal
-    if [[ "$check_if_wg_installed" == 0 ]]; then
+    if [ "$check_if_wg_installed" = 0 ]; then
       printf %b\\n "
   +---------------------------------------------+
         ${BW}OS Type: CentOS
@@ -117,12 +117,12 @@ function determine_os() {
   +---------------------------------------------+
       ${BW}1 = yes, 2 = no${Off}"
       read -r install_wireguard
-      if [[ "$install_wireguard" == 1 ]]; then
+      if [ "$install_wireguard" = 1 ]; then
         # If chosen to install, proceed with installation
         curl -Lo /etc/yum.repos.d/wireguard.repo https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo
         yum install epel-release
         yum install wireguard-dkms wireguard-tools
-      elif [[ "$install_wireguard" == 2 ]]; then
+      elif [ "$install_wireguard" = 2 ]; then
         # If chosen NOT to install, move along
         printf %b\\n "
         Understood, moving on with the script."
@@ -140,10 +140,10 @@ function determine_os() {
 
   ########### Fedora ###########
   ##############################
-  elif [[ "$distro" == "fedora" ]]; then
+  elif [ "$distro" = "fedora" ]; then
     check_if_wg_installed=$(dnf list installed | grep -i -c wireguard-tools)
     # If WireGuard is NOT installed, offer to instal
-    if [[ "$check_if_wg_installed" == 0 ]]; then
+    if [ "$check_if_wg_installed" = 0 ]; then
       printf %b\\n "
   +---------------------------------------------+
         ${BW}OS Type: Fedora
@@ -153,11 +153,11 @@ function determine_os() {
   +---------------------------------------------+
       ${BW}1 = yes, 2 = no${Off}"
       read -r install_wireguard
-      if [[ "$install_wireguard" == 1 ]]; then
+      if [ "$install_wireguard" = 1 ]; then
         # If chosen to install, proceed with installation
         dnf copr enable jdoss/wireguard
         dnf install wireguard-dkms wireguard-tools
-      elif [[ "$install_wireguard" == 2 ]]; then
+      elif [ "$install_wireguard" = 2 ]; then
         # If chosen NOT to install, move along
         printf %b\\n "
         Understood, moving on with the script."
@@ -175,10 +175,10 @@ function determine_os() {
 
   ########### Debian ###########
   ##############################
-  elif [[ "$distro" == "debian" ]]; then
+  elif [ "$distro" = "debian" ]; then
     check_if_wg_installed=$(dpkg-query -l | grep -i -c wireguard-tools)
     # If WireGuard is NOT installed, offer to instal
-    if [[ "$check_if_wg_installed" == 0 ]]; then
+    if [ "$check_if_wg_installed" = 0 ]; then
       printf %b\\n "
   +---------------------------------------------+
       ${BW}OS Type: Debian
@@ -188,13 +188,13 @@ function determine_os() {
   +---------------------------------------------+
       ${BW}1 = yes, 2 = no${Off}"
       read -r install_wireguard
-      if [[ "$install_wireguard" == 1 ]]; then
+      if [ "$install_wireguard" = 1 ]; then
         # If chosen to install, proceed with installation
         printf %s\\n "deb http://deb.debian.org/debian/ unstable main" >/etc/apt/sources.list.d/unstable.list
         printf 'Package: *\nPin: release a=unstable\nPin-Priority: 90\n' >/etc/apt/preferences.d/limit-unstable
         apt update
         apt install wireguard
-      elif [[ "$install_wireguard" == 2 ]]; then
+      elif [ "$install_wireguard" = 2 ]; then
         # If chosen NOT to install, move along
         printf %b\\n "
         Understood, moving on with the script."
@@ -212,10 +212,10 @@ function determine_os() {
 
   ########### FreeBSD ###########
   ##############################
-  elif [[ "$distro" == "freebsd" ]]; then
+  elif [ "$distro" = "freebsd" ]; then
     check_if_wg_installed=$(pkg info | grep -i -c wireguard)
     check_if_sudo_installed=$(pkg info | grep -i -c sudo)
-    if [[ "$check_if_sudo_installed" == 0 ]]; then
+    if [ "$check_if_sudo_installed" = 0 ]; then
       printf %b\\n "\n sudo is not istalled...
     At this time, the script needs sudo package to work properly on FreeBSD.
     
@@ -224,7 +224,7 @@ function determine_os() {
       exit
     else
       # If WireGuard is NOT installed, offer to instal
-      if [[ "$check_if_wg_installed" == 0 ]]; then
+      if [ "$check_if_wg_installed" = 0 ]; then
         printf %b\\n "
   +---------------------------------------------+
       ${BW}OS Type: FreeBSD
@@ -234,11 +234,11 @@ function determine_os() {
   +---------------------------------------------+
       ${BW}1 = yes, 2 = no${Off}"
         read -r install_wireguard
-        if [[ "$install_wireguard" == 1 ]]; then
+        if [ "$install_wireguard" = 1 ]; then
           # If chosen to install, proceed with installation
           pkg update
           pkg install wireguard
-        elif [[ "$install_wireguard" == 2 ]]; then
+        elif [ "$install_wireguard" = 2 ]; then
           # If chosen NOT to install, move along
           printf %b\\n "
         Understood, moving on with the script."
@@ -257,7 +257,7 @@ function determine_os() {
   fi
 }
 
-function colours() {
+colours() {
   # Borrowed from https://gist.github.com/nbrew/9278728
 
   # Reset
