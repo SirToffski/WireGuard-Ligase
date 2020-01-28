@@ -46,7 +46,7 @@ read -r number_of_clients
 printf %b\\n "\nSpecify the DNS server your clients will use.\n"
 read -r client_dns
 printf %b\\n "\nNext steps will ask to provide private address and a name for each client, one at a time.\n"
-while read -r i; do
+for i in $(seq 1 "$number_of_clients"); do
   printf %b\\n "\nPrivate address of a client (do NOT include /32):\n"
   read -r client_private_address_["$i"]
   printf %b\\n "\nProvide the name of the client\n"
@@ -70,7 +70,7 @@ PublicKey = $sever_public_key_output
 Endpoint = $server_details
 AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 21" >"$my_wgl_folder"/client_configs/"${client_name_["$i"]}".conf
-done < <(seq 1 "$number_of_clients")
+done
 
 printf %b\\n "\nAwesome!\nClient config files were saved to $my_wgl_folder/client_configs/"
 
@@ -88,25 +88,25 @@ if [ "$configure_server_with_clients" = 1 ]; then
   NOTE: You need to disable server WireGuard interface before changing the config."
 
   read -r server_file_for_clients
-  while read -r c; do
+  for c in $(seq 1 "$number_of_clients"); do
     printf %b\\n "
 [Peer]
 PublicKey = ${client_public_key_["$c"]}
 AllowedIPs = ${client_private_address_["$c"]}/32
   " | tee -a /etc/wireguard/"$server_file_for_clients".conf >/dev/null
-  done < <(seq 1 "$number_of_clients")
+  done
 else
   printf %b\\n "
   Alright, you may add the following to a server config file to setup clients.
 
   -----------------
   "
-  while read -r d; do
+  for d in $(seq 1 "$number_of_clients"); do
     printf %b\\n "
 [Peer]
 PublicKey = ${client_public_key_["$d"]}
 AllowedIPs = ${client_private_address_["$d"]}/32
 "
-  done < <(seq 1 "$number_of_clients")
+  done
   printf %b\\n "-----------------"
 fi

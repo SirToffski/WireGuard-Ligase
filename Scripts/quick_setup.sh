@@ -35,9 +35,9 @@ server_subnet="$private_range.0/25"
 # client_fourth_octet="$((i + 9))" --- this is un-used at the moment and reserved for future
 number_of_clients="4"
 create_client_ip_range() {
-  while read -r i; do
+  for i in $(seq 1 "$number_of_clients"); do
     printf %b\\n "\n${BR}$private_range.$((i + 9))"
-  done < <(seq 1 "$number_of_clients")
+  done
 }
 local_interface="eth0"
 server_listen_port="51820"
@@ -161,7 +161,7 @@ case "$proceed_quick_setup" in
     printf %s\\n "$new_server_config" >"$config_file_name".txt && printf %s\\n "$new_server_config" >/etc/wireguard/"$config_file_name".conf
 
     # Generating client keys
-    while read -r i; do
+    for i in $(seq 1 "$number_of_clients"); do
       wg genkey | tee "$my_wgl_folder"/keys/client_"$i"_Privatekey | wg pubkey >"$my_wgl_folder"/keys/client_"$i"_Publickey
 
       chmod 600 "$my_wgl_folder"/keys/client_"$i"_Privatekey
@@ -191,7 +191,7 @@ PersistentKeepalive = 21" >"$my_wgl_folder"/client_configs/client_["$i"].conf
 PublicKey = ${client_public_key_["$i"]}
 AllowedIPs = $private_range.$((i + 9))/32\n" | tee -a /etc/wireguard/"$config_file_name".conf >/dev/null
 
-    done < <(seq 1 "$number_of_clients")
+    done
 
     ####### ENABLE WireGuard INTERFACE AND SERVICE  BEGINS #######
     sleep 1
@@ -508,11 +508,11 @@ You may also need to reboot the server."
     read -r generate_qr_code
 
     if [ "$generate_qr_code" = 1 ]; then
-      while read -r q; do
+      for q in $(seq 1 "$number_of_clients"); do
         printf %b\\n "${BR}client_[$q]${Off}\n"
         qrencode -t ansiutf8 <"$my_wgl_folder"/client_configs/client_["$q"].conf
         printf %s\\n "+--------------------------------------------+"
-      done < <(seq 1 "$number_of_clients")
+      done
     elif [ "$generate_qr_code" = 2 ]; then
       printf %b\\n "\nAlright.. Moving on!\n+--------------------------------------------+"
     else

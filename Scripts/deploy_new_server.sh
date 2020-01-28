@@ -315,7 +315,7 @@ if [ "$client_config_answer" = 1 ]; then
   # For example if the server IP is 10.10.10.1/24, the first client
   # would usually have an IP of 10.10.10.2; though this can be any
   # address as long as it's within the range specified for the server.
-  while read -r i; do
+  for i in $(seq 1 "$number_of_clients"); do
     printf %b\\n "\n${IW}Private address of client # $i (do NOT include /32):${Off}\n"
     read -r -p "Client $i IP: " client_private_address_["$i"]
     # Client name can be anything, mainly to easily identify the device
@@ -348,7 +348,7 @@ Endpoint = $server_public_address:$server_listen_port
 AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 21" >"$my_wgl_folder"/client_configs/"${client_name_["$i"]}".conf
     printf '\e[2J\e[H'
-  done < <(seq 1 "$number_of_clients")
+  done
   printf %b\\n "\nAwesome!\nClient config files were saved to ${IW}$my_wgl_folder/client_configs/${Off}"
 else
   printf %s\\n "+--------------------------------------------+"
@@ -369,11 +369,11 @@ the client configs.\n\n Would you like to have QR codes generated?
 read -r -p "Choice: " generate_qr_code
 
 if [ "$generate_qr_code" = 1 ]; then
-  while read -r q; do
+  for q in $(seq 1 "$number_of_clients"); do
     printf %b\\n "${BR}${client_name_[$q]}${Off}\n"
     qrencode -t ansiutf8 <"$my_wgl_folder"/client_configs/"${client_name_["$q"]}".conf
     printf %s\\n "+--------------------------------------------+"
-  done < <(seq 1 "$number_of_clients")
+  done
 elif [ "$generate_qr_code" = 2 ]; then
   printf %b\\n "\nAlright.. Moving on!\n+--------------------------------------------+"
 else
@@ -387,19 +387,19 @@ read -r -p "Choice: " configure_server_with_clients
 # If you chose to add client info to the server config AND to save the server config
 # to /etc/wireguard/, then the script will add the clients to that config
 if [ "$configure_server_with_clients" = 1 ]; then
-  while read -r a; do
+  for a in $(seq 1 "$number_of_clients"); do
     printf %b\\n "\n[Peer]
 PublicKey = ${client_public_key_["$a"]}
 AllowedIPs = ${client_private_address_["$a"]}/32\n" >>/etc/wireguard/"$wg_serv_iface".conf
-  done < <(seq 1 "$number_of_clients")
+  done
 elif [ "$configure_server_with_clients" = 2 ]; then
   printf %b\\n "\nAlright, you may add the following to a server config file to setup clients.
 \n-----------------\n"
-  while read -r d; do
+  for d in $(seq 1 "$number_of_clients"); do
     printf %b\\n "\n${IY}[Peer]
 PublicKey = ${client_public_key_["$d"]}
 AllowedIPs = ${client_private_address_["$d"]}/32${Off}\n"
-  done < <(seq 1 "$number_of_clients")
+  done
 fi
 
 printf %b\\n "-----------------"
