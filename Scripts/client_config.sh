@@ -5,6 +5,7 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
+my_wgl_folder="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. >/dev/null 2>&1 && pwd)"
 # A simple check if the entire repo was cloned.
 ## If not, working directory is a directory of the currently running script.
 check_for_full_clone="$my_wgl_folder/configure-wireguard.sh"
