@@ -134,15 +134,15 @@ Press e/E to exit
 " your_choice
 
 case "$your_choice" in
-[Rr]*)
-  sudo bash "$my_wgl_folder"/Scripts/deploy_new_server.sh
-  ;;
-[Ee]*)
-  exit
-  ;;
-*)
-  printf '\e[2J\e[H'
-  ;;
+  [Rr]*)
+    sudo bash "$my_wgl_folder"/Scripts/deploy_new_server.sh
+    ;;
+  [Ee]*)
+    exit
+    ;;
+  *)
+    printf '\e[2J\e[H'
+    ;;
 esac
 
 printf %b\\n "\n+--------------------------------------------+
@@ -432,19 +432,19 @@ service wireguard start${Off}\n"
   " your_choice
 
     case "$your_choice" in
-    [Rr]*)
-      sudo bash "$my_wgl_folder"/Scripts/deploy_new_server.sh
-      ;;
-    [Ee]*)
-      exit
-      ;;
-    *)
-      chown -v root:root /etc/wireguard/"$wg_serv_iface".conf
-      chmod -v 600 /etc/wireguard/"$wg_serv_iface".conf
-      sysrc wireguard_enable="YES"
-      sysrc wireguard_interfaces="$wg_serv_iface"
-      service wireguard start
-      ;;
+      [Rr]*)
+        sudo bash "$my_wgl_folder"/Scripts/deploy_new_server.sh
+        ;;
+      [Ee]*)
+        exit
+        ;;
+      *)
+        chown -v root:root /etc/wireguard/"$wg_serv_iface".conf
+        chmod -v 600 /etc/wireguard/"$wg_serv_iface".conf
+        sysrc wireguard_enable="YES"
+        sysrc wireguard_interfaces="$wg_serv_iface"
+        service wireguard start
+        ;;
     esac
 
   else
@@ -461,18 +461,18 @@ service wireguard start${Off}\n"
   " your_choice
 
     case "$your_choice" in
-    [Rr]*)
-      sudo bash "$my_wgl_folder"/Scripts/deploy_new_server.sh
-      ;;
-    [Ee]*)
-      exit
-      ;;
-    *)
-      chown -v root:root /etc/wireguard/"$wg_serv_iface".conf
-      chmod -v 600 /etc/wireguard/"$wg_serv_iface".conf
-      wg-quick up "$wg_serv_iface"
-      systemctl enable wg-quick@"$wg_serv_iface".service
-      ;;
+      [Rr]*)
+        sudo bash "$my_wgl_folder"/Scripts/deploy_new_server.sh
+        ;;
+      [Ee]*)
+        exit
+        ;;
+      *)
+        chown -v root:root /etc/wireguard/"$wg_serv_iface".conf
+        chmod -v 600 /etc/wireguard/"$wg_serv_iface".conf
+        wg-quick up "$wg_serv_iface"
+        systemctl enable wg-quick@"$wg_serv_iface".service
+        ;;
     esac
   fi
 elif [ "$enable_on_boot" = 2 ]; then
