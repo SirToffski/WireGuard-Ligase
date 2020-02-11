@@ -764,6 +764,7 @@ ${BW}WireGuard interface = ${BR}$wg_serv_iface${Off}
         exit
         ;;
       *)
+        listen_port="$server_listen_port"
         printf %b\\n "\n${IW}We are going to setup some basic firewall rules so the server can
 work correctly.\n
 Step 1) Please provide the server subnet information to be used.${Off}\n
