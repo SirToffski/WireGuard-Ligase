@@ -1,326 +1,86 @@
 #!/usr/bin/env bash
 
-if [ "$EUID" -ne 0 ]; then
-  printf %s\\n "Please run the script as root."
-  exit 1
-fi
+check_root() {
+  if [ "$EUID" -ne 0 ]; then
+    printf %b\\n "Please run the script as root."
+    exit 1
+  fi
+}
 
-my_wgl_folder="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. >/dev/null 2>&1 && pwd)"
-
-check_for_full_clone="$my_wgl_folder/configure-wireguard.sh"
-if [ ! -f "$check_for_full_clone" ]; then
-  my_wgl_folder="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-else
-  source "$my_wgl_folder"/doc/functions.sh
-  # Setting the colours function
-  colours
-fi
-
-############## Determine OS Type ##############
-###############################################
-ubuntu_os=$(lsb_release -a | grep -i -c Ubuntu)
-arch_os=$(hostnamectl | grep -i -c "Arch Linux")
-cent_os=$(hostnamectl | grep -i -c CentOS)
-debian_os=$(lsb_release -a | grep -i -c Debian)
-fedora_os=$(lsb_release -a | grep -i -c Fedora)
-manjaro_os=$(hostnamectl | grep -i -c Manjaro)
-freebsd_os=$(uname -a | awk '{print $1}' | grep -i -c FreeBSD)
-
-if [ "$ubuntu_os" -gt 0 ]; then
-  distro=ubuntu
-elif [ "$arch_os" -gt 0 ]; then
-  distro=arch
-elif [ "$cent_os" -gt 0 ]; then
-  distro=centos
-elif [ "$debian_os" -gt 0 ]; then
-  distro=debian
-elif [ "$fedora_os" -gt 0 ]; then
-  distro=fedora
-elif [ "$manjaro_os" -gt 0 ]; then
-  distro=manjaro
-elif [ "$freebsd_os" -gt 0 ]; then
-  distro=freebsd
-fi
-###############################################
-###############################################
-
-my_separator="--------------------------------------"
-check_pub_ip=$(curl -s https://checkip.amazonaws.com)
-
-###############################################
-# If deploy_new_server.sh script has already been run,
-# attempt to source variables used in it to avoid repitition
-###############################################
-check_for_shared_vars="$my_wgl_folder/shared_vars.sh"
-if [ -f "$check_for_shared_vars" ]; then
-  source "$my_wgl_folder/shared_vars.sh"
-
+clear_screen() {
   printf '\e[2J\e[H'
+}
 
-  printf %b\\n "\n+--------------------------------------------+
-${BW}Server private address = ${BR}$server_private_range${Off}
-${BW}Server listen port = ${BR}$server_listen_port${Off}
-${BW}Server public address = ${BR}$server_public_address${Off}
-${BW}WAN interface = ${BR}$local_interface${Off}
-${BW}WireGuard interface = ${BR}$wg_serv_iface${Off}
-+--------------------------------------------+\n"
-
+ask_to_proceed() {
   read -n 1 -s -r -p "
 Review the above. 
-Press any key to continue (everything looks correct)
-Press r/R if some variables need to be changed
+Press any key to continue 
+Press r/R to try again
 Press e/E to exit
 " your_choice
+}
 
-  case "$your_choice" in
-  ###############################################
-  # If some variables need to be changed,
-  # start from the beginning and gather the info.
-  ###############################################
-  [Rr]*)
-    printf %b\\n "\n${IW}We are going to setup some basic firewall rules so the server can
-work correctly.\n
-Step 1) Please provide the server subnet information to be used.${Off}\n
-${BW}Example:${IW} If you server IP is ${BR}10.0.0.1/24${IW}, then please type ${BR}10.0.0.0/24${Off}\n"
+source_variables() {
+  # Default working directory of the script.
+  ## Requirements: Cloning the entire repository.
+  my_wgl_folder="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. >/dev/null 2>&1 && pwd)"
+  # A simple check if the entire repo was cloned.
+  ## If not, working directory is a directory of the currently running script.
+  check_for_full_clone="$my_wgl_folder/configure-wireguard.sh"
+  if [ ! -f "$check_for_full_clone" ]; then
+    my_wgl_folder="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+    ############## Determine OS Type ##############
+    ###############################################
+    ubuntu_os=$(lsb_release -a | grep -i -c Ubuntu)
+    arch_os=$(hostnamectl | grep -i -c "Arch Linux")
+    cent_os=$(hostnamectl | grep -i -c CentOS)
+    debian_os=$(lsb_release -a | grep -i -c Debian)
+    fedora_os=$(lsb_release -a | grep -i -c Fedora)
+    manjaro_os=$(hostnamectl | grep -i -c Manjaro)
+    freebsd_os=$(uname -a | awk '{print $1}' | grep -i -c FreeBSD)
 
-    read -r -p "Server subnet: " server_subnet
-
-    printf '\e[2J\e[H'
-
-    printf %b\\n "
-+--------------------------------------------+
-${BW}Server subnet = ${BR}$server_subnet${Off}
-+--------------------------------------------+
-
-${IW}Step 2) Please also provide the listen port of your server.${Off}
-
-${BW}Example: ${BR}51820${Off}"
-
-    read -r -p "Server listen port: " listen_port
-
-    printf '\e[2J\e[H'
-
-    # Public IP address of the server hosting the WireGuard server
-    printf %b\\n "
-+--------------------------------------------+
-${BW}Server subnet = ${BR}$server_subnet${Off}
-${BW}Server port = ${BR}$listen_port${Off}
-+--------------------------------------------+
-
-${BW}Step 3)${Off} ${IW}The public IP address of this machine is $check_pub_ip. 
-Is this the address you would like to use? ${Off}
-
-${BW}1 = yes, 2 = no${Off}"
-    read -r -p "Choice: " public_address
-
-    printf %b\\n "$my_separator"
-
-    if [ "$public_address" = 1 ]; then
-      server_public_address="$check_pub_ip"
-    elif [ "$public_address" = 2 ]; then
-      printf %b\\n "
-${IW}Please specify the public address of the server.${Off}
-"
-      read -r -p "Public IP: " server_public_address
+    if [ "$ubuntu_os" -gt 0 ]; then
+      distro=ubuntu
+    elif [ "$arch_os" -gt 0 ]; then
+      distro=arch
+    elif [ "$cent_os" -gt 0 ]; then
+      distro=centos
+    elif [ "$debian_os" -gt 0 ]; then
+      distro=debian
+    elif [ "$fedora_os" -gt 0 ]; then
+      distro=fedora
+    elif [ "$manjaro_os" -gt 0 ]; then
+      distro=manjaro
+    elif [ "$freebsd_os" -gt 0 ]; then
+      distro=freebsd
     fi
-
-    printf '\e[2J\e[H'
-
-    printf %b\\n "
-+--------------------------------------------+
-${BW}Server subnet = ${BR}$server_subnet${Off}
-${BW}Server port = ${BR}$listen_port${Off}
-${BW}Server public address = ${BR}$server_public_address${Off}
-+--------------------------------------------+
-
-${BW}Step 4)${IW} Please also provide the internet facing interface of the server. 
-${BW}Example: ${BR}eth0${Off}
-
-Available interfaces are:
-+--------------------+
-$(ip -br a | awk '{print $1}')
-+--------------------+
-"
-
-    read -r -p "Interface: " local_interface
-    printf '\e[2J\e[H'
-
-    printf %b\\n "
-+--------------------------------------------+
-${BW}Server subnet = ${BR}$server_subnet${Off}
-${BW}Server port = ${BR}$listen_port${Off}
-${BW}Server public address = ${BR}$server_public_address${Off}
-${BW}WAN Interface = ${BR}$local_interface${Off}
-+--------------------------------------------+
-
-${IW}Step 5) Specify wireguard server interface name 
-(will be the same as config name, without .conf)${Off}
-"
-
-    read -r -p "WireGuard Interface: " wg_serv_iface
-
-    printf '\e[2J\e[H'
-    ;;
-  [Ee]*)
-    exit
-    ;;
-  *)
-    printf %b\\n "\n${IW}We are going to setup some basic firewall rules so the server can
-work correctly.\n
-Step 1) Please provide the server subnet information to be used.${Off}\n
-${BW}Example:${IW} If you server IP is ${BR}10.0.0.1/24${IW}, then please type ${BR}10.0.0.0/24${Off}\n"
-
-    read -r -p "Server subnet: " server_subnet
-
-    printf '\e[2J\e[H'
-    ;;
-  esac
-
-###############################################
-# If no changes are needed,
-# source variables from shared_vars.sh
-###############################################
-else
-
-  printf %b\\n "\n${IW}We are going to setup some basic firewall rules so the server can
-work correctly.\n
-Step 1) Please provide the server subnet information to be used.${Off}\n
-${BW}Example:${IW} If you server IP is ${BR}10.0.0.1/24${IW}, then please type ${BR}10.0.0.0/24${Off}\n"
-
-  read -r -p "Server subnet: " server_subnet
-
-  printf '\e[2J\e[H'
-
-  printf %b\\n "
-+--------------------------------------------+
-${BW}Server subnet = ${BR}$server_subnet${Off}
-+--------------------------------------------+\n
-${IW}Step 2) Please also provide the listen port of your server.${Off}\n
-${BW}Example: ${BR}51820${Off}"
-
-  read -r -p "Server listen port: " listen_port
-
-  printf '\e[2J\e[H'
-
-  # Public IP address of the server hosting the WireGuard server
-  printf %b\\n "
-+--------------------------------------------+
-${BW}Server subnet = ${BR}$server_subnet${Off}
-${BW}Server port = ${BR}$listen_port${Off}
-+--------------------------------------------+
-
-${BW}Step 3)${Off} ${IW}The public IP address of this machine is $check_pub_ip. 
-Is this the address you would like to use? ${Off}\n
-${BW}1 = yes, 2 = no${Off}"
-  read -r -p "Choice: " public_address
-
-  printf %b\\n "$my_separator"
-
-  if [ "$public_address" = 1 ]; then
-    server_public_address="$check_pub_ip"
-  elif [ "$public_address" = 2 ]; then
-    printf %b\\n "\n${IW}Please specify the public address of the server.${Off}\n"
-    read -r -p "Public IP: " server_public_address
+    ###############################################
+    ###############################################P
+  else
+    source "$my_wgl_folder"/doc/functions.sh
+    # Setting the colours function
+    colours
+    determine_os
   fi
 
-  printf '\e[2J\e[H'
+  my_separator="--------------------------------------"
+  check_pub_ip=$(curl -s https://checkip.amazonaws.com)
 
+  ###############################################
+  # If deploy_new_server.sh script has already been run,
+  # attempt to source variables used in it to avoid repitition
+  ###############################################
+  check_for_shared_vars="$my_wgl_folder/shared_vars.sh"
+}
+
+cent_os_iptables() {
   printf %b\\n "
-+--------------------------------------------+
-${BW}Server subnet = ${BR}$server_subnet${Off}
-${BW}Server port = ${BR}$listen_port${Off}
-${BW}Server public address = ${BR}$server_public_address${Off}
-+--------------------------------------------+
-
-${BW}Step 4)${IW} Please also provide the internet facing interface of the server. 
-${BW}Example: ${BR}eth0${Off}\n
-Available interfaces are:
-+--------------------+
-$(ip -br a | awk '{print $1}')
-+--------------------+\n"
-
-  read -r -p "Interface: " local_interface
-  printf '\e[2J\e[H'
-
-  printf %b\\n "
-+--------------------------------------------+
-${BW}Server subnet = ${BR}$server_subnet${Off}
-${BW}Server port = ${BR}$listen_port${Off}
-${BW}Server public address = ${BR}$server_public_address${Off}
-${BW}WAN Interface = ${BR}$local_interface${Off}
-+--------------------------------------------+\n
-${IW}Step 5) Specify wireguard server interface name 
-(will be the same as config name, without .conf)${Off}\n"
-
-  read -r -p "WireGuard Interface: " wg_serv_iface
-
-  printf '\e[2J\e[H'
-
-fi
-
-if [ "$cent_os" -gt 0 ]; then
-  check_if_firewalld_installed=$(yum list installed | grep -i -c firewalld)
-  if [ "$check_if_firewalld_installed" = 1 ]; then
-    printf %b\\n "
-    ${IW}
-    OS Type: CentOS
-    Firewalld: installed
-    The following firewall rules will be configured:${Off}
-
-    ${IY}
-    firewall-cmd --zone=public --add-port=$listen_port/udp
-    firewall-cmd --zone=trusted --add-source=$server_subnet
-    firewall-cmd --permanent --zone=public --add-port=$listen_port/udp
-    firewall-cmd --permanent --zone=trusted --add-source=$server_subnet
-    firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -s $server_subnet ! -d $server_subnet -j SNAT --to $server_public_address
-    firewall-cmd --permanent --direct --add-rule ipv4 nat POSTROUTING 0 -s $server_subnet ! -d $server_subnet -j SNAT --to $server_public_address
-    ${Off}
-
-    # Enabling IP forwarding
-    # In /etc/sysctl.conf, net.ipv4.ip_forward value will be changed to 1:
-    ${IY}net.ipv4.ip_forward=1${Off}
-
-    #To avoid the need to reboot the server
-    ${IY}sysctl -p${Off}\n"
-
-    read -n 1 -s -r -p "
-  Review the above. 
-  Press any key to continue 
-  Press r/R to restart the script
-  Press e/E to exit
-  " your_choice
-
-    case "$your_choice" in
-    [Rr]*)
-      sudo bash "$my_wgl_folder"/Scripts/setup_iptables.sh
-      ;;
-    [Ee]*)
-      exit
-      ;;
-    *)
-      sed -i -E 's/.net.ipv4.ip_forward.*//g' /etc/sysctl.conf
-      printf %s\\n "net.ipv4.ip_forward=1" | tee -a /etc/sysctl.conf >/dev/null
-      sysctl -p
-
-      firewall-cmd --zone=public --add-port="$listen_port"/udp
-      firewall-cmd --zone=trusted --add-source="$server_subnet"
-      firewall-cmd --permanent --zone=public --add-port="$listen_port"/udp
-      firewall-cmd --permanent --zone=trusted --add-source="$server_subnet"
-      firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -s "$server_subnet" ! -d "$server_subnet" -j SNAT --to "$server_public_address"
-      firewall-cmd --permanent --direct --add-rule ipv4 nat POSTROUTING 0 -s "$server_subnet" ! -d "$server_subnet" -j SNAT --to "$server_public_address"
-      printf '\e[2J\e[H'
-      printf %b\\n "${BW}Done!${Off}"
-      ;;
-    esac
-
-  elif [ "$check_if_firewalld_installed" = 0 ]; then
-    printf %b\\n "
     ${IW}
     OS Type: CentOS
     Firewalld: NOT installed - using iptables
     The following firewall rules will be configured:${Off}"
 
-    printf %b\\n "
+  printf %b\\n "
     ${IW}The following iptables will be configured:${Off}
 
     # Track VPN connection
@@ -347,14 +107,9 @@ if [ "$cent_os" -gt 0 ]; then
 
     -------------------------------------------
     "
-    read -n 1 -s -r -p "
-  Review the above. 
-  Press any key to continue 
-  Press r/R to restart the script
-  Press e/E to exit
-  " your_choice
+  ask_to_proceed
 
-    case "$your_choice" in
+  case "$your_choice" in
     [Rr]*)
       sudo bash "$my_wgl_folder"/Scripts/setup_iptables.sh
       ;;
@@ -371,12 +126,62 @@ if [ "$cent_os" -gt 0 ]; then
       iptables -A INPUT -p udp -m udp --dport "$listen_port" -m conntrack --ctstate NEW -j ACCEPT
       iptables -A FORWARD -i "$wg_serv_iface" -o "$wg_serv_iface" -m conntrack --ctstate NEW -j ACCEPT
       iptables -t nat -A POSTROUTING -s "$server_subnet" -o "$local_interface" -j MASQUERADE
-      printf '\e[2J\e[H'
+      clear_screen
       printf %b\\n "${BW}Done!${Off}"
       ;;
-    esac
-  fi
-elif [ "$distro" = "freebsd" ]; then
+  esac
+}
+
+cent_os_firewalld() {
+  printf %b\\n "
+    ${IW}
+    OS Type: CentOS
+    Firewalld: installed
+    The following firewall rules will be configured:${Off}
+
+    ${IY}
+    firewall-cmd --zone=public --add-port=$listen_port/udp
+    firewall-cmd --zone=trusted --add-source=$server_subnet
+    firewall-cmd --permanent --zone=public --add-port=$listen_port/udp
+    firewall-cmd --permanent --zone=trusted --add-source=$server_subnet
+    firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -s $server_subnet ! -d $server_subnet -j SNAT --to $server_public_address
+    firewall-cmd --permanent --direct --add-rule ipv4 nat POSTROUTING 0 -s $server_subnet ! -d $server_subnet -j SNAT --to $server_public_address
+    ${Off}
+
+    # Enabling IP forwarding
+    # In /etc/sysctl.conf, net.ipv4.ip_forward value will be changed to 1:
+    ${IY}net.ipv4.ip_forward=1${Off}
+
+    #To avoid the need to reboot the server
+    ${IY}sysctl -p${Off}\n"
+
+  ask_to_proceed
+
+  case "$your_choice" in
+    [Rr]*)
+      sudo bash "$my_wgl_folder"/Scripts/setup_iptables.sh
+      ;;
+    [Ee]*)
+      exit
+      ;;
+    *)
+      sed -i -E 's/.net.ipv4.ip_forward.*//g' /etc/sysctl.conf
+      printf %s\\n "net.ipv4.ip_forward=1" | tee -a /etc/sysctl.conf >/dev/null
+      sysctl -p
+
+      firewall-cmd --zone=public --add-port="$listen_port"/udp
+      firewall-cmd --zone=trusted --add-source="$server_subnet"
+      firewall-cmd --permanent --zone=public --add-port="$listen_port"/udp
+      firewall-cmd --permanent --zone=trusted --add-source="$server_subnet"
+      firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -s "$server_subnet" ! -d "$server_subnet" -j SNAT --to "$server_public_address"
+      firewall-cmd --permanent --direct --add-rule ipv4 nat POSTROUTING 0 -s "$server_subnet" ! -d "$server_subnet" -j SNAT --to "$server_public_address"
+      clear_screen
+      printf %b\\n "${BW}Done!${Off}"
+      ;;
+  esac
+}
+
+freebsd_ipfw() {
   local_dns=$(grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' /etc/resolv.conf | awk '{print $1}')
   printf %b\\n "
     ${IW}
@@ -525,44 +330,39 @@ ipfw -q nat 1 config if ${BR}$local_interface${IY}same_ports unreg_only reset
 # ipfw built-in default, don't uncomment
 # \$cmd 65535 deny ip from any to any\n ${Off} " | less
 
-  read -n 1 -s -r -p "
-  Review the above. 
-  Press any key to continue 
-  Press r/R to restart the script
-  Press e/E to exit
-  " your_choice
+  ask_to_proceed
 
   case "$your_choice" in
-  [Rr]*)
-    sudo bash "$my_wgl_folder"/Scripts/setup_iptables.sh
-    ;;
-  [Ee]*)
-    exit
-    ;;
-  *)
-    sed -i -E 's/firewall_enable=.*//g' /etc/rc.conf
-    sed -i -E 's/firewall_nat_enable=.*//g' /etc/rc.conf
-    sed -i -E 's/firewall_script=.*//g' /etc/rc.conf
-    sed -i -E 's/firewall_logging=.*//g' /etc/rc.conf
-    sed -i -E 's/gateway_enable=.*//g' /etc/rc.conf
+    [Rr]*)
+      sudo bash "$my_wgl_folder"/Scripts/setup_iptables.sh
+      ;;
+    [Ee]*)
+      exit
+      ;;
+    *)
+      sed -i -E 's/firewall_enable=.*//g' /etc/rc.conf
+      sed -i -E 's/firewall_nat_enable=.*//g' /etc/rc.conf
+      sed -i -E 's/firewall_script=.*//g' /etc/rc.conf
+      sed -i -E 's/firewall_logging=.*//g' /etc/rc.conf
+      sed -i -E 's/gateway_enable=.*//g' /etc/rc.conf
 
-    sed -i -E 's/net.inet.tcp.tso=.*//g' /etc/sysctl.conf
+      sed -i -E 's/net.inet.tcp.tso=.*//g' /etc/sysctl.conf
 
-    printf %b\\n "gateway_enable=\"YES\"
-firewall_enable=\"YES\"
-firewall_nat_enable=\"YES\"
-firewall_script=\"/usr/local/etc/IPFW.rules\"
-firewall_logging=\"YES\"" | tee -a /etc/rc.conf >/dev/null
+      printf %b\\n 'gateway_enable="YES"
+firewall_enable="YES"
+firewall_nat_enable="YES"
+firewall_script="/usr/local/etc/IPFW.rules"
+firewall_logging="YES"' | tee -a /etc/rc.conf >/dev/null
 
-    # Disable TCP segmentation offloading
-    # See https://www.freebsd.org/doc/handbook/firewalls-ipfw.html
-    # 30.4.4 In-kernet NAT
-    printf %b\\n "net.inet.tcp.tso=0" | tee -a /etc/sysctl.conf >/dev/null
+      # Disable TCP segmentation offloading
+      # See https://www.freebsd.org/doc/handbook/firewalls-ipfw.html
+      # 30.4.4 In-kernet NAT
+      printf %b\\n "net.inet.tcp.tso=0" | tee -a /etc/sysctl.conf >/dev/null
 
-    sudo sysctl net.inet.tcp.tso="0"
-    sudo sysctl net.inet.ip.forwarding="1"
+      sudo sysctl net.inet.tcp.tso="0"
+      sudo sysctl net.inet.ip.forwarding="1"
 
-    printf %b\\n "#!/bin/sh
+      printf %b\\n "#!/bin/sh
 # ipfw config/rules
 # from FBSD Handbook, rc.firewall, et. al.
 # Flush all rules before we begin.
@@ -665,17 +465,17 @@ ipfw -q nat 1 config if \$local_interface same_ports unreg_only reset
 # ipfw built-in default, don't uncomment
 # \$cmd 65535 deny ip from any to any" | tee -a /usr/local/etc/IPFW.rules >/dev/null
 
-    printf %b\\n "\n Done!
+      printf %b\\n "\n Done!
 
 After script is finished, you will need to enable firewall using the following command:\n
 \$${BR}sudo service ipfw start${Off}\n
 \nOnce firewall is enabled, you will likely loose connection to the VPS. Simply SSH into the server again.\n
 You may also need to reboot the server."
-    ;;
+      ;;
   esac
+}
 
-else
-
+generic_iptables() {
   printf %b\\n "\n${IW}The following iptables will be configured:${Off}
 
   # Track VPN connection
@@ -703,38 +503,32 @@ else
   -------------------------------------------
   "
 
-  read -n 1 -s -r -p "
-  Review the above. 
-  Press any key to continue 
-  Press r/R to restart the script
-  Press e/E to exit
-  " your_choice
+  ask_to_proceed
 
   case "$your_choice" in
-  [Rr]*)
-    sudo bash "$my_wgl_folder"/Scripts/setup_iptables.sh
-    ;;
-  [Ee]*)
-    exit
-    ;;
-  *)
-    sed -i -E 's/.net.ipv4.ip_forward.*//g' /etc/sysctl.conf
-    printf %s\\n "net.ipv4.ip_forward=1" | tee -a /etc/sysctl.conf >/dev/null
-    sysctl -p
+    [Rr]*)
+      sudo bash "$my_wgl_folder"/Scripts/setup_iptables.sh
+      ;;
+    [Ee]*)
+      exit
+      ;;
+    *)
+      sed -i -E 's/.net.ipv4.ip_forward.*//g' /etc/sysctl.conf
+      printf %s\\n "net.ipv4.ip_forward=1" | tee -a /etc/sysctl.conf >/dev/null
+      sysctl -p
 
-    iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-    iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-    iptables -A INPUT -p udp -m udp --dport "$listen_port" -m conntrack --ctstate NEW -j ACCEPT
-    iptables -A FORWARD -i "$wg_serv_iface" -o "$wg_serv_iface" -m conntrack --ctstate NEW -j ACCEPT
-    iptables -t nat -A POSTROUTING -s "$server_subnet" -o "$local_interface" -j MASQUERADE
-    printf '\e[2J\e[H'
-    printf %b\\n "${BW}Done!${Off}"
-    ;;
+      iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+      iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+      iptables -A INPUT -p udp -m udp --dport "$listen_port" -m conntrack --ctstate NEW -j ACCEPT
+      iptables -A FORWARD -i "$wg_serv_iface" -o "$wg_serv_iface" -m conntrack --ctstate NEW -j ACCEPT
+      iptables -t nat -A POSTROUTING -s "$server_subnet" -o "$local_interface" -j MASQUERADE
+      clear_screen
+      printf %b\\n "${BW}Done!${Off}"
+      ;;
   esac
+}
 
-fi
-
-if [ "$distro" = "ubuntu" ] || [ "$distro" = "debian" ]; then
+save_debian_iptables() {
   printf %b\\n "\n${IW}In order to make the above iptables rules persistent after system reboot,
   ${BR}iptables-persistent${IW} package needs to be installed.\n
   Would you like the script to install iptables-persistent and to enable the service?\n
@@ -744,29 +538,47 @@ if [ "$distro" = "ubuntu" ] || [ "$distro" = "debian" ]; then
   systemctl enable netfilter-persistent
   netfilter-persistent save${Off}"
 
-  read -n 1 -s -r -p "
-  Review the above commands.
+  ask_to_proceed
 
-  Press any key to continue or CTRL+C to stop."
+  case "$your_choice" in
+    [Rr]*)
+      sudo bash "$my_wgl_folder"/Scripts/setup_iptables.sh
+      ;;
+    [Ee]*)
+      exit
+      ;;
+    *)
+      apt-get install iptables-persistent
+      systemctl enable netfilter-persistent
+      netfilter-persistent save
+      ;;
+  esac
+}
 
-  apt-get install iptables-persistent
-  systemctl enable netfilter-persistent
-  netfilter-persistent save
-elif [ "$distro" = "fedora" ]; then
+save_fedora_iptables() {
   printf %b\\n "\n${IW}In order to make the above iptables rules persistent after system reboot,
   netfilter rules will need to be saved.\n
   Would you like the script to save the netfilter rules?\n
   ${IW}Following commands would be used:\n
 
   ${IY}/sbin/service iptables save${Off}"
-  read -n 1 -s -r -p "
-  Review the above commands.
 
-  Press any key to continue or CTRL+C to stop."
+  ask_to_proceed
 
-  /sbin/service iptables save
+  case "$your_choice" in
+    [Rr]*)
+      sudo bash "$my_wgl_folder"/Scripts/setup_iptables.sh
+      ;;
+    [Ee]*)
+      exit
+      ;;
+    *)
+      /sbin/service iptables save
+      ;;
+  esac
+}
 
-elif [ "$distro" = "arch" ] || [ "$distro" = "manjaro" ]; then
+save_arch_iptables() {
   printf %b\\n "\n${IW}In order to make the above iptables rules persistent after system reboot,
   netfilter rules will need to be saved.\n
   Would you like the script to save the netfilter rules?\n
@@ -784,22 +596,29 @@ elif [ "$distro" = "arch" ] || [ "$distro" = "manjaro" ]; then
   systemctl restart iptables.service
   ${Off}
   "
-  read -n 1 -s -r -p "
-  Review the above commands.
+  ask_to_proceed
 
-  Press any key to continue or CTRL+C to stop."
+  case "$your_choice" in
+    [Rr]*)
+      sudo bash "$my_wgl_folder"/Scripts/setup_iptables.sh
+      ;;
+    [Ee]*)
+      exit
+      ;;
+    *)
+      if [ ! -f /etc/iptables/iptables.rules ]; then
+        touch /etc/iptables/iptables.rules
+      fi
+      systemctl enable iptables.service
+      systemctl start iptables.service
+      iptables-save >/etc/iptables/iptables.rules
+      systemctl restart iptables.service
+      ;;
+  esac
+}
 
-  check_iptables_rules=$(ls /etc/iptables/ | grep -c iptables.rules)
-  if [ "$check_iptables_rules" = 0 ]; then
-    touch /etc/iptables/iptables.rules
-  fi
-  systemctl enable iptables.service
-  systemctl start iptables.service
-  iptables-save >/etc/iptables/iptables.rules
-  systemctl restart iptables.service
-elif [ "$distro" = "centos" ]; then
-  if [ "$check_if_firewalld_installed" = 0 ]; then
-    printf %b\\n "
+save_centos_iptables() {
+  printf %b\\n "
   ${IW}In order to make the above iptables rules persistent after system reboot,
   netfilter rules will need to be saved.
 
@@ -815,17 +634,205 @@ First, iptables-service needs to be intalled.
   sudo service iptables save
   ${Off}
   "
-    read -n 1 -s -r -p "
-  Review the above commands.
+  ask_to_proceed
 
-  Press any key to continue or CTRL+C to stop."
-    sudo yum install iptables-services
-    sudo systemctl enable iptables
-    sudo service iptables save
+  case "$your_choice" in
+    [Rr]*)
+      sudo bash "$my_wgl_folder"/Scripts/setup_iptables.sh
+      ;;
+    [Ee]*)
+      exit
+      ;;
+    *)
+      sudo yum install iptables-services
+      sudo systemctl enable iptables
+      sudo service iptables save
+      ;;
+  esac
+}
+
+get_server_info() {
+  printf %b\\n "\n${IW}We are going to setup some basic firewall rules so the server can
+work correctly.\n
+Step 1) Please provide the server subnet information to be used.${Off}\n
+${BW}Example:${IW} If you server IP is ${BR}10.0.0.1/24${IW}, then please type ${BR}10.0.0.0/24${Off}\n"
+
+  read -r -p "Server subnet: " server_subnet
+
+  clear_screen
+
+  printf %b\\n "
++--------------------------------------------+
+${BW}Server subnet = ${BR}$server_subnet${Off}
++--------------------------------------------+
+
+${IW}Step 2) Please also provide the listen port of your server.${Off}
+
+${BW}Example: ${BR}51820${Off}"
+
+  read -r -p "Server listen port: " listen_port
+
+  clear_screen
+
+  # Public IP address of the server hosting the WireGuard server
+  printf %b\\n "
++--------------------------------------------+
+${BW}Server subnet = ${BR}$server_subnet${Off}
+${BW}Server port = ${BR}$listen_port${Off}
++--------------------------------------------+
+
+${BW}Step 3)${Off} ${IW}The public IP address of this machine is $check_pub_ip. 
+Is this the address you would like to use? ${Off}
+
+${BW}1 = yes, 2 = no${Off}"
+  read -r -p "Choice: " public_address
+
+  printf %b\\n "$my_separator"
+
+  if [ "$public_address" = 1 ]; then
+    server_public_address="$check_pub_ip"
+  elif [ "$public_address" = 2 ]; then
+    printf %b\\n "
+${IW}Please specify the public address of the server.${Off}
+"
+    read -r -p "Public IP: " server_public_address
   fi
-fi
 
-printf %b\\n "
+  clear_screen
+
+  printf %b\\n "
++--------------------------------------------+
+${BW}Server subnet = ${BR}$server_subnet${Off}
+${BW}Server port = ${BR}$listen_port${Off}
+${BW}Server public address = ${BR}$server_public_address${Off}
++--------------------------------------------+
+
+${BW}Step 4)${IW} Please also provide the internet facing interface of the server. 
+${BW}Example: ${BR}eth0${Off}
+
+Available interfaces are:
++--------------------+
+$(ip -br a | awk '{print $1}')
++--------------------+
+"
+
+  read -r -p "Interface: " local_interface
+  clear_screen
+
+  printf %b\\n "
++--------------------------------------------+
+${BW}Server subnet = ${BR}$server_subnet${Off}
+${BW}Server port = ${BR}$listen_port${Off}
+${BW}Server public address = ${BR}$server_public_address${Off}
+${BW}WAN Interface = ${BR}$local_interface${Off}
++--------------------------------------------+
+
+${IW}Step 5) Specify wireguard server interface name 
+(will be the same as config name, without .conf)${Off}
+"
+
+  read -r -p "WireGuard Interface: " wg_serv_iface
+
+  clear_screen
+}
+
+gather_information() {
+  if [ -f "$check_for_shared_vars" ]; then
+    source "$my_wgl_folder/shared_vars.sh"
+
+    clear_screen
+
+    printf %b\\n "\n+--------------------------------------------+
+${BW}Server private address = ${BR}$server_private_range${Off}
+${BW}Server listen port = ${BR}$server_listen_port${Off}
+${BW}Server public address = ${BR}$server_public_address${Off}
+${BW}WAN interface = ${BR}$local_interface${Off}
+${BW}WireGuard interface = ${BR}$wg_serv_iface${Off}
++--------------------------------------------+\n"
+
+    ask_to_proceed
+
+    case "$your_choice" in
+      ###############################################
+      # If some variables need to be changed,
+      # start from the beginning and gather the info.
+      ###############################################
+      [Rr]*)
+        get_server_info
+        ;;
+      [Ee]*)
+        exit
+        ;;
+      *)
+        printf %b\\n "\n${IW}We are going to setup some basic firewall rules so the server can
+work correctly.\n
+Step 1) Please provide the server subnet information to be used.${Off}\n
+${BW}Example:${IW} If you server IP is ${BR}10.0.0.1/24${IW}, then please type ${BR}10.0.0.0/24${Off}\n"
+
+        read -r -p "Server subnet: " server_subnet
+
+        clear_screen
+        ;;
+    esac
+
+  ###############################################
+  # If no changes are needed,
+  # source variables from shared_vars.sh
+  ###############################################
+  else
+    get_server_info
+  fi
+}
+
+setup_firewall() {
+
+  if [ "$cent_os" -gt 0 ]; then
+    check_if_firewalld_installed=$(yum list installed | grep -i -c firewalld)
+    if [ "$check_if_firewalld_installed" = 1 ]; then
+      cent_os_firewalld
+    elif [ "$check_if_firewalld_installed" = 0 ]; then
+      cent_os_iptables
+    fi
+  elif [ "$distro" = "freebsd" ]; then
+    freebsd_ipfw
+  else
+    generic_iptables
+  fi
+}
+
+save_firewal_rules() {
+  if [ "$distro" = "ubuntu" ] || [ "$distro" = "debian" ]; then
+    save_debian_iptables
+  elif [ "$distro" = "fedora" ]; then
+    save_fedora_iptables
+  elif
+    [ "$distro" = "arch" ] || [ "$distro" = "manjaro" ]
+  then
+    save_arch_iptables
+  elif
+    [ "$distro" = "centos" ]
+  then
+    if [ "$check_if_firewalld_installed" = 0 ]; then
+      save_centos_iptables
+    fi
+  fi
+}
+
+congrats_message() {
+
+  printf %b\\n "
 Congrats, everything should be up and running now!
 
 Ending the script...."
+}
+
+main() {
+  check_root
+  source_variables
+  gather_information
+  setup_firewall
+  save_firewal_rules
+  congrats_message
+}
+
+main
