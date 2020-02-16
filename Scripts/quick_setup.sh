@@ -244,7 +244,7 @@ firewall_rules() {
     if [ "$distro" = centos ]; then
       check_if_firewalld_installed=$(yum list installed | grep -i -c firewalld)
       sed -i -E 's/.net.ipv4.ip_forward.*//g' /etc/sysctl.conf
-      printf %s\\n "net.ipv4.ip_forward=1" | tee -a /etc/sysctl.conf >/dev/nullf
+      printf %s\\n "net.ipv4.ip_forward=1" | tee -a /etc/sysctl.conf >/dev/null
       sysctl -p
       if [ "$check_if_firewalld_installed" = 0 ]; then
         iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
