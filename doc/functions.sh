@@ -191,10 +191,9 @@ check_wg_installation() {
       read -r install_wireguard
       if [ "$install_wireguard" = 1 ]; then
         # If chosen to install, proceed with installation
-        printf %s\\n "deb http://deb.debian.org/debian/ unstable main" >/etc/apt/sources.list.d/unstable.list
-        printf 'Package: *\nPin: release a=unstable\nPin-Priority: 90\n' >/etc/apt/preferences.d/limit-unstable
-        apt update
-        apt install wireguard
+        printf %s\\n "deb http://deb.debian.org/debian buster-backports main" | tee -a /etc/apt/sources.list.d/buster-backports.list > /dev/null
+        apt-get update
+        apt-get -t buster-backports install wireguard
       elif [ "$install_wireguard" = 2 ]; then
         # If chosen NOT to install, move along
         printf %b\\n "
