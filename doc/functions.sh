@@ -340,3 +340,7 @@ colours() {
     On_IWhite='\033[0;107m'  # White
 
 }
+
+colour_print () {
+    printf %b\\n "$1$2$Off" >&2
+}
