@@ -50,8 +50,8 @@ create_needed_dirs() {
 
 ask_to_proceed() {
   read -n 1 -s -r -p "
-Review the above. 
-Press any key to continue 
+Review the above.
+Press any key to continue
 Press r/R to try again
 Press e/E to exit
 " your_choice
@@ -286,8 +286,14 @@ PrivateKey = $sever_private_key_output
 [Interface]
 Address = $server_private_range/32
 SaveConfig = true
-PostUp = iptables -A FORWARD -i $wg_serv_iface -j ACCEPT; iptables -t nat -A POSTROUTING -o $local_interface -j MASQUERADE; ip6tables -A FORWARD -i $wg_serv_iface -j ACCEPT; ip6tables -t nat -A POSTROUTING -o $local_interface -j MASQUERADE
-PostDown = iptables -D FORWARD -i $wg_serv_iface -j ACCEPT; iptables -t nat -D POSTROUTING -o $local_interface -j MASQUERADE; ip6tables -D FORWARD -i $wg_serv_iface -j ACCEPT; ip6tables -t nat -D POSTROUTING -o $local_interface -j MASQUERADE
+PostUp = iptables -A FORWARD -i $wg_serv_iface -j ACCEPT
+PostUp = iptables -t nat -A POSTROUTING -o $local_interface -j MASQUERADE
+PostUp = ip6tables -A FORWARD -i $wg_serv_iface -j ACCEPT
+PostUp = ip6tables -t nat -A POSTROUTING -o $local_interface -j MASQUERADE
+PostDown = iptables -D FORWARD -i $wg_serv_iface -j ACCEPT
+PostDown = iptables -t nat -D POSTROUTING -o $local_interface -j MASQUERADE
+PostDown = ip6tables -D FORWARD -i $wg_serv_iface -j ACCEPT
+PostDown = ip6tables -t nat -D POSTROUTING -o $local_interface -j MASQUERADE
 ListenPort = $server_listen_port
 PrivateKey = $sever_private_key_output
   ")

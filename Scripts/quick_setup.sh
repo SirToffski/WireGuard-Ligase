@@ -161,8 +161,14 @@ gen_server_conf() {
     new_server_config=$(printf %b\\n "\n[Interface]
   Address = $server_private_address
   SaveConfig = true
-  PostUp = iptables -A FORWARD -i $config_file_name -j ACCEPT; iptables -t nat -A POSTROUTING -o $local_interface -j MASQUERADE; ip6tables -A FORWARD -i $config_file_name -j ACCEPT; ip6tables -t nat -A POSTROUTING -o $local_interface -j MASQUERADE
-  PostDown = iptables -D FORWARD -i $config_file_name -j ACCEPT; iptables -t nat -D POSTROUTING -o $local_interface -j MASQUERADE; ip6tables -D FORWARD -i $config_file_name -j ACCEPT; ip6tables -t nat -D POSTROUTING -o $local_interface -j MASQUERADE
+  PostUp = iptables -A FORWARD -i $config_file_name -j ACCEPT
+  PostUp = iptables -t nat -A POSTROUTING -o $local_interface -j MASQUERADE
+  PostUp = ip6tables -A FORWARD -i $config_file_name -j ACCEPT
+  PostUp = ip6tables -t nat -A POSTROUTING -o $local_interface -j MASQUERADE
+  PostDown = iptables -D FORWARD -i $config_file_name -j ACCEPT
+  PostDown = iptables -t nat -D POSTROUTING -o $local_interface -j MASQUERADE
+  PostDown = ip6tables -D FORWARD -i $config_file_name -j ACCEPT
+  PostDown = ip6tables -t nat -D POSTROUTING -o $local_interface -j MASQUERADE
   ListenPort = $server_listen_port
   PrivateKey = $sever_private_key_output\n")
 
@@ -327,7 +333,7 @@ ipfw disable one_pass
 ipfw -q nat 1 config if \$local_interface same_ports unreg_only reset
 # allow all for localhost
 \$cmd 00010 allow ip from any to any via lo0
-\$cmd 00011 allow ip from any to any via \$wg_serv_iface 
+\$cmd 00011 allow ip from any to any via \$wg_serv_iface
 # NAT-specifig rules
 \$cmd 00099 reass all from any to any in       # reassamble inbound packets
 \$cmd 00100 nat 1 ip from any to any in via \$local_interface # NAT any inbound packets
@@ -353,7 +359,7 @@ ipfw -q nat 1 config if \$local_interface same_ports unreg_only reset
 \$cmd 00233 \$skip udp from any to any src-port \$listen_port out via \$local_interface keep-state
 \$cmd 00234 \$skip udp from \$server_subnet to any out via \$local_interface keep-state
 \$cmd 00235 \$skip tcp from \$server_subnet to any out via \$local_interface setup keep-state
-# allow icmp re: ping, et. al. 
+# allow icmp re: ping, et. al.
 # comment this out to disable ping, et.al.
 \$cmd 00250 \$skip icmp from any to any out via \$local_interface keep-state
 # alllow timeserver out
@@ -363,39 +369,39 @@ ipfw -q nat 1 config if \$local_interface same_ports unreg_only reset
 # allow outbound SSH traffic
 \$cmd 00280 \$skip tcp from any to any dst-port 22 out via \$local_interface setup keep-state
 # otherwise deny outbound packets
-# outbound catchall.  
-\$cmd 00299 deny log ip from any to any out via \$local_interface 
+# outbound catchall.
+\$cmd 00299 deny log ip from any to any out via \$local_interface
 # inbound rules
 # deny inbound traffic to restricted addresses
-\$cmd 00300 deny ip from 192.168.0.0/16 to any in via \$local_interface 
+\$cmd 00300 deny ip from 192.168.0.0/16 to any in via \$local_interface
 \$cmd 00301 deny all from 172.16.0.0/12 to any in via \$local_interface      #RFC 1918 private IP
-\$cmd 00302 deny ip from 10.0.0.0/8 to any in via \$local_interface 
-\$cmd 00303 deny ip from 127.0.0.0/8 to any in via \$local_interface 
-\$cmd 00304 deny ip from 0.0.0.0/8 to any in via \$local_interface 
-\$cmd 00305 deny ip from 169.254.0.0/16 to any in via \$local_interface 
-\$cmd 00306 deny ip from 192.0.2.0/24 to any in via \$local_interface 
-\$cmd 00307 deny ip from 204.152.64.0/23 to any in via \$local_interface 
-\$cmd 00308 deny ip from 224.0.0.0/3 to any in via \$local_interface 
+\$cmd 00302 deny ip from 10.0.0.0/8 to any in via \$local_interface
+\$cmd 00303 deny ip from 127.0.0.0/8 to any in via \$local_interface
+\$cmd 00304 deny ip from 0.0.0.0/8 to any in via \$local_interface
+\$cmd 00305 deny ip from 169.254.0.0/16 to any in via \$local_interface
+\$cmd 00306 deny ip from 192.0.2.0/24 to any in via \$local_interface
+\$cmd 00307 deny ip from 204.152.64.0/23 to any in via \$local_interface
+\$cmd 00308 deny ip from 224.0.0.0/3 to any in via \$local_interface
 # deny inbound packets on these ports
-# auth 113, netbios (services) 137/138/139, hosts-nameserver 81 
-\$cmd 00315 deny tcp from any to any dst-port 113 in via \$local_interface 
-\$cmd 00320 deny tcp from any to any dst-port 137 in via \$local_interface 
-\$cmd 00321 deny tcp from any to any dst-port 138 in via \$local_interface 
-\$cmd 00322 deny tcp from any to any dst-port 139 in via \$local_interface 
-\$cmd 00323 deny tcp from any to any dst-port 81 in via \$local_interface 
+# auth 113, netbios (services) 137/138/139, hosts-nameserver 81
+\$cmd 00315 deny tcp from any to any dst-port 113 in via \$local_interface
+\$cmd 00320 deny tcp from any to any dst-port 137 in via \$local_interface
+\$cmd 00321 deny tcp from any to any dst-port 138 in via \$local_interface
+\$cmd 00322 deny tcp from any to any dst-port 139 in via \$local_interface
+\$cmd 00323 deny tcp from any to any dst-port 81 in via \$local_interface
 # deny partial packets
-\$cmd 00330 deny ip from any to any frag in via \$local_interface 
-\$cmd 00332 deny tcp from any to any established in via \$local_interface 
+\$cmd 00330 deny ip from any to any frag in via \$local_interface
+\$cmd 00332 deny tcp from any to any established in via \$local_interface
 # allowing icmp re: ping, etc.
-\$cmd 00310 allow icmp from any to any in via \$local_interface 
+\$cmd 00310 allow icmp from any to any in via \$local_interface
 # allowing inbound mail, dhcp, http, https
 \$cmd 00370 allow udp from any 67 to me dst-port 68 in via \$local_interface keep-state
-# allow inbound ssh, mail. PROTECTED SERVICES: numbered ABOVE sshguard blacklist range 
+# allow inbound ssh, mail. PROTECTED SERVICES: numbered ABOVE sshguard blacklist range
 \$cmd 700 allow tcp from any to me dst-port \$ssh_port in via \$local_interface setup limit src-addr 2
 \$cmd 702 allow udp from any to any dst-port \$listen_port in via \$local_interface keep-state
 # deny everything else, and log it
 # inbound catchall
-\$cmd 999 deny log ip from any to any in via \$local_interface 
+\$cmd 999 deny log ip from any to any in via \$local_interface
 # NAT
 \$cmd 1000 nat 1 ip from any to any out via \$local_interface # skipto location for outbound stateful rules
 \$cmd 1001 allow ip from any to any
