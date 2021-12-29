@@ -9,7 +9,7 @@
 #                                   __/ |
 #                                  |___/
 # This is a simple bash script to aid in configuring WireGuard tunnels and clients.
-# Q: Hasn't this been done bedofe?
+# Q: Hasn't this been done before?
 # A: Probably.
 # Q: Why another WG configuration script?
 # A: Why not?
