@@ -79,8 +79,9 @@ See [**changelog**](/Changelog.md).
 
   - [x] Add an option for a quick hands-free server deployment / host configuration. Especially useful for people who dont want to answer a lot of questions and are not too fussy about naming clients, etc.
   - [x] Customize server config depending on the distro in use (Arch vs Ubuntu, vs RHEL, etc)
-  - [ ] Add option to configure other UNIX OS types (such as OpenBSD) - work in progress. 
+  - [ ] Add option to configure other UNIX OS types (such as OpenBSD) - work in progress.
     * FreeBSD support has been implemented.
+  - [ ] Add IPv6 suport.
 
 ## Disclaimer
 
